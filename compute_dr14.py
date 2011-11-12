@@ -2,26 +2,26 @@ from numpy  import *
 import math
 
 
-def dr_rms( y ) 
+def dr_rms( y ) :
 	n = y.shape
 	rms = numpy.sqrt( 2 * sum( y , 0 ) / n[0] ) 
 	return rms 
 	
-def u_rms( y ) 
+def u_rms( y ) :
 	n = y.shape
 	rms = numpy.sqrt( sum( y , 0 ) / n[0] ) 
 	return rms 
 
-def decibel_u( y , ref )
+def decibel_u( y , ref ) :
 	20*numpy.log10( ref / y )
 
-def compute_dr14( Y , Fs )
+def compute_dr14( Y , Fs ) :
 	s = Y.shape
 	ch = s[1]
 	
 	block_time = 3 
 	cut_best_bins = 0.2
-	block_samples = block_time * FS
+	block_samples = block_time * Fs
 	
 	seg_cnt = math.floor( s[0] / block_samples )
 	
