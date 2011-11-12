@@ -4,12 +4,14 @@ import read_wav
 
 def main():
 	
-	(Y , fs ) = read_wav.read_wav( "p.wav" )
+	(Y , fs, ch ) = read_wav.read_wav( "01.wav" )
 	(dr14 , p , rms ) = compute_dr14.compute_dr14( Y , fs ) 
 	
-	print( (dr14 , p , rms ) ) 
+	print( "dr14:" , dr14 ) 
+	print( "peak;" , p ) 
+	print( "rms:" , rms ) 
 	
-	print("ciao") 
+	print("end") 
 	
 	return 0
 

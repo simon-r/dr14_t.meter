@@ -23,5 +23,5 @@ def read_wav( file_name ):
 	else:
 		channels = s[1]
 		
-	return ( samples , channels )
+	return ( samples , sample_rate , channels )
 	

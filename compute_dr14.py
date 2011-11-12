@@ -14,7 +14,7 @@ def u_rms( y ) :
 	return rms 
 
 def decibel_u( y , ref ) :
-	20 * numpy.log10( ref / y )
+	return 20 * numpy.log10( y / ref )
 
 def compute_dr14( Y , Fs ) :
 	s = Y.shape
@@ -46,7 +46,7 @@ def compute_dr14( Y , Fs ) :
 	n_blk = round( seg_cnt * cut_best_bins ) 
 	if n_blk == 0:
 		n_blk = 1
-	
+		
 	r = arange(seg_cnt-n_blk,seg_cnt) 
 	
 	rms_sum = numpy.sum( rms[r,:]**2 , 0 ) 
@@ -55,9 +55,7 @@ def compute_dr14( Y , Fs ) :
 	
 	err_i = (rms_sum < 1/(2**24))
 	ch_dr14[err_i] = 0 ;
-	
-	print( ch_dr14 ) 
-	
+		
 	dr14 = round( numpy.mean( ch_dr14 ) )
 	
 	dB_peak = decibel_u( numpy.max( peaks ) , 1 )
@@ -65,5 +63,5 @@ def compute_dr14( Y , Fs ) :
 	y_rms = u_rms( Y ) 
 	dB_rms = decibel_u( numpy.sum( y_rms ) , 1 ) 
 	
-	return (dr14,dB_peak,dB_rms)
+	return ( dr14 , dB_peak , dB_rms )
 	
