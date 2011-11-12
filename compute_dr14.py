@@ -1,5 +1,6 @@
 from numpy  import *
 import math
+import numpy
 
 
 def dr_rms( y ) :
@@ -13,7 +14,7 @@ def u_rms( y ) :
 	return rms 
 
 def decibel_u( y , ref ) :
-	20*numpy.log10( ref / y )
+	20 * numpy.log10( ref / y )
 
 def compute_dr14( Y , Fs ) :
 	s = Y.shape
@@ -55,12 +56,12 @@ def compute_dr14( Y , Fs ) :
 	err_i = (rms_sum < 1/(2**24))
 	ch_dr14[err_i] = 0 ;
 	
-	dr14 = round( numpy.mean( ch_dr_14 ) )
+	dr14 = round( numpy.mean( ch_dr14 ) )
 	
-	dB_peak = decibel_u( max( peaks ) , 1 )
+	dB_peak = decibel_u( numpy.max( peaks ) , 1 )
 	
 	y_rms = u_rms( Y ) 
-	dB_rms = decible_u( numpy.sum( y_rms ) , 1 ) 
+	dB_rms = decibel_u( numpy.sum( y_rms ) , 1 ) 
 	
 	return (dr14,dB_peak,dB_rms)
 	
