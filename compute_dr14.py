@@ -5,12 +5,12 @@ import numpy
 
 def dr_rms( y ) :
 	n = y.shape
-	rms = numpy.sqrt( 2 * sum( y , 0 ) / n[0] ) 
+	rms = numpy.sqrt( 2 * sum( y**2 , 0 ) / n[0] ) 
 	return rms 
 	
 def u_rms( y ) :
 	n = y.shape
-	rms = numpy.sqrt( sum( y , 0 ) / n[0] ) 
+	rms = numpy.sqrt( sum( y**2 , 0 ) / n[0] ) 
 	return rms 
 
 def decibel_u( y , ref ) :
@@ -55,6 +55,8 @@ def compute_dr14( Y , Fs ) :
 	
 	err_i = (rms_sum < 1/(2**24))
 	ch_dr14[err_i] = 0 ;
+	
+	print( ch_dr14 ) 
 	
 	dr14 = round( numpy.mean( ch_dr14 ) )
 	
