@@ -42,7 +42,7 @@ class DynamicRangeMeter:
         txt = ''
         
         txt = tm.new_table(txt)
-        for i in len( self.res_list ):
+        for i in range( len( self.res_list ) ) :
             txt = tm.new_row(txt)
             
             txt = tm.new_cell(txt)
@@ -77,7 +77,7 @@ class Table:
     def end_table( self , txt ):
         pass
     
-    def new_rox( self , txt ):
+    def new_row( self , txt ):
         pass
     
     def end_row( self , txt ):
@@ -99,7 +99,7 @@ class TextTable ( Table ):
     def end_table( self , txt ):
         return txt + '\n\r'
     
-    def new_rox( self , txt ):
+    def new_row( self , txt ):
         return txt + '\n\r'
     
     def end_row( self , txt ):
@@ -120,7 +120,7 @@ class BBcodeTable ( Table ):
     def end_table( self , txt ):
         return txt + '[/table]\n\r'
     
-    def new_rox( self , txt ):
+    def new_row( self , txt ):
         return txt + '[tr]\n\r'
     
     def end_row( self , txt ):
