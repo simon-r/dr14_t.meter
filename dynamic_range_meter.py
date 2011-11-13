@@ -19,7 +19,8 @@ import os
 from compute_dr14 import compute_dr14
 from audio_track import *
 import sys
-
+from audio_decoder import AudioDecoder
+import threading
 
 
 class DynamicRangeMeter:
@@ -57,14 +58,56 @@ class DynamicRangeMeter:
         return len( self.res_list )
  
     
+    def scan_dir_mt( self , dir_name , thread_cnt ):
+        
+        dir_list = sorted( os.listdir( dir_name ) )
+        
+        self.dir_name = dir_name 
+        self.dr14 = 0
+        
+        ad = AudioDecoder()
+        
+        jobs = []
+        for file_name in dir_list:
+            ( fn , ext ) = os.path.splitext( file_name )
+            if ext in ad.formats:
+                jobs.append( os.path.join( dir_name , file_name ) )
+        
+        #print(jobs)
+        
+        empty_res = { 'file_name': '' , 'dr14': 0 , 'dB_peak': -100 , 'dB_rms': -100 }
+        self.res_list = [empty_res for i in range( len(jobs) )]
+        
+        lock_j = threading.Lock()
+        lock_res_list = threading.Lock()
+        
+        threads = [1 for i in range(len(jobs))]
+        job_free = [0]
+        
+        for t in range( thread_cnt ):
+            threads[t] = ScanDirMt( jobs , job_free , lock_j , self.res_list , lock_res_list )
+            
+        for t in range( thread_cnt ):
+            threads[t].start() 
+        
+        for t in range( thread_cnt ):
+            threads[t].join()
+            
+        for d in self.res_list:
+            self.dr14 = self.dr14 + d['dr14']
+            
+        self.dr14 = int( round( self.dr14 / len(jobs) ) )
+        
+        
+    
     def write_dr14( self , tm ):
         txt = ''
         
         txt = txt + " --------------------------------------------------------------------------------- " + tm.nl()
         txt = tm.new_bold(txt)
-        txt = txt + " Analyzed folder:  " + self.dir_name + tm.nl()
+        txt = txt + " Analyzed folder:  " + self.dir_name
         txt = tm.end_bold(txt)
-        txt = txt + " --------------------------------------------------------------------------------- " + tm.nl()
+        txt = txt + tm.nl() + " --------------------------------------------------------------------------------- " + tm.nl()
         
         txt = tm.new_table(txt)
         txt = tm.append_row( txt , [ "-----------", "-----------", "-----------", "-------------------------------" ] )
@@ -79,7 +122,7 @@ class DynamicRangeMeter:
             row.append( " %.2f" % self.res_list[i]['dB_rms'] + ' dB' )
             row.append( self.res_list[i]['file_name'] )
             
-            txt = tm.append_row( row )
+            txt = tm.append_row( txt , row )
 
         
         txt = tm.append_row( txt , [ "-----------", "-----------", "-----------", "-------------------------------" ] )
@@ -106,6 +149,46 @@ class DynamicRangeMeter:
         out_file.close() 
     
     
+class ScanDirMt(threading.Thread):
+    def __init__( self , jobs , job_free , lock_j , res_list , lock_res_list ):
+        threading.Thread.__init__(self)
+        self.jobs = jobs
+        self.jobs_free = job_free
+        self.lock_j = lock_j
+        self.res_list = res_list
+        self.lock_res_list = lock_res_list
+        
+    def run(self):
+       
+        at = AudioTrack() 
+        
+        #print("start .... ")
+        
+        while True:
+            
+            #Aquire the next free job
+            self.lock_j.acquire(blocking=True, timeout=-1)
+            
+            if self.jobs_free[0] >= len(self.jobs):
+                self.lock_j.release()
+                return
+            
+            curr_job =  self.jobs_free[0]
+            file_name = self.jobs[curr_job]
+            self.jobs_free[0] = self.jobs_free[0] + 1
+            
+            self.lock_j.release()
+            
+            if at.open( file_name ):
+                ( dr14, dB_peak, dB_rms ) = compute_dr14( at.Y , at.Fs )
+                self.lock_res_list.acquire(blocking=True, timeout=-1)
+                self.res_list[curr_job] = { 'file_name': file_name , 'dr14': dr14 , 'dB_peak': dB_peak , 'dB_rms': dB_rms }
+                self.lock_res_list.release()
+   
+   
+   
+   
+   
     
 class Table:
     

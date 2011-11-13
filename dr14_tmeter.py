@@ -20,11 +20,19 @@ import read_wav
 from dynamic_range_meter import *
 import os
 from optparse import OptionParser
+from time import clock, time
+import multiprocessing
 
 
 def main():
 	
 	parser = OptionParser(usage="usage: %prog [options] dir_name", version="%prog 0.5" )
+	
+	parser.add_option("-m", "--multithread",
+				action="store_true",
+				dest="multithread",
+				default=False,
+				help="Start the multithread mode")
 	
 	(options, args) = parser.parse_args()
 	
@@ -37,7 +45,17 @@ def main():
 	dir_name = args[0]
 	
 	dr = DynamicRangeMeter()
-	dr.scan_dir(dir_name)
+	
+	cpu = multiprocessing.cpu_count()
+		
+	a = time()
+	if not options.__dict__['multithread']:
+		dr.scan_dir(dir_name)
+	else:
+		dr.scan_dir_mt(dir_name, round( cpu / 2 ) )
+	b = time() - a
+	
+	print( "Elapsed time: " + str(b) )
 	
 	dr.fwrite_dr14( os.path.join( dir_name , "dr14_bbcode.txt" ) , BBcodeTable() )
 	dr.fwrite_dr14( os.path.join( dir_name , "dr14.txt" ) , TextTable() )
