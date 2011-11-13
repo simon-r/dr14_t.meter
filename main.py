@@ -1,15 +1,14 @@
 import compute_dr14
 import read_wav
+from dynamic_range_meter import DynamicRangeMeter
 
 
 def main():
 	
-	(Y , fs, ch ) = read_wav.read_wav( "01.wav" )
-	(dr14 , p , rms ) = compute_dr14.compute_dr14( Y , fs ) 
+	dr = DynamicRangeMeter()
+	dr.scan_dir('.')
 	
-	print( "dr14:" , dr14 ) 
-	print( "peak;" , p ) 
-	print( "rms:" , rms ) 
+	
 	
 	print("end") 
 	
