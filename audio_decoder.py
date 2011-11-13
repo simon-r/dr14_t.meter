@@ -18,7 +18,6 @@ import read_wav
 import os
 import sys
 import tempfile
-import random
 
 class AudioDecoder:
     

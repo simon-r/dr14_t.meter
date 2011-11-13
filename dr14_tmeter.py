@@ -15,12 +15,10 @@
 #along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
-import compute_dr14
-import read_wav
 from dynamic_range_meter import *
 import os
 from optparse import OptionParser
-from time import clock, time
+from time import  time
 import multiprocessing
 
 

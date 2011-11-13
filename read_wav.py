@@ -14,7 +14,6 @@
 #You should have received a copy of the GNU General Public License
 #along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import numpy
 import scipy.io.wavfile
 
 def read_wav( file_name ):
@@ -28,7 +27,7 @@ def read_wav( file_name ):
 	if samples.dtype == 'int16':
 		samples = samples / (convert_16_bit + 1.0)
 	elif samples.dtype == 'int32':
-		samples = samples / (convert_16_bit + 1.0)
+		samples = samples / (convert_32_bit + 1.0)
 	else :
 		samples = samples / (convert_8_bit + 1.0)
 		

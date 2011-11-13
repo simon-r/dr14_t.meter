@@ -14,7 +14,6 @@
 #You should have received a copy of the GNU General Public License
 #along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import read_wav
 import os
 from compute_dr14 import compute_dr14
 from audio_track import *
