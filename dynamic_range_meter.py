@@ -70,7 +70,7 @@ class DynamicRangeMeter:
         for file_name in dir_list:
             ( fn , ext ) = os.path.splitext( file_name )
             if ext in ad.formats:
-                jobs.append( os.path.join( dir_name , file_name ) )
+                jobs.append( file_name )
         
         #print(jobs)
         
@@ -84,7 +84,7 @@ class DynamicRangeMeter:
         job_free = [0]
         
         for t in range( thread_cnt ):
-            threads[t] = ScanDirMt( jobs , job_free , lock_j , self.res_list , lock_res_list )
+            threads[t] = ScanDirMt( dir_name, jobs , job_free , lock_j , self.res_list , lock_res_list )
             
         for t in range( thread_cnt ):
             threads[t].start() 
@@ -150,8 +150,9 @@ class DynamicRangeMeter:
     
 
 class ScanDirMt(threading.Thread):
-    def __init__( self , jobs , job_free , lock_j , res_list , lock_res_list ):
+    def __init__( self ,dir_name , jobs , job_free , lock_j , res_list , lock_res_list ):
         threading.Thread.__init__(self)
+        self.dir_name = dir_name
         self.jobs = jobs
         self.jobs_free = job_free
         self.lock_j = lock_j
@@ -179,8 +180,11 @@ class ScanDirMt(threading.Thread):
             
             self.lock_j.release()
             
-            if at.open( file_name ):
+            full_file = os.path.join( self.dir_name , file_name ) 
+            
+            if at.open( full_file ):
                 ( dr14, dB_peak, dB_rms ) = compute_dr14( at.Y , at.Fs )
+                
                 self.lock_res_list.acquire(blocking=True, timeout=-1)
                 self.res_list[curr_job] = { 'file_name': file_name , 'dr14': dr14 , 'dB_peak': dB_peak , 'dB_rms': dB_rms }
                 self.lock_res_list.release()
@@ -292,6 +296,9 @@ class BBcodeTable ( Table ):
 
 class HtmlTable ( Table ):
 
+    def nl(self):
+        return '<br />\n\r'
+        
     def new_table( self , txt ):
         return txt + '<table>\n\r'
     
