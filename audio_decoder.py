@@ -1,6 +1,8 @@
 import read_wav
 import os
-
+import sys
+import tempfile
+import random
 
 class AudioDecoder:
     
@@ -18,3 +20,45 @@ class AudioDecoder:
             ( Y , Fs , channels ) = read_mp3( file_name )
         elif ext == '.flac':
             ( Y , Fs , channels ) = read_flac( file_name )
+        else:
+            ( Y , Fs , channels ) = ( [] , 0 , 0 )
+        
+        
+        return ( Y , Fs , channels ) 
+
+
+def read_mp3( file_name ):
+
+    if sys.platform.startswith('linux'):
+        mp3_cmd = "lame "
+    elif sys.platform.startswith('win'):
+        mp3_cmd = ".\decoder\lame "
+    
+    
+    tmp_file = tempfile.mktemp() + ".wav"
+    mp3_cmd = mp3_cmd + "--decode " + file_name + " %s " % tmp_file
+    
+    r = os.popen( mp3_cmd ).read() ;
+    ( Y , Fs , channels ) = read_wav.read_wav( tmp_file )
+    os.remove( tmp_file )
+    
+    return ( Y , Fs , channels )
+    
+
+def read_flac( file_name ):
+
+    if sys.platform.startswith('linux'):
+        flac_cmd = "flac "
+    elif sys.platform.startswith('win'):
+        flac_cmd = ".\decoder\flac "
+    
+    
+    tmp_file = tempfile.mktemp() + ".wav"
+    flac_cmd = flac_cmd + "-d " + file_name + " -o %s " % tmp_file
+    
+    r = os.popen( flac_cmd ).read() ;
+    ( Y , Fs , channels ) = read_wav.read_wav( tmp_file )
+    os.remove( tmp_file )
+    
+    return ( Y , Fs , channels )
+  

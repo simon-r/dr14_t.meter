@@ -121,6 +121,7 @@ class DynamicRangeMeter:
         txt = txt + "Official DR value:	  " + str(self.dr14) + "\n\r"
         txt = txt + "\n\r\n\r"
         txt = txt + "=============================================================================================="
+        txt = txt + "\n\r"
         
         
         self.table_txt = txt
