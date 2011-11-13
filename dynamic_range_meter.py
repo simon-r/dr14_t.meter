@@ -106,8 +106,6 @@ class DynamicRangeMeter:
             txt = tm.end_cell(txt)
             
             txt = tm.end_row(txt)
-            
-            txt = tm.new_row(txt)
         
         
         txt = tm.new_cell(txt)
@@ -181,10 +179,10 @@ class TextTable ( Table ):
         return txt + '\n\r'
     
     def new_row( self , txt ):
-        return txt + '\n\r'
+        return txt + ''
     
     def end_row( self , txt ):
-        return '\n\r' + txt + '\n\r'
+        return txt + '\n\r'
     
     def new_cell( self , txt ):
         return txt + ''

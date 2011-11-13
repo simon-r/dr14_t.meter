@@ -40,6 +40,7 @@ def main():
 	dr.scan_dir(dir_name)
 	
 	dr.fwrite_dr14( os.path.join( dir_name , "dr14_bbcode.txt" ) , BBcodeTable() )
+	dr.fwrite_dr14( os.path.join( dir_name , "dr14.txt" ) , TextTable() )
 	
 	print( "DR = " + str( dr.dr14 ) )
 	
