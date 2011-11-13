@@ -49,7 +49,7 @@ def main():
     cpu = multiprocessing.cpu_count()
         
     a = time()
-    if not options.__dict__['multithread']:
+    if not options.multithread:
         dr.scan_dir(dir_name)
     else:
         dr.scan_dir_mt(dir_name, round( cpu / 2 ) )
