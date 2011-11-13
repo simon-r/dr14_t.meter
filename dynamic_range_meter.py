@@ -37,6 +37,10 @@ class DynamicRangeMeter:
             return 0
         
     def scan_dir( self , dir_name ):
+        
+        if not os.path.isdir(dir_name) :
+            return 0
+        
         dir_list = sorted( os.listdir( dir_name ) )
         
         self.res_list = []
@@ -58,6 +62,9 @@ class DynamicRangeMeter:
  
     
     def scan_dir_mt( self , dir_name , thread_cnt ):
+        
+        if not os.path.isdir(dir_name) :
+            return 0
         
         dir_list = sorted( os.listdir( dir_name ) )
         

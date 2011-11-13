@@ -50,12 +50,16 @@ def main():
         
     a = time()
     if not options.multithread:
-        dr.scan_dir(dir_name)
+        r = dr.scan_dir(dir_name)
     else:
-        dr.scan_dir_mt(dir_name, round( cpu / 2 ) )
+        r = dr.scan_dir_mt(dir_name, round( cpu / 2 ) )
     b = time() - a
     
     print( "Elapsed time: " + str(b) )
+    
+    if r == 0:
+        print("No audio files found")
+        return r
     
     dr.fwrite_dr14( os.path.join( dir_name , "dr14_bbcode.txt" ) , BBcodeTable() )
     dr.fwrite_dr14( os.path.join( dir_name , "dr14.txt" ) , TextTable() )
@@ -65,7 +69,7 @@ def main():
 
     print("end") 
     
-    return 0
+    return r
 
 if __name__ == '__main__':
     main()
