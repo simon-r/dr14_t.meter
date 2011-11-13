@@ -114,7 +114,7 @@ def read_mp4( file_name ):
     
     
     tmp_file = tempfile.mktemp() + ".wav"
-    mp4_cmd = mp4_cmd + "-q " + "\"" + file_name + "\"" + " --o %s " % tmp_file
+    mp4_cmd = mp4_cmd + "-q " + "\"" + file_name + "\"" + " -o %s " % tmp_file
     
     print( file_name )
     
