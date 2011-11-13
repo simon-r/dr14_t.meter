@@ -26,7 +26,12 @@ import multiprocessing
     
 def main():
     
-    parser = OptionParser(usage="usage: %prog [options] dir_name", version="%prog 0.5" )
+    desc = "Compute the DR14 of an audio file value according to the algorithm " 
+    desc =  desc + "decribed by the Pleasurize Music Foundation "
+    desc =  desc + "Visit: http://www.dynamicrange.de/" 
+    use = "usage: %prog [options] dir_name"
+
+    parser = OptionParser( description=desc ,  usage=use  , version="%prog 0.5"  )
     
     parser.add_option("-m", "--multithread",
                 action="store_true",
