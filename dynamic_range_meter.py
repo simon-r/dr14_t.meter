@@ -18,7 +18,7 @@ import read_wav
 import os
 from compute_dr14 import compute_dr14
 from audio_track import *
-
+import sys
 
 
 
@@ -60,82 +60,40 @@ class DynamicRangeMeter:
     def write_dr14( self , tm ):
         txt = ''
         
-        txt = txt + " --------------------------------------------------------------------------------- " + "\n\r"
-        txt = txt + " Analyzed folder:  " + self.dir_name + "\n\r"
-        txt = txt + " --------------------------------------------------------------------------------- " + "\n\r"
+        txt = txt + " --------------------------------------------------------------------------------- " + tm.nl()
+        txt = tm.new_bold(txt)
+        txt = txt + " Analyzed folder:  " + self.dir_name + tm.nl()
+        txt = tm.end_bold(txt)
+        txt = txt + " --------------------------------------------------------------------------------- " + tm.nl()
         
         txt = tm.new_table(txt)
-        
-        txt = tm.new_row(txt)
-        
-        txt = tm.new_cell(txt)
-        txt = txt + "-----------"
-        txt = tm.end_cell(txt)
-        
-        txt = tm.new_cell(txt)
-        txt = txt + "-----------"
-        txt = tm.end_cell(txt)
-        
-        txt = tm.new_cell(txt)
-        txt = txt + "-----------"
-        txt = tm.end_cell(txt)
-        
-        txt = tm.new_cell(txt)
-        txt = txt + "-------------------------------"
-        txt = tm.end_cell(txt)
-        
-        txt = tm.end_row(txt)
+        txt = tm.append_row( txt , [ "-----------", "-----------", "-----------", "-------------------------------" ] )
+        txt = tm.append_row( txt , [ "DR", "Peak", "RMS", "File name" ] )
+        txt = tm.append_row( txt , [ "-----------", "-----------", "-----------", "-------------------------------" ] )
         
         for i in range( len( self.res_list ) ) :
-            txt = tm.new_row(txt)
             
-            txt = tm.new_cell(txt)
-            txt = txt + "DR%d" % self.res_list[i]['dr14']
-            txt = tm.end_cell(txt)
+            row = []
+            row.append( "DR%d" % self.res_list[i]['dr14'] )
+            row.append( " %.2f" % self.res_list[i]['dB_peak'] + ' dB' )
+            row.append( " %.2f" % self.res_list[i]['dB_rms'] + ' dB' )
+            row.append( self.res_list[i]['file_name'] )
             
-            txt = tm.new_cell(txt)
-            txt = txt + " %.2f" % self.res_list[i]['dB_peak'] + ' dB'
-            txt = tm.end_cell(txt)
-            
-            txt = tm.new_cell(txt)
-            txt = txt + " %.2f" % self.res_list[i]['dB_rms'] + ' dB'
-            txt = tm.end_cell(txt)
-            
-            txt = tm.new_cell(txt)
-            txt = txt + self.res_list[i]['file_name']
-            txt = tm.end_cell(txt)
-            
-            txt = tm.end_row(txt)
+            txt = tm.append_row( row )
+
         
-        
-        txt = tm.new_cell(txt)
-        txt = txt + "-----------"
-        txt = tm.end_cell(txt)
-        
-        txt = tm.new_cell(txt)
-        txt = txt + "-----------"
-        txt = tm.end_cell(txt)
-        
-        txt = tm.new_cell(txt)
-        txt = txt + "-----------"
-        txt = tm.end_cell(txt)
-        
-        txt = tm.new_cell(txt)
-        txt = txt + "-------------------------------"
-        txt = tm.end_cell(txt)
-        
-        txt = tm.end_row(txt)        
+        txt = tm.append_row( txt , [ "-----------", "-----------", "-----------", "-------------------------------" ] )
         
         txt = tm.end_table(txt)
         
         
-        txt = txt + "\n\r\n\r"
-        txt = txt + "Number of files:	  " + str(len( self.res_list )) + "\n\r"
-        txt = txt + "\n\r\n\r"
-        txt = txt + "Official DR value:	  " + str(self.dr14) + "\n\r"
-        txt = txt + "\n\r\n\r"
+        txt = txt + tm.nl()
+        txt = txt + "Number of files:	  " + str(len( self.res_list )) + tm.nl()
+        txt = txt + tm.nl()
+        txt = txt + "Official DR value:	  " + str(self.dr14) + tm.nl()
+        txt = txt + tm.nl()
         txt = txt + "=============================================================================================="
-        txt = txt + "\n\r"
+        txt = txt + tm.nl()
         
         
         self.table_txt = txt
@@ -150,6 +108,22 @@ class DynamicRangeMeter:
     
     
 class Table:
+    
+    def nl(self):
+        if sys.platform.startswith('linux'):
+            return '\n'
+        elif sys.platform.startswith('win'):
+            return '\n\r'
+    
+    def append_row( self , txt , row_el ):
+        txt = self.new_row(txt)
+        for i in row_el:
+            txt = self.new_cell(txt)
+            txt = txt + i
+            txt = self.end_cell(txt)
+        txt = self.end_row(txt)
+        return txt
+
     def new_table( self , txt ):
         pass
     
@@ -166,6 +140,12 @@ class Table:
         pass
     
     def end_cell( self , txt ):
+        pass
+    
+    def new_bold( self , txt ):
+        pass
+    
+    def end_bold( self , txt ):
         pass
     
     
@@ -173,22 +153,28 @@ class Table:
 class TextTable ( Table ):
 
     def new_table( self , txt ):
-        return txt + '\n\r'
+        return txt + self.nl()
     
     def end_table( self , txt ):
-        return txt + '\n\r'
+        return txt + self.nl()
     
     def new_row( self , txt ):
         return txt + ''
     
     def end_row( self , txt ):
-        return txt + '\n\r'
+        return txt + self.nl()
     
     def new_cell( self , txt ):
         return txt + ''
     
     def end_cell( self , txt ):
         return txt + '\t'
+    
+    def new_bold( self , txt ):
+        return txt + ''
+    
+    def end_bold( self , txt ):
+        return txt + ''
     
     
 class BBcodeTable ( Table ):
@@ -209,6 +195,10 @@ class BBcodeTable ( Table ):
         return txt + '[th]'
     
     def end_cell( self , txt ):
-        return txt + '[/th]\t'
+        return txt + '[/th]'
     
-   
+    def new_bold( self , txt ):
+        return txt + '[b]'
+    
+    def end_bold( self , txt ):
+        return txt + '[/b]'

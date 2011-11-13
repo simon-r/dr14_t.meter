@@ -23,7 +23,7 @@ import random
 class AudioDecoder:
     
     def __init__(self):
-        self.formats = [ '.flac' , '.mp3' ]
+        self.formats = [ '.flac' , '.mp3' , '.ogg' , '.mp4' , '.m4a' ]
     
     def read_track( self , file_name ):
         
@@ -36,6 +36,10 @@ class AudioDecoder:
             ( Y , Fs , channels ) = read_mp3( file_name )
         elif ext == '.flac':
             ( Y , Fs , channels ) = read_flac( file_name )
+        elif ext == '.ogg':
+            ( Y , Fs , channels ) = read_ogg( file_name )
+        elif ext in ['.mp4' , '.m4a' ]:
+            ( Y , Fs , channels ) = read_mp4( file_name )
         else:
             ( Y , Fs , channels ) = ( [] , 0 , 0 )
         
@@ -82,3 +86,41 @@ def read_flac( file_name ):
     
     return ( Y , Fs , channels )
   
+def read_ogg( file_name ):
+
+    if sys.platform.startswith('linux'):
+        ogg_cmd = "oggdec "
+    elif sys.platform.startswith('win'):
+        ogg_cmd = ".\decoder\oggdec "
+    
+    
+    tmp_file = tempfile.mktemp() + ".wav"
+    ogg_cmd = ogg_cmd + "--quiet " + "\"" + file_name + "\"" + " --output %s " % tmp_file
+    
+    print( file_name )
+    
+    r = os.popen( ogg_cmd ).read()
+    ( Y , Fs , channels ) = read_wav.read_wav( tmp_file )
+    os.remove( tmp_file )
+    
+    return ( Y , Fs , channels )
+    
+    
+def read_mp4( file_name ):
+
+    if sys.platform.startswith('linux'):
+        mp4_cmd = "faad "
+    elif sys.platform.startswith('win'):
+        mp4_cmd = ".\decoder\faad "
+    
+    
+    tmp_file = tempfile.mktemp() + ".wav"
+    mp4_cmd = mp4_cmd + "-q " + "\"" + file_name + "\"" + " --o %s " % tmp_file
+    
+    print( file_name )
+    
+    r = os.popen( mp4_cmd ).read()
+    ( Y , Fs , channels ) = read_wav.read_wav( tmp_file )
+    os.remove( tmp_file )
+    
+    return ( Y , Fs , channels )
