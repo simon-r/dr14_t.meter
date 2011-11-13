@@ -25,6 +25,7 @@ class DynamicRangeMeter:
         
         self.res_list = []
         self.dir_name = dir_name 
+        self.dr14 = 0 
         
         at = AudioTrack() 
         for file_name in dir_list:
@@ -32,29 +33,56 @@ class DynamicRangeMeter:
             
             if at.open( full_file ):
                 ( dr14, dB_peak, dB_rms ) = compute_dr14( at.Y , at.Fs )
+                self.dr14 = self.dr14 + dr14
                 res = { 'file_name': file_name , 'dr14': dr14 , 'dB_peak': dB_peak , 'dB_rms': dB_rms }
                 self.res_list.append(res)
-                
+             
+        self.dr14 = round( self.dr14 / len( self.res_list ) )
         return len( self.res_list )
  
     
     def write_dr14( self , tm ):
         txt = ''
         
+        txt = txt + " --------------------------------------------------------------------------------- " + "\n\r"
+        txt = txt + " Analyzed folder:  " + self.dir_name + "\n\r"
+        txt = txt + " --------------------------------------------------------------------------------- " + "\n\r"
+        
         txt = tm.new_table(txt)
+        
+        txt = tm.new_row(txt)
+        
+        txt = tm.new_cell(txt)
+        txt = txt + "-----------"
+        txt = tm.end_cell(txt)
+        
+        txt = tm.new_cell(txt)
+        txt = txt + "-----------"
+        txt = tm.end_cell(txt)
+        
+        txt = tm.new_cell(txt)
+        txt = txt + "-----------"
+        txt = tm.end_cell(txt)
+        
+        txt = tm.new_cell(txt)
+        txt = txt + "-------------------------------"
+        txt = tm.end_cell(txt)
+        
+        txt = tm.end_row(txt)
+        
         for i in range( len( self.res_list ) ) :
             txt = tm.new_row(txt)
             
             txt = tm.new_cell(txt)
-            txt = txt + 'DR' + self.res_list[i]['dr14']
+            txt = txt + "DR%d" % self.res_list[i]['dr14']
             txt = tm.end_cell(txt)
             
             txt = tm.new_cell(txt)
-            txt = txt + self.res_list[i]['dB_peak'] + ' dB'
+            txt = txt + " %.2f" % self.res_list[i]['dB_peak'] + ' dB'
             txt = tm.end_cell(txt)
             
             txt = tm.new_cell(txt)
-            txt = txt + self.res_list[i]['dB_rms'] + ' dB'
+            txt = txt + " %.2f" % self.res_list[i]['dB_rms'] + ' dB'
             txt = tm.end_cell(txt)
             
             txt = tm.new_cell(txt)
@@ -62,11 +90,47 @@ class DynamicRangeMeter:
             txt = tm.end_cell(txt)
             
             txt = tm.end_row(txt)
-        txt = tm.end_table()
+            
+            txt = tm.new_row(txt)
         
-        sel.table_txt = txt
+        
+        txt = tm.new_cell(txt)
+        txt = txt + "-----------"
+        txt = tm.end_cell(txt)
+        
+        txt = tm.new_cell(txt)
+        txt = txt + "-----------"
+        txt = tm.end_cell(txt)
+        
+        txt = tm.new_cell(txt)
+        txt = txt + "-----------"
+        txt = tm.end_cell(txt)
+        
+        txt = tm.new_cell(txt)
+        txt = txt + "-------------------------------"
+        txt = tm.end_cell(txt)
+        
+        txt = tm.end_row(txt)        
+        
+        txt = tm.end_table(txt)
+        
+        
+        txt = txt + "\n\r\n\r"
+        txt = txt + "Number of files:	  " + str(len( self.res_list )) + "\n\r"
+        txt = txt + "\n\r\n\r"
+        txt = txt + "Official DR value:	  " + str(self.dr14) + "\n\r"
+        txt = txt + "\n\r\n\r"
+        txt = txt + "=============================================================================================="
+        
+        
+        self.table_txt = txt
         return txt 
     
+    def fwrite_dr14( self , file_name , tm ):
+        self.write_dr14( tm )
+        out_file = open( file_name , "wt")
+        out_file.write( self.table_txt )
+        out_file.close() 
     
     
     
@@ -103,7 +167,7 @@ class TextTable ( Table ):
         return txt + '\n\r'
     
     def end_row( self , txt ):
-        return txt + '\n\r'
+        return '\n\r' + txt + '\n\r'
     
     def new_cell( self , txt ):
         return txt + ''
@@ -124,7 +188,7 @@ class BBcodeTable ( Table ):
         return txt + '[tr]\n\r'
     
     def end_row( self , txt ):
-        return txt + '[/tr]\n\r'
+        return txt + '\n\r[/tr]\n\r'
     
     def new_cell( self , txt ):
         return txt + '[th]'
