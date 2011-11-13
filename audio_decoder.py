@@ -36,9 +36,11 @@ def read_mp3( file_name ):
     
     
     tmp_file = tempfile.mktemp() + ".wav"
-    mp3_cmd = mp3_cmd + "--decode " + file_name + " %s " % tmp_file
+    mp3_cmd = mp3_cmd + "--silent " + "--decode " + "\"" + file_name + "\"" + " %s " % tmp_file
     
-    r = os.popen( mp3_cmd ).read() ;
+    print( file_name )
+    
+    r = os.popen( mp3_cmd ).read()
     ( Y , Fs , channels ) = read_wav.read_wav( tmp_file )
     os.remove( tmp_file )
     
@@ -54,9 +56,11 @@ def read_flac( file_name ):
     
     
     tmp_file = tempfile.mktemp() + ".wav"
-    flac_cmd = flac_cmd + "-d " + file_name + " -o %s " % tmp_file
+    flac_cmd = flac_cmd + "-s " + "-d " + "\"" + file_name + "\"" + " -o %s " % tmp_file
     
-    r = os.popen( flac_cmd ).read() ;
+    print( file_name )
+    
+    r = os.popen( flac_cmd ).read()
     ( Y , Fs , channels ) = read_wav.read_wav( tmp_file )
     os.remove( tmp_file )
     
