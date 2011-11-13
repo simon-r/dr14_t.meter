@@ -1,3 +1,4 @@
+#!/usr/bin/python3
 # dr14_t.meter: compute the DR14 value of the given audiofiles
 #Copyright (C) 2011  Simone Riva
 #
@@ -34,7 +35,7 @@ def main():
 	
 	(options, args) = parser.parse_args()
 	
-	if len(args) != 1:
+	if len(args) <= 0:
 		parser.error("wrong number of arguments")
 		return 1 
 	
