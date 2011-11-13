@@ -148,6 +148,7 @@ class DynamicRangeMeter:
         out_file.close() 
     
     
+
 class ScanDirMt(threading.Thread):
     def __init__( self , jobs , job_free , lock_j , res_list , lock_res_list ):
         threading.Thread.__init__(self)
@@ -189,6 +190,7 @@ class ScanDirMt(threading.Thread):
    
    
     
+
 class Table:
     
     def nl(self):
@@ -232,6 +234,7 @@ class Table:
     
     
     
+
 class TextTable ( Table ):
 
     def new_table( self , txt ):
@@ -259,6 +262,7 @@ class TextTable ( Table ):
         return txt + ''
     
     
+
 class BBcodeTable ( Table ):
 
     def new_table( self , txt ):
@@ -284,3 +288,30 @@ class BBcodeTable ( Table ):
     
     def end_bold( self , txt ):
         return txt + '[/b]'
+
+
+class HtmlTable ( Table ):
+
+    def new_table( self , txt ):
+        return txt + '<table>\n\r'
+    
+    def end_table( self , txt ):
+        return txt + '</table>\n\r'
+    
+    def new_row( self , txt ):
+        return txt + '<tr>\n\r'
+    
+    def end_row( self , txt ):
+        return txt + '\n\r</tr>\n\r'
+    
+    def new_cell( self , txt ):
+        return txt + '<th>'
+    
+    def end_cell( self , txt ):
+        return txt + '</th>'
+    
+    def new_bold( self , txt ):
+        return txt + '<b>'
+    
+    def end_bold( self , txt ):
+        return txt + '</b>'
