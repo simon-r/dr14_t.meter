@@ -26,8 +26,8 @@ import multiprocessing
     
 def main():
     
-    desc = "Compute the DR14 of an audio file value according to the algorithm " 
-    desc =  desc + "decribed by the Pleasurize Music Foundation "
+    desc = "Compute the DR14 value of an audio file according to the algorithm " 
+    desc =  desc + "described by the Pleasurize Music Foundation "
     desc =  desc + "Visit: http://www.dynamicrange.de/" 
     use = "usage: %prog [options] dir_name"
 
