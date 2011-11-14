@@ -51,7 +51,7 @@ def read_mp3( file_name ):
     if sys.platform.startswith('linux'):
         mp3_cmd = "lame "
     elif sys.platform.startswith('win'):
-        mp3_cmd = ".\decoder\lame "
+        mp3_cmd = ".\\decoder\\lame "
     
     
     tmp_file = tempfile.mktemp() + ".wav"
@@ -71,7 +71,7 @@ def read_flac( file_name ):
     if sys.platform.startswith('linux'):
         flac_cmd = "flac "
     elif sys.platform.startswith('win'):
-        flac_cmd = ".\decoder\flac "
+        flac_cmd = ".\\decoder\\flac "
     
     
     tmp_file = tempfile.mktemp() + ".wav"
@@ -90,7 +90,7 @@ def read_ogg( file_name ):
     if sys.platform.startswith('linux'):
         ogg_cmd = "oggdec "
     elif sys.platform.startswith('win'):
-        ogg_cmd = ".\decoder\oggdec "
+        ogg_cmd = ".\\decoder\\oggdec "
     
     
     tmp_file = tempfile.mktemp() + ".wav"
@@ -110,7 +110,7 @@ def read_mp4( file_name ):
     if sys.platform.startswith('linux'):
         mp4_cmd = "faad "
     elif sys.platform.startswith('win'):
-        mp4_cmd = ".\decoder\faad "
+        mp4_cmd = ".\\decoder\\faad "
     
     
     tmp_file = tempfile.mktemp() + ".wav"

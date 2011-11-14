@@ -31,19 +31,27 @@ class AudioTrack:
         return 1/self.Fs * self.Y.shape[0]
 
     def open( self , file_name ):
+
+        self.Y = numpy.array([])
+        self.Fs = 0
+        self.channels = 0      
         
         if not ( os.path.exists( file_name ) ) :
             return False
         
         ( f , ext ) = os.path.splitext( file_name )
+
+        #print ( "EXT:  " + ext + " " de.formats )
         
         de = AudioDecoder()
-        
+        print ( "EXT:  " + ext + " " + str(ext in de.formats) )
         if ext == '.wav':
             ( self.Y , self.Fs , self.channels ) = read_wav.read_wav( file_name )
         elif ext in de.formats:
+            print( "ciao" )
             ( self.Y , self.Fs , self.channels ) = de.read_track( file_name )
-        
+
+        print( self.channels )
         if self.channels == 0:
             return False
         else:
