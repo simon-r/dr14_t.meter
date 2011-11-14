@@ -41,17 +41,13 @@ class AudioTrack:
         
         ( f , ext ) = os.path.splitext( file_name )
 
-        #print ( "EXT:  " + ext + " " de.formats )
-        
         de = AudioDecoder()
-        print ( "EXT:  " + ext + " " + str(ext in de.formats) )
+
         if ext == '.wav':
             ( self.Y , self.Fs , self.channels ) = read_wav.read_wav( file_name )
         elif ext in de.formats:
-            print( "ciao" )
             ( self.Y , self.Fs , self.channels ) = de.read_track( file_name )
 
-        print( self.channels )
         if self.channels == 0:
             return False
         else:
