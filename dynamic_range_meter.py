@@ -56,9 +56,12 @@ class DynamicRangeMeter:
                 self.dr14 = self.dr14 + dr14
                 res = { 'file_name': file_name , 'dr14': dr14 , 'dB_peak': dB_peak , 'dB_rms': dB_rms }
                 self.res_list.append(res)
-             
-        self.dr14 = int( round( self.dr14 / len( self.res_list ) ) )
-        return len( self.res_list )
+        
+        if len( self.res_list ) > 0:
+            self.dr14 = int( round( self.dr14 / len( self.res_list ) ) )
+            return len( self.res_list )
+        else:
+            return 0
  
     
     def scan_dir_mt( self , dir_name , thread_cnt ):
@@ -87,7 +90,7 @@ class DynamicRangeMeter:
         lock_j = threading.Lock()
         lock_res_list = threading.Lock()
         
-        threads = [1 for i in range(len(jobs))]
+        threads = [1 for i in range(thread_cnt)]
         job_free = [0]
         
         for t in range( thread_cnt ):
@@ -102,7 +105,11 @@ class DynamicRangeMeter:
         for d in self.res_list:
             self.dr14 = self.dr14 + d['dr14']
             
-        self.dr14 = int( round( self.dr14 / len(jobs) ) )
+        if len( self.res_list ) > 0:
+            self.dr14 = int( round( self.dr14 / len( self.res_list ) ) )
+            return len( self.res_list )
+        else:
+            return 0
         
         
     

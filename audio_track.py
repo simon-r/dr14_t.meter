@@ -41,11 +41,13 @@ class AudioTrack:
         
         if ext == '.wav':
             ( self.Y , self.Fs , self.channels ) = read_wav.read_wav( file_name )
-            return True
         elif ext in de.formats:
             ( self.Y , self.Fs , self.channels ) = de.read_track( file_name )
+        
+        if self.channels == 0:
+            return False
+        else:
             return True
         
-        return False
     
     
