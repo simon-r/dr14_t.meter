@@ -75,8 +75,9 @@ def read_flac( file_name ):
 
 
     tmp_file = tempfile.mktemp() + ".wav"
+    
     flac_cmd = flac_cmd + "-s " + "-d " + "\"" + file_name + "\"" + " -o %s " % tmp_file
-
+    print( flac_cmd )
     print( file_name )
 
     r = os.popen( flac_cmd ).read()

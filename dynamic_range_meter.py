@@ -52,6 +52,7 @@ class DynamicRangeMeter:
             full_file = os.path.join( dir_name , file_name )
             
             if at.open( full_file ):
+                print ("Start ...." )
                 ( dr14, dB_peak, dB_rms ) = compute_dr14( at.Y , at.Fs )
                 self.dr14 = self.dr14 + dr14
                 res = { 'file_name': file_name , 'dr14': dr14 , 'dB_peak': dB_peak , 'dB_rms': dB_rms }

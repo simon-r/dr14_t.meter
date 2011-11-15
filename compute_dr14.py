@@ -22,12 +22,12 @@ import numpy
 
 def dr_rms( y ) :
     n = y.shape
-    rms = numpy.sqrt( 2 * sum( y**2 , 0 ) / n[0] )
+    rms = numpy.sqrt( 2 * numpy.sum( y**2.0 , 0 ) / float(n[0]) )
     return rms
 
 def u_rms( y ) :
     n = y.shape
-    rms = numpy.sqrt( sum( y**2 , 0 ) / n[0] )
+    rms = numpy.sqrt( numpy.sum( y**2 , 0 ) / float(n[0]) )
     return rms
 
 def decibel_u( y , ref ) :
@@ -54,7 +54,7 @@ def compute_dr14( Y , Fs ) :
     curr_sam = 0
     rms = zeros((seg_cnt,ch))
     peaks = zeros((seg_cnt,ch))
-
+    
     for i in range(seg_cnt - 1):
         r = arange(curr_sam,curr_sam+block_samples)
         rms[i,:] = dr_rms( Y[r,:] )
@@ -67,7 +67,6 @@ def compute_dr14( Y , Fs ) :
     #print( s )
     #print( curr_sam )
     #print ( r )
-
     if r.shape[0] > 0:
         rms[i,:] = dr_rms( Y[r,:] )
         peaks[i,:] = numpy.max( numpy.abs( Y[r,:] ) , 0 )
@@ -93,7 +92,7 @@ def compute_dr14( Y , Fs ) :
     dB_peak = decibel_u( numpy.max( peaks ) , 1 )
 
     y_rms = u_rms( Y )
-    dB_rms = decibel_u( numpy.sum( y_rms ) , 1 )
 
+    dB_rms = decibel_u( numpy.sum( y_rms ) , 1 )
 
     return ( dr14 , dB_peak , dB_rms )
