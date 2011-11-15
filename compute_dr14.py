@@ -51,8 +51,6 @@ def compute_dr14( Y , Fs ) :
 	if seg_cnt < 3:
 		return ( 0 , -100 , -100 )
 	
-
-
 	curr_sam = 0 
 	rms = zeros((seg_cnt,ch))
 	peaks = zeros((seg_cnt,ch))
@@ -95,7 +93,8 @@ def compute_dr14( Y , Fs ) :
 	dB_peak = decibel_u( numpy.max( peaks ) , 1 )
 	
 	y_rms = u_rms( Y ) 
-	dB_rms = decibel_u( numpy.sum( y_rms ) , 1 ) 
+	dB_rms = decibel_u( numpy.sum( y_rms ) , 1 )
+	
 	
 	return ( dr14 , dB_peak , dB_rms )
 	

@@ -25,57 +25,64 @@ import multiprocessing
 
     
 def main():
-    
-    desc = "Compute the DR14 value of an audio file according to the algorithm " 
-    desc =  desc + "described by the Pleasurize Music Foundation "
-    desc =  desc + "Visit: http://www.dynamicrange.de/" 
-    use = "usage: %prog [options] dir_name"
 
-    parser = OptionParser( description=desc ,  usage=use  , version="%prog 0.5"  )
-    
-    parser.add_option("-m", "--multithread",
-                action="store_true",
-                dest="multithread",
-                default=False,
-                help="Start the multithread mode")
-    
-    (options, args) = parser.parse_args()
-    
-    if len(args) <= 0:
-        parser.error("wrong number of arguments")
-        return 1 
-    
-    print( args )
-    
-    dir_name = args[0]
-    
-    dr = DynamicRangeMeter()
-    
-    cpu = multiprocessing.cpu_count()
-        
-    a = time()
-    if not options.multithread:
-        r = dr.scan_dir(dir_name)
-    else:
-        r = dr.scan_dir_mt(dir_name, round( cpu / 2 ) )
-    b = time() - a
-    
-    print( "Elapsed time: " + str(b) )
-    
-    if r == 0:
-        print("No audio files found")
-        return r
-    
-    dr.fwrite_dr14( os.path.join( dir_name , "dr14_bbcode.txt" ) , BBcodeTable() )
-    dr.fwrite_dr14( os.path.join( dir_name , "dr14.txt" ) , TextTable() )
-    dr.fwrite_dr14( os.path.join( dir_name , "dr14.html" ) , HtmlTable() )
-    
-    print( "DR = " + str( dr.dr14 ) )
+	desc = "Compute the DR14 value of an audio file according to the algorithm " 
+	desc =  desc + "described by the Pleasurize Music Foundation "
+	desc =  desc + "Visit: http://www.dynamicrange.de/" 
+	use = "usage: %prog [options] dir_name"
 
-    print("end") 
+	parser = OptionParser( description=desc ,  usage=use  , version="%prog 0.5"  )
+
+	parser.add_option("-m", "--multithread",
+		action="store_true",
+		dest="multithread",
+		default=False,
+		help="Start the multithread mode")
+
+	(options, args) = parser.parse_args()
+
+	if len(args) <= 0:
+		parser.error("wrong number of arguments")
+		return 1 
+
+	print( args )
+
+	dir_name = args[0]
+
+	dr = DynamicRangeMeter()
+
     
-    return r
+
+	a = time()
+	if not options.multithread:
+	        r = dr.scan_dir(dir_name)
+	else:
+		cpu = multiprocessing.cpu_count() / 2
+		if cpu <= 2:
+			cpu = 2
+		else:
+			cpu = round( cpu )
+
+		r = dr.scan_dir_mt(dir_name, cpu )
+
+	b = time() - a
+
+	print( "Elapsed time: " + str(b) )
+	
+	if r == 0:
+		print("No audio files found")
+		return r
+
+	dr.fwrite_dr14( os.path.join( dir_name , "dr14_bbcode.txt" ) , BBcodeTable() )
+	dr.fwrite_dr14( os.path.join( dir_name , "dr14.txt" ) , TextTable() )
+	dr.fwrite_dr14( os.path.join( dir_name , "dr14.html" ) , HtmlTable() )
+
+	print( "DR = " + str( dr.dr14 ) )
+
+	print("end") 
+
+	return r
 
 if __name__ == '__main__':
-    main()
+	main()
 
