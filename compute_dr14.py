@@ -37,30 +37,47 @@ def compute_dr14( Y , Fs ) :
 	s = Y.shape
 	ch = s[1]
 	
+	if Fs == 44100:
+		delta_fs = 60 
+	else:
+		delta_fs = 0 	
+	
 	block_time = 3 
 	cut_best_bins = 0.2
-	block_samples = block_time * Fs
+	block_samples = block_time * ( Fs + delta_fs )
 	
-	seg_cnt = math.floor( s[0] / block_samples )
+	seg_cnt = math.floor( s[0] / block_samples ) + 1
 	
 	if seg_cnt < 3:
 		return ( 0 , -100 , -100 )
 	
+
+
 	curr_sam = 0 
 	rms = zeros((seg_cnt,ch))
 	peaks = zeros((seg_cnt,ch))
 	
-	for i in range(seg_cnt):
+	for i in range(seg_cnt - 1):
 		r = arange(curr_sam,curr_sam+block_samples)
 		rms[i,:] = dr_rms( Y[r,:] ) 
-		p = numpy.max( numpy.abs( Y[r,:] ) , 0 ) 
-		peaks[i,:] = p 
+		peaks[i,:] = numpy.max( numpy.abs( Y[r,:] ) , 0 ) 
 		curr_sam = curr_sam + block_samples
+	
+	i = seg_cnt - 1 ;
+	r = arange( curr_sam,s[0] )
+	
+	#print( s )
+	#print( curr_sam )
+	#print ( r )
+	
+	if r.shape[0] > 0:
+		rms[i,:] = dr_rms( Y[r,:] )
+		peaks[i,:] = numpy.max( numpy.abs( Y[r,:] ) , 0 )
 	
 	peaks = numpy.sort( peaks , 0 )
 	rms = numpy.sort( rms , 0 )
 	
-	n_blk = round( seg_cnt * cut_best_bins ) 
+	n_blk = int( floor( seg_cnt * cut_best_bins ) )
 	if n_blk == 0:
 		n_blk = 1
 		
