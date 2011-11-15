@@ -31,6 +31,8 @@ class AudioDecoder:
         if ext not in self.formats :
             return ( [] , 0 , 0 )
 
+        print (file_name)
+
         if ext == '.mp3':
             ( Y , Fs , channels ) = read_mp3( file_name )
         elif ext == '.flac':
@@ -57,7 +59,7 @@ def read_mp3( file_name ):
     tmp_file = tempfile.mktemp() + ".wav"
     mp3_cmd = mp3_cmd + "--silent " + "--decode " + "\"" + file_name + "\"" + " %s " % tmp_file
 
-    print( file_name )
+    #print( file_name )
 
     r = os.popen( mp3_cmd ).read()
     ( Y , Fs , channels ) = read_wav.read_wav( tmp_file )
@@ -77,8 +79,8 @@ def read_flac( file_name ):
     tmp_file = tempfile.mktemp() + ".wav"
     
     flac_cmd = flac_cmd + "-s " + "-d " + "\"" + file_name + "\"" + " -o %s " % tmp_file
-    print( flac_cmd )
-    print( file_name )
+    #print( flac_cmd )
+    #print( file_name )
 
     r = os.popen( flac_cmd ).read()
     ( Y , Fs , channels ) = read_wav.read_wav( tmp_file )
