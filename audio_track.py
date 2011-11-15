@@ -21,12 +21,12 @@ from audio_decoder import AudioDecoder
 
 
 class AudioTrack:
-    
+
     def __init__(self):
         self.Y = numpy.array([])
         self.Fs = 0
-        self.channels = 0 
-    
+        self.channels = 0
+
     def time(self):
         return 1/self.Fs * self.Y.shape[0]
 
@@ -34,11 +34,11 @@ class AudioTrack:
 
         self.Y = numpy.array([])
         self.Fs = 0
-        self.channels = 0      
-        
+        self.channels = 0
+
         if not ( os.path.exists( file_name ) ) :
             return False
-        
+
         ( f , ext ) = os.path.splitext( file_name )
 
         de = AudioDecoder()
@@ -52,6 +52,3 @@ class AudioTrack:
             return False
         else:
             return True
-        
-    
-    
