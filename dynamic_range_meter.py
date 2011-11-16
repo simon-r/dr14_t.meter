@@ -22,7 +22,7 @@ from audio_decoder import AudioDecoder
 import threading
 
 
-class DynamicRangeMeter:
+class DynamicRangeMeter:   
     
     def scan_file( self , file_name):
         self.res_list = []
