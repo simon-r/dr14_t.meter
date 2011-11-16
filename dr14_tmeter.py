@@ -29,7 +29,7 @@ def main():
 	desc = "Compute the DR14 value of an audio file according to the algorithm " 
 	desc =  desc + "described by the Pleasurize Music Foundation "
 	desc =  desc + "Visit: http://www.dynamicrange.de/" 
-	use = "usage: %prog [options] dir_name"
+	use = "usage: %prog [options] path_name"
 
 	parser = OptionParser( description=desc ,  usage=use  , version="%prog 0.5"  )
 
@@ -93,9 +93,9 @@ def main():
 		print("No audio files found")
 		return r
 
-	dr.fwrite_dr14( os.path.join( dir_name , "dr14_bbcode.txt" ) , BBcodeTable() )
-	dr.fwrite_dr14( os.path.join( dir_name , "dr14.txt" ) , TextTable() )
-	dr.fwrite_dr14( os.path.join( dir_name , "dr14.html" ) , HtmlTable() )
+	dr.fwrite_dr14( os.path.join( path_name , "dr14_bbcode.txt" ) , BBcodeTable() )
+	dr.fwrite_dr14( os.path.join( path_name , "dr14.txt" ) , TextTable() )
+	dr.fwrite_dr14( os.path.join( path_name , "dr14.html" ) , HtmlTable() )
 
 	print( "DR = " + str( dr.dr14 ) )
 
