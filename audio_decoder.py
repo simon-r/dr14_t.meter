@@ -33,17 +33,24 @@ class AudioDecoder:
 
         print (file_name)
 
+        af = AudioFileReader()
+    
         if ext == '.mp3':
-            ( Y , Fs , channels ) = read_mp3( file_name )
+            af = Mp3FileReader()
+            #( Y , Fs , channels ) = read_mp3( file_name )
         elif ext == '.flac':
-            ( Y , Fs , channels ) = read_flac( file_name )
+            af = FlacFileReader()
+            #( Y , Fs , channels ) = read_flac( file_name )
         elif ext == '.ogg':
-            ( Y , Fs , channels ) = read_ogg( file_name )
+            af = OggFileReader()
+            #( Y , Fs , channels ) = read_ogg( file_name )
         elif ext in ['.mp4' , '.m4a' ]:
-            ( Y , Fs , channels ) = read_mp4( file_name )
+            af = Mp4FileReader()
+            #( Y , Fs , channels ) = read_mp4( file_name )
         else:
-            ( Y , Fs , channels ) = ( [] , 0 , 0 )
+            return ( [] , 0 , 0 )
 
+        ( Y , Fs , channels ) = af.read_audio_file( file_name )
         return ( Y , Fs , channels )
         
  
@@ -58,7 +65,7 @@ class AudioFileReader:
     def get_cmd(self):
         pass
 
-    def get_cmd_options(self , file_name , tmp_file ):
+    def get_cmd_options( self , file_name , tmp_file ):
         pass
 
     def read_audio_file( self , file_name ):
@@ -69,11 +76,11 @@ class AudioFileReader:
         tmp_dir = tempfile.gettempdir()
         tmp_file = os.path.join( tmp_dir , file ) + ".wav"
     
-        full_command = full_command + " " + get_cmd_options(self , file_name , tmp_file )
+        full_command = full_command + " " + self.get_cmd_options( file_name , tmp_file )
 
         #print( file_name )
 
-        r = os.popen( mp3_cmd ).read()
+        r = os.popen( full_command ).read()
         ( Y , Fs , channels ) = read_wav.read_wav( tmp_file )
         os.remove( tmp_file )
 
@@ -113,6 +120,8 @@ class OggFileReader( AudioFileReader ):
         return  "--quiet " + "\"" + file_name + "\"" + " --output \"%s\"  " % tmp_file
 
 
+######################################################################
+# !!!!! Depreceted !!!!!!!!!!!!!!!!!!!!!!!!!
 ######################################################################
 def read_mp3( file_name ):
 
