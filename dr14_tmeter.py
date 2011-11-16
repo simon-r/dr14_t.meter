@@ -26,9 +26,10 @@ import multiprocessing
     
 def main():
 
-	desc = "Compute the DR14 value of an audio file according to the algorithm " 
+	desc = "Compute the DR14 value of the audio files according to the algorithm " 
 	desc =  desc + "described by the Pleasurize Music Foundation "
-	desc =  desc + "Visit: http://www.dynamicrange.de/" 
+	desc =  desc + "Visit: http://www.dynamicrange.de/"
+
 	use = "usage: %prog [options] path_name"
 
 	parser = OptionParser( description=desc ,  usage=use  , version="%prog 0.5"  )
