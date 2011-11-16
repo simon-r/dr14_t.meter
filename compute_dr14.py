@@ -28,7 +28,7 @@ def dr_rms( y ) :
 def u_rms( y ) :
     n = y.shape
     
-    samples_per_block = int(2e5)
+    samples_per_block = int(1e5)
     blk_cnt = int( n[0] / samples_per_block )
     
     s_sum = numpy.array([0.0,0.0])

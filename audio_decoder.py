@@ -56,8 +56,11 @@ def read_mp3( file_name ):
         mp3_cmd = ".\\decoder\\lame "
 
 
-    tmp_file = tempfile.mktemp() + ".wav"
-    mp3_cmd = mp3_cmd + "--silent " + "--decode " + "\"" + file_name + "\"" + " %s " % tmp_file
+    (head, file) = os.path.split( file_name )
+    tmp_dir = tempfile.gettempdir()
+    tmp_file = os.path.join( tmp_dir , file ) + ".wav"
+    
+    mp3_cmd = mp3_cmd + "--silent " + "--decode " + "\"" + file_name + "\"" + " \"%s\" " % tmp_file
 
     #print( file_name )
 
@@ -75,10 +78,11 @@ def read_flac( file_name ):
     elif sys.platform.startswith('win'):
         flac_cmd = ".\\decoder\\flac "
 
-
-    tmp_file = tempfile.mktemp() + ".wav"
+    (head, file) = os.path.split( file_name )
+    tmp_dir = tempfile.gettempdir()
+    tmp_file = os.path.join( tmp_dir , file ) + ".wav"
     
-    flac_cmd = flac_cmd + "-s " + "-d " + "\"" + file_name + "\"" + " -o %s " % tmp_file
+    flac_cmd = flac_cmd + "-s " + "-d " + "\"" + file_name + "\"" + " -o \"%s\" " % tmp_file
     #print( flac_cmd )
     #print( file_name )
 
@@ -96,8 +100,11 @@ def read_ogg( file_name ):
         ogg_cmd = ".\\decoder\\oggdec "
 
 
-    tmp_file = tempfile.mktemp() + ".wav"
-    ogg_cmd = ogg_cmd + "--quiet " + "\"" + file_name + "\"" + " --output %s " % tmp_file
+    (head, file) = os.path.split( file_name )
+    tmp_dir = tempfile.gettempdir()
+    tmp_file = os.path.join( tmp_dir , file ) + ".wav"
+    
+    ogg_cmd = ogg_cmd + "--quiet " + "\"" + file_name + "\"" + " --output \"%s\"  " % tmp_file
 
     print( file_name )
 
@@ -116,8 +123,11 @@ def read_mp4( file_name ):
         mp4_cmd = ".\\decoder\\faad "
 
 
-    tmp_file = tempfile.mktemp() + ".wav"
-    mp4_cmd = mp4_cmd + "-q " + "\"" + file_name + "\"" + " -o %s " % tmp_file
+    (head, file) = os.path.split( file_name )
+    tmp_dir = tempfile.gettempdir()
+    tmp_file = os.path.join( tmp_dir , file ) + ".wav"
+    
+    mp4_cmd = mp4_cmd + "-q " + "\"" + file_name + "\"" + " -o \"%s\"  " % tmp_file
 
     print( file_name )
 
