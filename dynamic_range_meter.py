@@ -82,8 +82,6 @@ class DynamicRangeMeter:
             if ext in ad.formats:
                 jobs.append( file_name )
         
-        #print(jobs)
-        
         empty_res = { 'file_name': '' , 'dr14': 0 , 'dB_peak': -100 , 'dB_rms': -100 }
         self.res_list = [empty_res for i in range( len(jobs) )]
         
@@ -105,6 +103,8 @@ class DynamicRangeMeter:
         for d in self.res_list:
             self.dr14 = self.dr14 + d['dr14']
             
+            
+        #print( str(self.res_list ) )
         if len( self.res_list ) > 0:
             self.dr14 = int( round( self.dr14 / len( self.res_list ) ) )
             return len( self.res_list )
@@ -195,13 +195,17 @@ class ScanDirMt(threading.Thread):
             self.lock_j.release()
             
             full_file = os.path.join( self.dir_name , file_name ) 
+            print( full_file )
             
             if at.open( full_file ):
                 ( dr14, dB_peak, dB_rms ) = compute_dr14( at.Y , at.Fs )
-                
                 self.lock_res_list.acquire(blocking=True, timeout=-1)
+                #print( "-" + full_file )
+                #print( "-" + str(( dr14, dB_peak, dB_rms )) )
                 self.res_list[curr_job] = { 'file_name': file_name , 'dr14': dr14 , 'dB_peak': dB_peak , 'dB_rms': dB_rms }
                 self.lock_res_list.release()
+            else:
+                print( "- fail -" + full_file )
    
    
    

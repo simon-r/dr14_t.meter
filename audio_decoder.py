@@ -78,10 +78,9 @@ class AudioFileReader:
     
         full_command = full_command + " " + self.get_cmd_options( file_name , tmp_file )
 
-        #print( file_name )
-
         r = os.popen( full_command ).read()
         ( Y , Fs , channels ) = read_wav.read_wav( tmp_file )
+        #print (  "-fail- read mp3: " + tmp_file + str( ( Y , Fs , channels ) ) )
         os.remove( tmp_file )
 
         return ( Y , Fs , channels )
