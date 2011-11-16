@@ -44,10 +44,76 @@ class AudioDecoder:
         else:
             ( Y , Fs , channels ) = ( [] , 0 , 0 )
 
+        return ( Y , Fs , channels )
+        
+ 
+class AudioFileReader:
+    
+    def __init__(self):
+        if sys.platform.startswith('linux'):
+            self.__cmd = "%s " % self.get_cmd()
+        elif sys.platform.startswith('win'):
+            self.__cmd = ".\\decoder\\%s " % self.get_cmd()
+
+    def get_cmd(self):
+        pass
+
+    def get_cmd_options(self , file_name , tmp_file ):
+        pass
+
+    def read_audio_file( self , file_name ):
+        
+        full_command = self.__cmd
+        
+        (head, file) = os.path.split( file_name )
+        tmp_dir = tempfile.gettempdir()
+        tmp_file = os.path.join( tmp_dir , file ) + ".wav"
+    
+        full_command = full_command + " " + get_cmd_options(self , file_name , tmp_file )
+
+        #print( file_name )
+
+        r = os.popen( mp3_cmd ).read()
+        ( Y , Fs , channels ) = read_wav.read_wav( tmp_file )
+        os.remove( tmp_file )
 
         return ( Y , Fs , channels )
 
 
+
+class Mp3FileReader( AudioFileReader ):
+    def get_cmd(self):
+        return "lame"
+    
+    def get_cmd_options(self , file_name , tmp_file ):
+        return "--silent " + "--decode " + "\"" + file_name + "\"" + " \"%s\" " % tmp_file
+
+
+class FlacFileReader( AudioFileReader ):
+    def get_cmd(self):
+        return "flac"
+    
+    def get_cmd_options(self , file_name , tmp_file ):
+        return "-s " + "-d " + "\"" + file_name + "\"" + " -o \"%s\" " % tmp_file
+
+
+class Mp4FileReader( AudioFileReader ):
+    def get_cmd(self):
+        return "faad"
+    
+    def get_cmd_options(self , file_name , tmp_file ):
+        return  "-q " + "\"" + file_name + "\"" + " -o \"%s\"  " % tmp_file
+
+
+class OggFileReader( AudioFileReader ):
+    def get_cmd(self):
+        return "oggdec"
+    
+    def get_cmd_options(self , file_name , tmp_file ):
+        return  "--quiet " + "\"" + file_name + "\"" + " --output \"%s\"  " % tmp_file
+
+
+######################################################################
 def read_mp3( file_name ):
 
     if sys.platform.startswith('linux'):
