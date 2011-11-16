@@ -15,6 +15,7 @@
 #along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import scipy.io.wavfile
+import sys
 
 def read_wav( file_name ):
 
@@ -25,7 +26,6 @@ def read_wav( file_name ):
 
 	try:
 		sample_rate, samples = scipy.io.wavfile.read(file_name)
-	
 		if samples.dtype == 'int16':
 			samples = samples / (convert_16_bit + 1.0)
 		elif samples.dtype == 'int32':
@@ -33,6 +33,8 @@ def read_wav( file_name ):
 		else :
 			samples = samples / (convert_8_bit + 1.0)
 	except:
+		print ( "Unexpected error:", str( sys.exc_info() ) )
+		print (  "-Except! - read mp3: " + file_name + str( ( sample_rate , samples ) ) )
 		return ( [] , 0 , 0 )
 		
 		
