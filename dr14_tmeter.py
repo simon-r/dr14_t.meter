@@ -39,6 +39,12 @@ def main():
 		default=False,
 		help="Start the multithread mode")
 
+	parser.add_option("-f", "--file",
+		action="store_true",
+		dest="scan_file",
+		default=False,
+		help="Compute the DR14 of a single file")
+
 	(options, args) = parser.parse_args()
 
 	if len(args) <= 0:
@@ -47,15 +53,29 @@ def main():
 
 	print( args )
 
-	dir_name = args[0]
+	path_name = args[0]
 
 	dr = DynamicRangeMeter()
 
-    
+	
+	if options.scan_file:
+		r = dr.scan_file( path_name )
+		
+		if r == 1:
+			print( "" )
+			print( dr.res_list[0]['file_name'] + " :" )
+			print( "DR      = %d" % dr.res_list[0]['dr14'] )
+			print( "Peak dB = %.2f" % dr.res_list[0]['dB_peak'] )
+			print( "Rms dB  = %.2f" % dr.res_list[0]['dB_rms'] )
+			return 1 
+		else:
+			print ( "Error: invalid audio file" )
+			return 0
+
 
 	a = time()
 	if not options.multithread:
-	        r = dr.scan_dir(dir_name)
+	        r = dr.scan_dir( path_name )
 	else:
 		cpu = multiprocessing.cpu_count() / 2
 		if cpu <= 2:
@@ -63,7 +83,7 @@ def main():
 		else:
 			cpu = round( cpu )
 
-		r = dr.scan_dir_mt(dir_name, cpu )
+		r = dr.scan_dir_mt( path_name , cpu )
 
 	b = time() - a
 

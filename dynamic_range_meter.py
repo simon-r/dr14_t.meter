@@ -30,7 +30,7 @@ class DynamicRangeMeter:
         at = AudioTrack() 
         
         if at.open( file_name ):
-            ( dr14 , peak , rms ) = compute_dr14.compute_dr14( Y , Fs )
+            ( dr14 , dB_peak , dB_rms ) = compute_dr14( at.Y , at.Fs )
             self.res_list.append( { 'file_name': file_name , 'dr14': dr14 , 'dB_peak': dB_peak , 'dB_rms': dB_rms } )
             return 1
         else:
