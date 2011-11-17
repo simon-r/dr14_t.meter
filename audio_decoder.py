@@ -22,7 +22,7 @@ import tempfile
 class AudioDecoder:
 
     def __init__(self):
-        self.formats = [ '.flac' , '.mp3' , '.ogg' , '.mp4' , '.m4a' , '.wav' ]
+        self.formats = [ '.flac' , '.mp3' , '.ogg' , '.mp4' , '.m4a' , '.wav' , '.ape' ]
 
     def read_track( self , file_name ):
 
@@ -43,6 +43,8 @@ class AudioDecoder:
             af = Mp4FileReader()
         elif ext == '.wav':
             af = WavFileReader()
+        elif ext == '.wav':
+            af = ApeFileReader()
         else:
             return ( [] , 0 , 0 )
 
@@ -113,6 +115,13 @@ class OggFileReader( AudioFileReader ):
     
     def get_cmd_options(self , file_name , tmp_file ):
         return  "--quiet " + "\"" + file_name + "\"" + " --output \"%s\"  " % tmp_file
+
+class ApeFileReader( AudioFileReader ):
+    def get_cmd(self):
+        return "mac"
+    
+    def get_cmd_options(self , file_name , tmp_file ):
+        return  "\"" + file_name + "\"" + " \"%s\"  -d " % tmp_file
 
 
 class WavFileReader( AudioFileReader ):
