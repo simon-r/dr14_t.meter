@@ -195,7 +195,6 @@ class ScanDirMt(threading.Thread):
             self.lock_j.release()
             
             full_file = os.path.join( self.dir_name , file_name ) 
-            print( full_file )
             
             if at.open( full_file ):
                 ( dr14, dB_peak, dB_rms ) = compute_dr14( at.Y , at.Fs )

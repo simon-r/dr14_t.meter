@@ -22,7 +22,7 @@ import tempfile
 class AudioDecoder:
 
     def __init__(self):
-        self.formats = [ '.flac' , '.mp3' , '.ogg' , '.mp4' , '.m4a' ]
+        self.formats = [ '.flac' , '.mp3' , '.ogg' , '.mp4' , '.m4a' , '.wav' ]
 
     def read_track( self , file_name ):
 
@@ -31,22 +31,18 @@ class AudioDecoder:
         if ext not in self.formats :
             return ( [] , 0 , 0 )
 
-        print (file_name)
-
         af = AudioFileReader()
     
         if ext == '.mp3':
             af = Mp3FileReader()
-            #( Y , Fs , channels ) = read_mp3( file_name )
         elif ext == '.flac':
             af = FlacFileReader()
-            #( Y , Fs , channels ) = read_flac( file_name )
         elif ext == '.ogg':
             af = OggFileReader()
-            #( Y , Fs , channels ) = read_ogg( file_name )
         elif ext in ['.mp4' , '.m4a' ]:
             af = Mp4FileReader()
-            #( Y , Fs , channels ) = read_mp4( file_name )
+        elif ext == '.wav':
+            af = WavFileReader()
         else:
             return ( [] , 0 , 0 )
 
@@ -117,6 +113,11 @@ class OggFileReader( AudioFileReader ):
     
     def get_cmd_options(self , file_name , tmp_file ):
         return  "--quiet " + "\"" + file_name + "\"" + " --output \"%s\"  " % tmp_file
+
+
+class WavFileReader( AudioFileReader ):
+    def read_audio_file( self , file_name ):
+        return read_wav.read_wav( file_name )
 
 
 ######################################################################

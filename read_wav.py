@@ -23,7 +23,6 @@ def read_wav( file_name ):
 	convert_16_bit = float(2**15)
 	convert_32_bit = float(2**31)
 	
-
 	try:
 		sample_rate, samples = scipy.io.wavfile.read(file_name)
 		if samples.dtype == 'int16':
