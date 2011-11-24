@@ -16,12 +16,12 @@
 #You should have received a copy of the GNU General Public License
 #along with this program.  If not, see <http://www.gnu.org/licenses/>.
     
-    
-from dynamic_range_meter import *
+
 import os
 from optparse import OptionParser
 from time import  time
 import multiprocessing
+from dr14tmeter.dynamic_range_meter import *
 
     
 def main():

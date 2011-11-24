@@ -15,9 +15,9 @@
 #along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import numpy
-import read_wav
+import dr14tmeter.read_wav as read_wav
 import os
-from audio_decoder import AudioDecoder
+from dr14tmeter.audio_decoder import AudioDecoder
 
 
 class AudioTrack:
@@ -47,6 +47,8 @@ class AudioTrack:
             ( self.Y , self.Fs , self.channels ) = read_wav.read_wav( file_name )
         elif ext in de.formats:
             ( self.Y , self.Fs , self.channels ) = de.read_track( file_name )
+
+        print( file_name )
 
         if self.channels == 0:
             return False

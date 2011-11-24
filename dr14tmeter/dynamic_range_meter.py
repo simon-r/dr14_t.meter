@@ -15,10 +15,10 @@
 #along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import os
-from compute_dr14 import compute_dr14
-from audio_track import *
+from dr14tmeter.compute_dr14 import compute_dr14
+from dr14tmeter.audio_track import *
 import sys
-from audio_decoder import AudioDecoder
+from dr14tmeter.audio_decoder import AudioDecoder
 import threading
 
 
