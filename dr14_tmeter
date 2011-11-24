@@ -1,0 +1,10 @@
+#!/usr/bin/python3
+
+import dr14tmeter.dr14_tmeter
+import sys
+
+sys.path.append( "dr14tmeter" )
+import dr14tmeter
+
+dr14tmeter.dr14_tmeter.main()
+
