@@ -118,10 +118,10 @@ class OggFileReader( AudioFileReader ):
 
 class ApeFileReader( AudioFileReader ):
     def get_cmd(self):
-        return "mac"
+        return "ffmpeg"
     
     def get_cmd_options(self , file_name , tmp_file ):
-        return  "\"" + file_name + "\"" + " \"%s\"  -d " % tmp_file
+        return  " -i \"" + file_name + "\"" + " \"%s\" " % tmp_file
 
 
 class WavFileReader( AudioFileReader ):
