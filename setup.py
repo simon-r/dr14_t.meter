@@ -6,7 +6,7 @@ from distutils.core import setup
 #iles = ["things/*"]
 
 setup(name = "dr14_tmeter",
-    version = "0.5.0",
+    version = "0.5.1",
     description = "Compute the DR14 value of the given audio files",
     author = "Simone Riva",
     author_email = "simone.rva [at] gmail.com",
