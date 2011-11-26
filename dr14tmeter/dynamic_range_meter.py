@@ -182,7 +182,7 @@ class ScanDirMt(threading.Thread):
         while True:
             
             #Aquire the next free job
-            self.lock_j.acquire(blocking=True, timeout=-1)
+            self.lock_j.acquire()
             
             if self.jobs_free[0] >= len(self.jobs):
                 self.lock_j.release()
@@ -198,7 +198,7 @@ class ScanDirMt(threading.Thread):
             
             if at.open( full_file ):
                 ( dr14, dB_peak, dB_rms ) = compute_dr14( at.Y , at.Fs )
-                self.lock_res_list.acquire(blocking=True, timeout=-1)
+                self.lock_res_list.acquire()
                 #print( "-" + full_file )
                 #print( "-" + str(( dr14, dB_peak, dB_rms )) )
                 self.res_list[curr_job] = { 'file_name': file_name , 'dr14': dr14 , 'dB_peak': dB_peak , 'dB_rms': dB_rms }

@@ -1,4 +1,4 @@
-#!/usr/bin/python3
+#!/usr/bin/python
 
 # dr14_t.meter: compute the DR14 value of the given audiofiles
 #Copyright (C) 2011  Simone Riva
@@ -82,7 +82,7 @@ def main():
 		if cpu <= 2:
 			cpu = 2
 		else:
-			cpu = round( cpu )
+			cpu = int( round( cpu ) )
 
 		r = dr.scan_dir_mt( path_name , cpu )
 

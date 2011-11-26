@@ -61,7 +61,7 @@ def compute_dr14( Y , Fs ) :
     cut_best_bins = 0.2
     block_samples = block_time * ( Fs + delta_fs )
 
-    seg_cnt = math.floor( s[0] / block_samples ) + 1
+    seg_cnt = int( math.floor( s[0] / block_samples ) + 1 )
 
     if seg_cnt < 3:
         return ( 0 , -100 , -100 )
