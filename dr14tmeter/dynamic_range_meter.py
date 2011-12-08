@@ -53,7 +53,7 @@ class DynamicRangeMeter:
             
             if at.open( full_file ):
                 ( dr14, dB_peak, dB_rms ) = compute_dr14( at.Y , at.Fs )
-                print( full_file + ": \t " + str( dr14 ) )
+                print( file_name + ": \t " + str( dr14 ) )
                 self.dr14 = self.dr14 + dr14
                 res = { 'file_name': file_name , 'dr14': dr14 , 'dB_peak': dB_peak , 'dB_rms': dB_rms }
                 self.res_list.append(res)
@@ -202,7 +202,7 @@ class ScanDirMt(threading.Thread):
             if at.open( full_file ):
                 ( dr14, dB_peak, dB_rms ) = compute_dr14( at.Y , at.Fs )
                 self.lock_res_list.acquire()
-                print( full_file + ": \t " + str( dr14 ) )
+                print( file_name + ": \t " + str( dr14 ) )
                 #print( "-" + str(( dr14, dB_peak, dB_rms )) )
                 self.res_list[curr_job] = { 'file_name': file_name , 'dr14': dr14 , 'dB_peak': dB_peak , 'dB_rms': dB_rms }
                 self.lock_res_list.release()
