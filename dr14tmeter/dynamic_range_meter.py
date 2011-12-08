@@ -53,6 +53,7 @@ class DynamicRangeMeter:
             
             if at.open( full_file ):
                 ( dr14, dB_peak, dB_rms ) = compute_dr14( at.Y , at.Fs )
+                print( full_file + ": \t " + str( dr14 ) )
                 self.dr14 = self.dr14 + dr14
                 res = { 'file_name': file_name , 'dr14': dr14 , 'dB_peak': dB_peak , 'dB_rms': dB_rms }
                 self.res_list.append(res)
@@ -116,9 +117,11 @@ class DynamicRangeMeter:
     def write_dr14( self , tm ):
         txt = ''
         
+        ( head , album_dir ) = os.path.split( self.dir_name ) 
+        
         txt = txt + " --------------------------------------------------------------------------------- " + tm.nl()
         txt = tm.new_bold(txt)
-        txt = txt + " Analyzed folder:  " + self.dir_name
+        txt = txt + " Analyzed folder:  " + album_dir
         txt = tm.end_bold(txt)
         txt = txt + tm.nl() + " --------------------------------------------------------------------------------- " + tm.nl()
         
@@ -199,7 +202,7 @@ class ScanDirMt(threading.Thread):
             if at.open( full_file ):
                 ( dr14, dB_peak, dB_rms ) = compute_dr14( at.Y , at.Fs )
                 self.lock_res_list.acquire()
-                #print( "-" + full_file )
+                print( full_file + ": \t " + str( dr14 ) )
                 #print( "-" + str(( dr14, dB_peak, dB_rms )) )
                 self.res_list[curr_job] = { 'file_name': file_name , 'dr14': dr14 , 'dB_peak': dB_peak , 'dB_rms': dB_rms }
                 self.lock_res_list.release()

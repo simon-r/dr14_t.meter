@@ -32,7 +32,7 @@ def main():
 
 	use = "usage: %prog [options] path_name"
 
-	parser = OptionParser( description=desc ,  usage=use  , version="%prog 0.5.1"  )
+	parser = OptionParser( description=desc ,  usage=use  , version="%prog 0.5.2"  )
 
 	parser.add_option("-m", "--multithread",
 		action="store_true",
@@ -52,9 +52,11 @@ def main():
 		parser.error("wrong number of arguments")
 		return 1 
 
-	print( args )
+	#print( args )
 
-	path_name = args[0]
+	path_name = os.path.abspath( args[0] )
+
+	print ( path_name )
 
 	dr = DynamicRangeMeter()
 

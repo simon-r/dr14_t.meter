@@ -48,7 +48,7 @@ class AudioTrack:
         elif ext in de.formats:
             ( self.Y , self.Fs , self.channels ) = de.read_track( file_name )
 
-        print( file_name )
+        #print( file_name )
 
         if self.channels == 0:
             return False
