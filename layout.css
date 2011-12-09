@@ -76,6 +76,7 @@ table.menu_table td {
 
 
 table.dw_table {
+    text-align:left;
     border-width: 1px;
     border-spacing: 2px;
     border-style: solid;
@@ -87,6 +88,8 @@ table.dw_table th {
     padding: 3px;
     border-style: solid;
     border-color: gray;
+    font-weight: bold;
+    text-align:left;
 }
 table.dw_table td {
     border-width: 0px;
