@@ -21,51 +21,9 @@
   </script>
     <meta http-equiv="content-type" content="text/html; charset=UTF-8">
     <meta http-equiv="content-type" content="text/html; charset=UTF-8">
-    <style type="text/css">
-table.list_table {
-    width:70%;
-    border-width: 1px;
-	border-spacing: 2px;
-	border-style: solid;
-	border-color: gray;
-	border-collapse: collapse;
-}
-table.list_table th {
-	border-width: 1px;
-	padding: 3px;
-	border-style: solid;
-	border-color: gray;
-}
-table.list_table td {
-	border-width: 1px;
-	padding: 2px;
-	border-style: solid;
-	border-color: gray;
-}
-
-table.dw_table {
-    border-width: 1px;
-    border-spacing: 2px;
-	border-style: solid;
-	border-color: gray;
-	border-collapse: collapse;
-}
-table.dw_table th {
-	border-width: 0px;
-	padding: 3px;
-	border-style: solid;
-	border-color: gray;
-}
-table.dw_table td {
-	border-width: 0px;
-	padding: 2px;
-	border-style: solid;
-	border-color: gray;
-}
-
-
-</style> </head>
-  <body bottommargin="0" leftmargin="0" rightmargin="0" topmargin="0" style="                    background-color: rgb(255, 255, 255);"
+    <link href="layout.css" rel="stylesheet" type="text/css">
+  </head>
+  <body bottommargin="0" leftmargin="0" rightmargin="0" topmargin="0" style="                               background-color: rgb(255, 255, 255);"
     link="#1e2580" marginheight="0" marginwidth="0"> <br>
     <script>(function(d, s, id) {
   var js, fjs = d.getElementsByTagName(s)[0];
@@ -90,16 +48,15 @@ table.dw_table td {
         <tr valign="top">
           <!------------------------This is a content window, to make more than one just cut and paste the contents between these comment tags, and paste it after the ending comment, like I have already did once below---------------------------->
           <td width="100%">
-            <table bgcolor="#f3fffc" border="1" bordercolor="#8784c6" cellpadding="10"
-              cellspacing="0" width="100%">
+            <table class="main_table">
               <tbody>
-                <tr valign="top">
-                  <td bordercolor="#E9E9F8"> <span style="font-weight: bold;">DR14
-                      T.meter</span> is a free and opens source command line
-                    tool for computing the Dynamic Range of a given audio file
-                    according to the procedure used in the off-line meter
-                    released by the <a target="_top" href="http://www.dynamicrange.de/">Pleasurize
-                      Music Foundation</a>.<br>
+                <tr>
+                  <td> <span style="font-weight: bold;">DR14 T.meter</span> is
+                    a free and opens source command line tool for computing the
+                    Dynamic Range of a given audio file according to the
+                    procedure used in the off-line meter released by the <a target="_top"
+                      href="http://www.dynamicrange.de/">Pleasurize Music
+                      Foundation</a>.<br>
                     <br>
                     This tool is very useful for measure how is loud your music
                     and for understanding that a good quality album always has
@@ -243,27 +200,24 @@ deb
             ----------------------This is a content window----------------------------------------------------------------------------------------->
           </td>
           <td width="170"><!-----------------menu window----------------------------->
-            <table style="width: 196px; height: 157px; background-color: rgb(233, 233, 248);"
-              border="0" cellpadding="0" cellspacing="4">
+            <table class="menu_table">
               <tbody>
-                <tr style="font-weight: bold;" valign="top">
-                  <td style="width: 196px; background-color: rgb(119, 145, 153);"
-                    bordercolor="#E9E9F8">Link:</td>
+                <tr>
+                  <th> Links </th>
                 </tr>
                 <tr>
-                  <td style="vertical-align: top;"><a href="https://github.com/simon-r/dr14_t.meter">Project
+                  <td><a href="https://github.com/simon-r/dr14_t.meter">Project
                       page</a></td>
                 </tr>
                 <tr>
-                  <td style="vertical-align: top;"><a href="dr14.html">Resulting
-                      table</a></td>
+                  <td><a href="dr14.html">Resulting table</a></td>
                 </tr>
                 <tr>
-                  <td style="vertical-align: top;"><a target="_top" href="http://en.wikipedia.org/wiki/Loudness_war">loudness
+                  <td><a target="_top" href="http://en.wikipedia.org/wiki/Loudness_war">loudness
                       war</a></td>
                 </tr>
                 <tr>
-                  <td style="vertical-align: top;"><a target="_top" href="http://www.dynamicrange.de/">Pleasurize
+                  <td><a target="_top" href="http://www.dynamicrange.de/">Pleasurize
                       Music Foundation</a></td>
                 </tr>
                 <tr>
@@ -275,25 +229,24 @@ deb
             <!---------------------------------------------------------------->
             <br>
             <!-----------------menu window----------------------------->
-            <table style="width: 171px; height: 281px;" bgcolor="#e9e9f8" border="0"
-              cellpadding="0" cellspacing="0">
+            <table class="menu_table">
               <tbody>
-                <tr valign="top">
-                  <td bordercolor="#E9E9F8"><br>
+                <tr>
+                  <td><br>
                     <div style="text-align: center;"><a href="http://dynamicrange.de/"><img
                           title="DR logo" alt="DR logo" src="dr.png"></a><br>
                     </div>
                     <br>
                   </td>
                 </tr>
-                <tr align="center">
-                  <td style="vertical-align: top;"><a target="_blank" href="http://www.tnt-audio.com/topics/realstereo_e.html"><img
+                <tr>
+                  <td><a target="_blank" href="http://www.tnt-audio.com/topics/realstereo_e.html"><img
                         title="Real Stero" alt="Real Stero" src="smallstereo_white.png"></a></td>
                 </tr>
               </tbody>
             </table>
-            <!-----------------menu window----------------------------->
-            <table class="dw_table">
+            <!-----------------menu window-----------------------------> <br>
+            <table class="menu_table">
               <tbody>
                 <tr>
                   <td> <g:plusone count="false" href="http://simon-r.github.com/dr14_t.meter/"></g:plusone>
@@ -301,9 +254,11 @@ deb
                   </td>
                 </tr>
                 <tr>
-                  <td> <div class="fb-like" data-href="http://simon-r.github.com/dr14_t.meter/"
+                  <td>
+                    <div class="fb-like" data-href="http://simon-r.github.com/dr14_t.meter/"
                       data-send="true" data-layout="button_count" data-width="140"
-                      data-show-faces="true"></div> <br>
+                      data-show-faces="true"></div>
+                    <br>
                   </td>
                 </tr>
                 <tr>
