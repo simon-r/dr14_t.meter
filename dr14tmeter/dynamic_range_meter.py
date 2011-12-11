@@ -118,14 +118,15 @@ class DynamicRangeMeter:
         txt = ''
         
         ( head , album_dir ) = os.path.split( self.dir_name ) 
-        
-        txt = txt + " --------------------------------------------------------------------------------- " + tm.nl()
-        txt = tm.new_bold(txt)
-        txt = txt + " Analyzed folder:  " + album_dir
-        txt = tm.end_bold(txt)
-        txt = txt + tm.nl() + " --------------------------------------------------------------------------------- " + tm.nl()
-        
         txt = tm.new_table(txt)
+        
+        txt = tm.new_head( txt )
+        
+        txt = tm.append_row( txt , [ "-----------", "-----------", "-----------", "-------------------------------" ] )
+        txt = tm.add_title( txt , " Analyzed folder:  " + album_dir )
+        
+        txt = tm.end_head( txt )
+        
         txt = tm.append_row( txt , [ "-----------", "-----------", "-----------", "-------------------------------" ] )
         txt = tm.append_row( txt , [ "DR", "Peak", "RMS", "File name" ] )
         txt = tm.append_row( txt , [ "-----------", "-----------", "-----------", "-------------------------------" ] )
@@ -141,22 +142,20 @@ class DynamicRangeMeter:
             txt = tm.append_row( txt , row )
 
         
+        txt = tm.new_foot( txt )
         txt = tm.append_row( txt , [ "-----------", "-----------", "-----------", "-------------------------------" ] )
+               
+        txt = tm.add_title( txt , "Number of files: \t\t " + str(len( self.res_list )) )
+        txt = tm.add_title( txt , "Official DR value: \t\t " + str(self.dr14) )
+        
+        txt = tm.append_row( txt , [ "-----------", "-----------", "-----------", "-------------------------------" ] )
+        txt = tm.end_foot( txt )
         
         txt = tm.end_table(txt)
         
-        
-        txt = txt + tm.nl()
-        txt = txt + "Number of files:	  " + str(len( self.res_list )) + tm.nl()
-        txt = txt + tm.nl()
-        txt = txt + "Official DR value:	  " + str(self.dr14) + tm.nl()
-        txt = txt + tm.nl()
-        txt = txt + "=============================================================================================="
-        txt = txt + tm.nl()
-        
-        
         self.table_txt = txt
         return txt 
+    
     
     def fwrite_dr14( self , file_name , tm ):
         self.write_dr14( tm )
@@ -232,11 +231,26 @@ class Table:
         txt = self.end_row(txt)
         return txt
 
+    def add_title( self , txt , title ):
+        pass
+    
     def new_table( self , txt ):
         pass
     
     def end_table( self , txt ):
         pass
+    
+    def new_head( self , txt ):
+        return txt
+    
+    def end_head( self , txt ):
+        return txt
+    
+    def new_foot( self , txt ):
+        return txt
+    
+    def end_foot( self , txt ):
+        return txt
     
     def new_row( self , txt ):
         pass
@@ -260,6 +274,9 @@ class Table:
     
 
 class TextTable ( Table ):
+
+    def add_title( self , txt , title ):
+        return txt + title + self.nl()
 
     def new_table( self , txt ):
         return txt + self.nl()
@@ -289,20 +306,23 @@ class TextTable ( Table ):
 
 class BBcodeTable ( Table ):
 
+    def add_title( self , txt , title ):
+        return txt + self.nl() + "[tr]" + self.nl() + " [td  colspan=4] " + title + " [/td] " + self.nl() + "[/tr]" + self.nl()
+
     def new_table( self , txt ):
-        return txt + '[table]\n\r'
+        return txt + '[table]' + self.nl()
     
     def end_table( self , txt ):
-        return txt + '[/table]\n\r'
+        return txt + self.nl() + '[/table]' + self.nl() 
     
     def new_row( self , txt ):
-        return txt + '[tr]\n\r'
+        return txt + self.nl() + '[tr]' + self.nl()
     
     def end_row( self , txt ):
-        return txt + '\n\r[/tr]\n\r'
+        return txt + self.nl() + '[/tr]' + self.nl()
     
     def new_cell( self , txt ):
-        return txt + '[td]'
+        return txt + ' [td]'
     
     def end_cell( self , txt ):
         return txt + '[/td]'
@@ -316,23 +336,36 @@ class BBcodeTable ( Table ):
 
 class HtmlTable ( Table ):
 
-    def nl(self):
-        return '<br />\n\r'
+    def add_title( self , txt , title ):
+        return txt + self.nl() + "<tr>" + self.nl() + " <th colspan=\"4\" > " + title + "</th>" + self.nl() + "</tr>" + self.nl() 
+
         
     def new_table( self , txt ):
-        return txt + '<table>\n\r'
+        return txt + "<table>" + self.nl() 
     
     def end_table( self , txt ):
-        return txt + '</table>\n\r'
+        return txt + self.nl() + "</table>" + self.nl()
+        
+    def new_head( self , txt ):
+        return txt + self.nl() + "<head>" + self.nl() 
+    
+    def end_head( self , txt ):
+        return txt + self.nl() + "</head>" + self.nl()
+    
+    def new_foot( self , txt ):
+        return txt + self.nl() + "<foot>" + self.nl() 
+    
+    def end_foot( self , txt ):
+        return txt + self.nl() + "</foot>" + self.nl() 
     
     def new_row( self , txt ):
-        return txt + '<tr>\n\r'
+        return txt + self.nl() + "<tr>" + self.nl() 
     
     def end_row( self , txt ):
-        return txt + '\n\r</tr>\n\r'
+        return txt + self.nl() + "</tr>" + self.nl() 
     
     def new_cell( self , txt ):
-        return txt + '<td>'
+        return txt + ' <td>'
     
     def end_cell( self , txt ):
         return txt + '</td>'

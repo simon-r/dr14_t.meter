@@ -43,7 +43,7 @@ class AudioDecoder:
             af = Mp4FileReader()
         elif ext == '.wav':
             af = WavFileReader()
-        elif ext == '.wav':
+        elif ext == '.ape':
             af = ApeFileReader()
         else:
             return ( [] , 0 , 0 )
@@ -128,95 +128,3 @@ class WavFileReader( AudioFileReader ):
     def read_audio_file( self , file_name ):
         return read_wav.read_wav( file_name )
 
-
-######################################################################
-# !!!!! Depreceted !!!!!!!!!!!!!!!!!!!!!!!!!
-######################################################################
-def read_mp3( file_name ):
-
-    if sys.platform.startswith('linux'):
-        mp3_cmd = "lame "
-    elif sys.platform.startswith('win'):
-        mp3_cmd = ".\\decoder\\lame "
-
-
-    (head, file) = os.path.split( file_name )
-    tmp_dir = tempfile.gettempdir()
-    tmp_file = os.path.join( tmp_dir , file ) + ".wav"
-    
-    mp3_cmd = mp3_cmd + "--silent " + "--decode " + "\"" + file_name + "\"" + " \"%s\" " % tmp_file
-
-    #print( file_name )
-
-    r = os.popen( mp3_cmd ).read()
-    ( Y , Fs , channels ) = read_wav.read_wav( tmp_file )
-    os.remove( tmp_file )
-
-    return ( Y , Fs , channels )
-
-
-def read_flac( file_name ):
-
-    if sys.platform.startswith('linux'):
-        flac_cmd = "flac "
-    elif sys.platform.startswith('win'):
-        flac_cmd = ".\\decoder\\flac "
-
-    (head, file) = os.path.split( file_name )
-    tmp_dir = tempfile.gettempdir()
-    tmp_file = os.path.join( tmp_dir , file ) + ".wav"
-    
-    flac_cmd = flac_cmd + "-s " + "-d " + "\"" + file_name + "\"" + " -o \"%s\" " % tmp_file
-    #print( flac_cmd )
-    #print( file_name )
-
-    r = os.popen( flac_cmd ).read()
-    ( Y , Fs , channels ) = read_wav.read_wav( tmp_file )
-    os.remove( tmp_file )
-
-    return ( Y , Fs , channels )
-
-def read_ogg( file_name ):
-
-    if sys.platform.startswith('linux'):
-        ogg_cmd = "oggdec "
-    elif sys.platform.startswith('win'):
-        ogg_cmd = ".\\decoder\\oggdec "
-
-
-    (head, file) = os.path.split( file_name )
-    tmp_dir = tempfile.gettempdir()
-    tmp_file = os.path.join( tmp_dir , file ) + ".wav"
-    
-    ogg_cmd = ogg_cmd + "--quiet " + "\"" + file_name + "\"" + " --output \"%s\"  " % tmp_file
-
-    print( file_name )
-
-    r = os.popen( ogg_cmd ).read()
-    ( Y , Fs , channels ) = read_wav.read_wav( tmp_file )
-    os.remove( tmp_file )
-
-    return ( Y , Fs , channels )
-
-
-def read_mp4( file_name ):
-
-    if sys.platform.startswith('linux'):
-        mp4_cmd = "faad "
-    elif sys.platform.startswith('win'):
-        mp4_cmd = ".\\decoder\\faad "
-
-
-    (head, file) = os.path.split( file_name )
-    tmp_dir = tempfile.gettempdir()
-    tmp_file = os.path.join( tmp_dir , file ) + ".wav"
-    
-    mp4_cmd = mp4_cmd + "-q " + "\"" + file_name + "\"" + " -o \"%s\"  " % tmp_file
-
-    print( file_name )
-
-    r = os.popen( mp4_cmd ).read()
-    ( Y , Fs , channels ) = read_wav.read_wav( tmp_file )
-    os.remove( tmp_file )
-
-    return ( Y , Fs , channels )
