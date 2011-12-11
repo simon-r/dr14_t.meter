@@ -102,6 +102,12 @@ def main():
 
 	print( "DR = " + str( dr.dr14 ) )
 
+	print("")
+	print("The full result has been written in the files: dr14_bbcode.txt, dr14.txt, dr14.html")
+	print("located in the directory:")
+	print( path_name )
+	print("")
+
 	print("end") 
 
 	return r
