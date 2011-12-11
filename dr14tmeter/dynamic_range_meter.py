@@ -246,6 +246,12 @@ class Table:
     def end_head( self , txt ):
         return txt
     
+    def new_tbody( self , txt ):
+        return txt
+    
+    def end_tbody( self , txt ):
+        return txt
+    
     def new_foot( self , txt ):
         return txt
     
