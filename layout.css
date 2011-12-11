@@ -1,104 +1,68 @@
-
 table.main_table {
-    width:100%;
-    border-width: 3px;
-    border-spacing: 2px;
-    border-style: solid;
-    border-color: blue;
-    border-collapse: collapse;
-    background-color:#f3fffc;
-    color:black;
+  border: 3px solid #999999;
+  background-color: #f2f2f2;
+  border-collapse: collapse;
+  border-spacing: 2px;
+  width: 100%;
+  color: black;
+  font-family: Arial,Helvetica,sans-serif;
 }
 table.main_table th {
-    border-width: 3px;
-    padding: 3px;
-    border-style: solid;
-    border-color: gray;
+  border: 3px solid gray;
+  padding: 3px;
 }
 table.main_table td {
-    border-width: 3px;
-    padding: 10px;
-    border-style: solid;
-    border-color: gray;
+  border: 3px solid gray;
+  padding: 10px;
 }
-
-
-
 table.list_table {
-    width:70%;
-    border-width: 0px;
-    border-spacing: 2px;
-    border-style: solid;
-    border-color: gray;
-    border-collapse: collapse;
+  border: 0px solid gray;
+  width: 70%;
+  border-spacing: 2px;
+  border-collapse: collapse;
 }
 table.list_table th {
-    border-width: 0px;
-    padding: 3px;
-    border-style: solid;
-    border-color: gray;
+  border: 0px solid gray;
+  padding: 3px;
 }
 table.list_table td {
-    border-width: 0px;
-    padding: 2px;
-    border-style: solid;
-    border-color: gray;
+  border: 0px solid gray;
+  padding: 2px;
 }
-
-
 table.menu_table {
-    width:100%;
-    border-width: 0px;
-    border-spacing: 4px;
-    border-style: solid;
-    border-color: gray;
-    border-collapse: collapse;
-    background-color:rgb(233, 233, 248);
-    text-align:left;
-    
+  border: 0px solid gray;
+  background-color: #f2f2f2;
+  width: 100%;
+  border-spacing: 4px;
+  font-family: Arial,Helvetica,sans-serif;
+  border-collapse: collapse;
+  text-align: left;
 }
 table.menu_table th {
-    border-width: 2px;
-    padding: 0px;
-    border-style: solid;
-    border-color: gray;
-    background-color:rgb(119, 145, 153);
-    font-weight: bold;
-    text-align:left;
+  border: 2px solid gray;
+  padding: 0px;
+  background-color: #779199;
+  font-weight: bold;
+  text-align: left;
 }
 table.menu_table td {
-    border-width: 1px;
-    padding: 2px;
-    border-style: solid;
-    border-color: gray;
+  border: 1px solid gray;
+  padding: 2px;
 }
-
-
-
 table.dw_table {
-    width:100%;
-    text-align:left;
-    border-width: 1px;
-    border-spacing: 2px;
-    border-style: solid;
-    border-color: gray;
-    border-collapse: collapse;
+  border: 1px solid gray;
+  width: 100%;
+  text-align: left;
+  border-spacing: 2px;
+  border-collapse: collapse;
 }
 table.dw_table th {
-    border-width: 0px;
-    padding: 3px;
-    border-style: solid;
-    border-color: gray;
-    font-weight: bold;
-    text-align:left;
+  border: 0px solid gray;
+  padding: 3px;
+  text-align: left;
+  font-weight: bold;
 }
 table.dw_table td {
-    border-width: 0px;
-    padding: 2px;
-    border-style: solid;
-    border-color: gray;
+  border: 0px solid gray;
+  padding: 2px;
 }
-
-
-
-
