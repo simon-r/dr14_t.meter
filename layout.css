@@ -26,20 +26,20 @@ table.main_table td {
 
 table.list_table {
     width:70%;
-    border-width: 1px;
+    border-width: 0px;
     border-spacing: 2px;
     border-style: solid;
     border-color: gray;
     border-collapse: collapse;
 }
 table.list_table th {
-    border-width: 1px;
+    border-width: 0px;
     padding: 3px;
     border-style: solid;
     border-color: gray;
 }
 table.list_table td {
-    border-width: 1px;
+    border-width: 0px;
     padding: 2px;
     border-style: solid;
     border-color: gray;
@@ -76,6 +76,7 @@ table.menu_table td {
 
 
 table.dw_table {
+    width:100%;
     text-align:left;
     border-width: 1px;
     border-spacing: 2px;
