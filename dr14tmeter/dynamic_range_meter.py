@@ -17,6 +17,7 @@
 import os
 from dr14tmeter.compute_dr14 import compute_dr14
 from dr14tmeter.audio_track import *
+from dr14tmeter.table import *
 import sys
 from dr14tmeter.audio_decoder import AudioDecoder
 import threading
@@ -117,7 +118,8 @@ class DynamicRangeMeter:
     def write_dr14( self , tm ):
         txt = ''
         
-        ( head , album_dir ) = os.path.split( self.dir_name ) 
+        ( head , album_dir ) = os.path.split( self.dir_name )
+        
         txt = tm.new_table(txt)
         
         txt = tm.new_head( txt )
@@ -127,8 +129,10 @@ class DynamicRangeMeter:
         
         txt = tm.end_head( txt )
         
+        txt = tm.new_tbody( txt )
+        
         txt = tm.append_row( txt , [ "-----------", "-----------", "-----------", "-------------------------------" ] )
-        txt = tm.append_row( txt , [ "DR", "Peak", "RMS", "File name" ] )
+        txt = tm.append_row( txt , [ "DR", "Peak", "RMS", "File name" ] , 'h' )
         txt = tm.append_row( txt , [ "-----------", "-----------", "-----------", "-------------------------------" ] )
         
         for i in range( len( self.res_list ) ) :
@@ -141,6 +145,7 @@ class DynamicRangeMeter:
             
             txt = tm.append_row( txt , row )
 
+        txt = tm.end_tbody( txt )
         
         txt = tm.new_foot( txt )
         txt = tm.append_row( txt , [ "-----------", "-----------", "-----------", "-------------------------------" ] )
@@ -209,175 +214,3 @@ class ScanDirMt(threading.Thread):
                 print( "- fail -" + full_file )
    
    
-   
-   
-   
-    
-
-class Table:
-    
-    def nl(self):
-        if sys.platform.startswith('linux'):
-            return '\n'
-        elif sys.platform.startswith('win'):
-            return '\n\r'
-    
-    def append_row( self , txt , row_el ):
-        txt = self.new_row(txt)
-        for i in row_el:
-            txt = self.new_cell(txt)
-            txt = txt + i
-            txt = self.end_cell(txt)
-        txt = self.end_row(txt)
-        return txt
-
-    def add_title( self , txt , title ):
-        pass
-    
-    def new_table( self , txt ):
-        pass
-    
-    def end_table( self , txt ):
-        pass
-    
-    def new_head( self , txt ):
-        return txt
-    
-    def end_head( self , txt ):
-        return txt
-    
-    def new_tbody( self , txt ):
-        return txt
-    
-    def end_tbody( self , txt ):
-        return txt
-    
-    def new_foot( self , txt ):
-        return txt
-    
-    def end_foot( self , txt ):
-        return txt
-    
-    def new_row( self , txt ):
-        pass
-    
-    def end_row( self , txt ):
-        pass
-    
-    def new_cell( self , txt ):
-        pass
-    
-    def end_cell( self , txt ):
-        pass
-    
-    def new_bold( self , txt ):
-        pass
-    
-    def end_bold( self , txt ):
-        pass
-    
-    
-    
-
-class TextTable ( Table ):
-
-    def add_title( self , txt , title ):
-        return txt + title + self.nl()
-
-    def new_table( self , txt ):
-        return txt + self.nl()
-    
-    def end_table( self , txt ):
-        return txt + self.nl()
-    
-    def new_row( self , txt ):
-        return txt + ''
-    
-    def end_row( self , txt ):
-        return txt + self.nl()
-    
-    def new_cell( self , txt ):
-        return txt + ''
-    
-    def end_cell( self , txt ):
-        return txt + '\t'
-    
-    def new_bold( self , txt ):
-        return txt + ''
-    
-    def end_bold( self , txt ):
-        return txt + ''
-    
-    
-
-class BBcodeTable ( Table ):
-
-    def add_title( self , txt , title ):
-        return txt + self.nl() + "[tr]" + self.nl() + " [td  colspan=4] " + title + " [/td] " + self.nl() + "[/tr]" + self.nl()
-
-    def new_table( self , txt ):
-        return txt + '[table]' + self.nl()
-    
-    def end_table( self , txt ):
-        return txt + self.nl() + '[/table]' + self.nl() 
-    
-    def new_row( self , txt ):
-        return txt + self.nl() + '[tr]' + self.nl()
-    
-    def end_row( self , txt ):
-        return txt + self.nl() + '[/tr]' + self.nl()
-    
-    def new_cell( self , txt ):
-        return txt + ' [td]'
-    
-    def end_cell( self , txt ):
-        return txt + '[/td]'
-    
-    def new_bold( self , txt ):
-        return txt + '[b]'
-    
-    def end_bold( self , txt ):
-        return txt + '[/b]'
-
-
-class HtmlTable ( Table ):
-
-    def add_title( self , txt , title ):
-        return txt + self.nl() + "<tr>" + self.nl() + " <th colspan=\"4\" > " + title + "</th>" + self.nl() + "</tr>" + self.nl() 
-
-        
-    def new_table( self , txt ):
-        return txt + "<table>" + self.nl() 
-    
-    def end_table( self , txt ):
-        return txt + self.nl() + "</table>" + self.nl()
-        
-    def new_head( self , txt ):
-        return txt + self.nl() + "<head>" + self.nl() 
-    
-    def end_head( self , txt ):
-        return txt + self.nl() + "</head>" + self.nl()
-    
-    def new_foot( self , txt ):
-        return txt + self.nl() + "<foot>" + self.nl() 
-    
-    def end_foot( self , txt ):
-        return txt + self.nl() + "</foot>" + self.nl() 
-    
-    def new_row( self , txt ):
-        return txt + self.nl() + "<tr>" + self.nl() 
-    
-    def end_row( self , txt ):
-        return txt + self.nl() + "</tr>" + self.nl() 
-    
-    def new_cell( self , txt ):
-        return txt + ' <td>'
-    
-    def end_cell( self , txt ):
-        return txt + '</td>'
-    
-    def new_bold( self , txt ):
-        return txt + '<b>'
-    
-    def end_bold( self , txt ):
-        return txt + '</b>'

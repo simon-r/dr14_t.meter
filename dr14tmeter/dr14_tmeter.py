@@ -22,6 +22,7 @@ from optparse import OptionParser
 from time import  time
 import multiprocessing
 from dr14tmeter.dynamic_range_meter import *
+from dr14tmeter.table import *
 
     
 def main():
@@ -103,12 +104,12 @@ def main():
 	print( "DR = " + str( dr.dr14 ) )
 
 	print("")
-	print("The full result has been written in the files: dr14_bbcode.txt, dr14.txt, dr14.html")
-	print("located in the directory:")
+	print("- The full result has been written in the files: dr14_bbcode.txt, dr14.txt, dr14.html")
+	print("- located in the directory:")
 	print( path_name )
 	print("")
 
-	print("end") 
+	print("Success! ") 
 
 	return r
 
