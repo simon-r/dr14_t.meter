@@ -121,7 +121,7 @@ class ApeFileReader( AudioFileReader ):
         return "ffmpeg"
     
     def get_cmd_options(self , file_name , tmp_file ):
-        return  " -i \"" + file_name + "\"" + " \"%s\" " % tmp_file
+        return  " -i \"" + file_name + "\"" + " \"%s\" &> /dev/null " % tmp_file
 
 
 class WavFileReader( AudioFileReader ):
