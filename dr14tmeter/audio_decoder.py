@@ -23,7 +23,7 @@ import subprocess
 class AudioDecoder:
 
     def __init__(self):
-        self.formats = [ '.flac' , '.mp3' , '.ogg' , '.mp4' , '.m4a' , '.wav' , '.ape' ]
+        self.formats = [ '.flac' , '.mp3' , '.ogg' , '.mp4' , '.m4a' , '.wav' , '.ape' , '.wma' ]
 
     def read_track( self , file_name ):
 
@@ -46,6 +46,8 @@ class AudioDecoder:
             af = WavFileReader()
         elif ext == '.ape':
             af = ApeFileReader()
+        elif ext == '.wma':
+            af = WmaFileReader()
         else:
             return ( [] , 0 , 0 )
 
@@ -119,6 +121,14 @@ class OggFileReader( AudioFileReader ):
         return  "--quiet " + "\"" + file_name + "\"" + " --output \"%s\"  " % tmp_file
 
 class ApeFileReader( AudioFileReader ):
+    def get_cmd(self):
+        return "ffmpeg"
+    
+    def get_cmd_options(self , file_name , tmp_file ):
+        return  " -i \"" + file_name + "\"" + " \"%s\" -y &> /dev/null " % tmp_file
+
+
+class WmaFileReader( AudioFileReader ):
     def get_cmd(self):
         return "ffmpeg"
     
