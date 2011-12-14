@@ -77,12 +77,8 @@ class AudioFileReader:
     
         full_command = full_command + " " + self.get_cmd_options( file_name , tmp_file )
 
-        oe = "" 
-        oo = ""
         r = subprocess.check_output( full_command , shell=True  )
-        print ( "==============================================================>>>>>>>>>>>" )
-        print ( r )
-        print ( "==============================================================<<<<<<<<<<<" )
+        
         ( Y , Fs , channels ) = read_wav.read_wav( tmp_file )
         #print (  "-fail- read mp3: " + tmp_file + str( ( Y , Fs , channels ) ) )
         os.remove( tmp_file )
@@ -127,7 +123,7 @@ class ApeFileReader( AudioFileReader ):
         return "ffmpeg"
     
     def get_cmd_options(self , file_name , tmp_file ):
-        return  " -i \"" + file_name + "\"" + " \"%s\" &> /dev/null " % tmp_file
+        return  " -i \"" + file_name + "\"" + " \"%s\" -y &> /dev/null " % tmp_file
 
 
 class WavFileReader( AudioFileReader ):
