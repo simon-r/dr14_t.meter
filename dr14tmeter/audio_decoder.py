@@ -18,6 +18,7 @@ import dr14tmeter.read_wav as read_wav
 import os
 import sys
 import tempfile
+import subprocess
 
 class AudioDecoder:
 
@@ -76,7 +77,12 @@ class AudioFileReader:
     
         full_command = full_command + " " + self.get_cmd_options( file_name , tmp_file )
 
-        r = os.popen( full_command ).read()
+        oe = "" 
+        oo = ""
+        r = subprocess.check_output( full_command , shell=True  )
+        print ( "==============================================================>>>>>>>>>>>" )
+        print ( r )
+        print ( "==============================================================<<<<<<<<<<<" )
         ( Y , Fs , channels ) = read_wav.read_wav( tmp_file )
         #print (  "-fail- read mp3: " + tmp_file + str( ( Y , Fs , channels ) ) )
         os.remove( tmp_file )
