@@ -79,7 +79,7 @@ class AudioFileReader:
     
         full_command = full_command + " " + self.get_cmd_options( file_name , tmp_file )
 
-        r = subprocess.check_output( full_command , shell=True  )
+        r = subprocess.call( full_command , shell=True  )
         
         ( Y , Fs , channels ) = read_wav.read_wav( tmp_file )
         #print (  "-fail- read mp3: " + tmp_file + str( ( Y , Fs , channels ) ) )
@@ -125,7 +125,7 @@ class ApeFileReader( AudioFileReader ):
         return "ffmpeg"
     
     def get_cmd_options(self , file_name , tmp_file ):
-        return  " -i \"" + file_name + "\"" + " \"%s\" -y &> /dev/null " % tmp_file
+        return  " -i \"" + file_name + "\"" + " -y \"%s\" -loglevel quiet -y " % tmp_file
 
 
 class WmaFileReader( AudioFileReader ):
@@ -133,7 +133,7 @@ class WmaFileReader( AudioFileReader ):
         return "ffmpeg"
     
     def get_cmd_options(self , file_name , tmp_file ):
-        return  " -i \"" + file_name + "\"" + " \"%s\" -y &> /dev/null " % tmp_file
+        return  " -i \"" + file_name + "\"" + " -y \"%s\" -loglevel quiet " % tmp_file
 
 
 class WavFileReader( AudioFileReader ):
