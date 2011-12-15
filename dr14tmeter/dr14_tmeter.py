@@ -25,6 +25,7 @@ from dr14tmeter.dynamic_range_meter import *
 from dr14tmeter.table import *
 import subprocess
 import sys
+import re
     
 def main():
 
@@ -54,6 +55,13 @@ def main():
 		type="string" ,
 		default="" ,
 		help="Write the result files into the given directory")
+	
+	parser.add_option("-t", "--tables",
+		action="store",
+		dest="out_tables",
+		type="string" ,
+		default="thb" ,
+		help="Select the output files to be written, codes: h=html t=text b=bbcode ")
 
 	(options, args) = parser.parse_args()
 
@@ -70,7 +78,11 @@ def main():
 		return 
 
 	if options.out_dir != "" and not( os.path.exists( options.out_dir ) ) :
-		print( "Error: The target directory \"%s\" don't exixst! " % options.out_dir )
+		print( "Error (-o): The target directory \"%s\" don't exixst! " % options.out_dir )
+		return 
+
+	if re.search( ".*[^htb].*" , options.out_tables ) :
+		print( "Error (-t) : Invalid table code" )
 		return 
 
 	print ( path_name )
@@ -120,14 +132,23 @@ def main():
 		out_dir = options.out_dir
 
 
-	dr.fwrite_dr14( os.path.join( out_dir , "dr14_bbcode.txt" ) , BBcodeTable() )
-	dr.fwrite_dr14( os.path.join( out_dir , "dr14.txt" ) , TextTable() )
-	dr.fwrite_dr14( os.path.join( out_dir , "dr14.html" ) , HtmlTable() )
+	out_list = "" ;
+	if 'b' in options.out_tables:
+		dr.fwrite_dr14( os.path.join( out_dir , "dr14_bbcode.txt" ) , BBcodeTable() )
+		out_list = " dr14_bbcode.txt "
+		
+	if 't' in options.out_tables:
+		dr.fwrite_dr14( os.path.join( out_dir , "dr14.txt" ) , TextTable() )
+		out_list = out_list + " dr14.txt "
+		
+	if 'h' in options.out_tables:
+		dr.fwrite_dr14( os.path.join( out_dir , "dr14.html" ) , HtmlTable() )
+		out_list = out_list + " dr14.html "
 
 	print( "DR = " + str( dr.dr14 ) )
 
 	print("")
-	print("- The full result has been written in the files: dr14_bbcode.txt, dr14.txt, dr14.html")
+	print("- The full result has been written in the files: %s" % out_list )
 	print("- located in the directory:")
 	print( out_dir )
 	print("")
