@@ -1,9 +1,11 @@
+
+
 *|table.main_table {
   border: 0px solid #dfdfdf;
   border-collapse: collapse;
   width: 100%;
   font-family: Arial,Helvetica,sans-serif;
-  background-color: #f2f2f2;
+  background-color:#f2f2f2;
   border-spacing: 2px;
   color: black;
 }
@@ -31,7 +33,7 @@
 }
 *|table.menu_table {
   border: 0px solid gray;
-  background-color: #f2f2f2;
+  background-color:#f2f2f2; 
   width: 100%;
   border-spacing: 4px;
   font-family: Arial,Helvetica,sans-serif;
@@ -66,3 +68,13 @@
   border: 0px solid gray;
   padding: 2px;
 }
+
+*|div.chapter { 
+ }
+ 
+*|div.chapter *|h2 {
+   border-bottom:thick dotted;
+   border-width:1px;
+   font-weight: bold;
+ }
+ 
