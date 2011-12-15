@@ -48,6 +48,13 @@ def main():
 		default=False,
 		help="Compute the DR14 of a single file")
 
+	parser.add_option("-o", "--outdir",
+		action="store",
+		dest="out_dir",
+		type="string" ,
+		default="" ,
+		help="Write the result files into the given directory")
+
 	(options, args) = parser.parse_args()
 
 	if len(args) <= 0:
@@ -57,6 +64,14 @@ def main():
 	#print( args )
 
 	path_name = os.path.abspath( args[0] )
+
+	if not( os.path.exists( path_name ) ) :
+		print( "Error: The input directory \"%s\" don't exixst! " % path_name )
+		return 
+
+	if options.out_dir != "" and not( os.path.exists( options.out_dir ) ) :
+		print( "Error: The target directory \"%s\" don't exixst! " % options.out_dir )
+		return 
 
 	print ( path_name )
 
@@ -98,16 +113,23 @@ def main():
 		print("No audio files found")
 		return r
 
-	dr.fwrite_dr14( os.path.join( path_name , "dr14_bbcode.txt" ) , BBcodeTable() )
-	dr.fwrite_dr14( os.path.join( path_name , "dr14.txt" ) , TextTable() )
-	dr.fwrite_dr14( os.path.join( path_name , "dr14.html" ) , HtmlTable() )
+
+	if options.out_dir == "" :
+		out_dir = path_name
+	else :
+		out_dir = options.out_dir
+
+
+	dr.fwrite_dr14( os.path.join( out_dir , "dr14_bbcode.txt" ) , BBcodeTable() )
+	dr.fwrite_dr14( os.path.join( out_dir , "dr14.txt" ) , TextTable() )
+	dr.fwrite_dr14( os.path.join( out_dir , "dr14.html" ) , HtmlTable() )
 
 	print( "DR = " + str( dr.dr14 ) )
 
 	print("")
 	print("- The full result has been written in the files: dr14_bbcode.txt, dr14.txt, dr14.html")
 	print("- located in the directory:")
-	print( path_name )
+	print( out_dir )
 	print("")
 
 	print("Success! ") 
