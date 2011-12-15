@@ -23,7 +23,8 @@ from time import  time
 import multiprocessing
 from dr14tmeter.dynamic_range_meter import *
 from dr14tmeter.table import *
-
+import subprocess
+import sys
     
 def main():
 
@@ -110,6 +111,9 @@ def main():
 	print("")
 
 	print("Success! ") 
+
+	if sys.platform.startswith('linux'):
+		subprocess.call( "stty sane" , shell=True ) 
 
 	return r
 

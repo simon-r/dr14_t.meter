@@ -79,7 +79,7 @@ class AudioFileReader:
     
         full_command = full_command + " " + self.get_cmd_options( file_name , tmp_file )
 
-        r = subprocess.call( full_command , shell=True  )
+        r = subprocess.call( full_command , shell=True  , stderr=subprocess.PIPE , stdout=subprocess.PIPE )
         
         ( Y , Fs , channels ) = read_wav.read_wav( tmp_file )
         #print (  "-fail- read mp3: " + tmp_file + str( ( Y , Fs , channels ) ) )
