@@ -173,10 +173,10 @@ class HtmlTable ( Table ):
         return txt + self.nl() + "</table>" + self.nl()
         
     def new_head( self , txt ):
-        return txt + self.nl() + "<head>" + self.nl() 
+        return txt + self.nl() + "<thead>" + self.nl() 
     
     def end_head( self , txt ):
-        return txt + self.nl() + "</head>" + self.nl()
+        return txt + self.nl() + "</thead>" + self.nl()
         
     def new_tbody( self , txt ):
         return txt + self.nl() + "<tbody>" + self.nl() 
@@ -185,10 +185,10 @@ class HtmlTable ( Table ):
         return txt + self.nl() + "</tbody>" + self.nl() 
     
     def new_foot( self , txt ):
-        return txt + self.nl() + "<foot>" + self.nl() 
+        return txt + self.nl() + "<tfoot>" + self.nl() 
     
     def end_foot( self , txt ):
-        return txt + self.nl() + "</foot>" + self.nl() 
+        return txt + self.nl() + "</tfoot>" + self.nl() 
     
     def new_row( self , txt ):
         return txt + self.nl() + "<tr>" + self.nl() 
