@@ -1,5 +1,14 @@
+div {   
+	margin:2%;
+	padding:5px; 
+	color:#0080C0; 
+	font-size:10px;  
+	width: 80%;
+	}
+
+
 table {
-	width: 80%px;
+	width: 80%;
 	border-collapse:collapse;
 	border:1px solid #FFCA5E;
 }
@@ -12,10 +21,9 @@ caption {
 	color: #FFAA00;
 }
 thead th {
-	background: url(bg_th.jpg) no-repeat right;
+	font-family: Arial, Helvetica, sans-serif;
 	height: 47px;
-	color: #FFFFFF;
-	font-size: 0.8em;
+	color: #777777;
 	font-weight: bold;
 	padding: 0px 7px;
 	margin: 20px 0px 0px;
@@ -23,10 +31,9 @@ thead th {
 	border-right: 1px solid #FCF1D4;
 }
 tbody tr {
-background: url(bg_td1.jpg) repeat-x top;
 }
 tbody tr.odd {
-	background: #FFF8E8 url(bg_td2.jpg) repeat-x;
+	background: #FFF8E8;
 }
 
 tbody th,td {
@@ -48,13 +55,13 @@ a:hover {
 	color: #F8A704;
 	text-decoration: underline;
 }
-tfoot th {
-	background: url(bg_total.jpg) repeat-x bottom;
+
+tfoot th, td {
 	color: #FFFFFF;
 	height: 30px;
-}
-tfoot td {
-	background: url(bg_total.jpg) repeat-x bottom;
-	color: #FFFFFF;
-	height: 30px;
+	font-family: Arial, Helvetica, sans-serif;
+	color: #777777;
+	text-align: left;
+	text-indent: 10px;
+	border-top: 1px solid #FFCA5E;
 }
