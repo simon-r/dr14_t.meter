@@ -35,7 +35,7 @@ def main():
 
 	use = "usage: %prog [options] path_name"
 
-	parser = OptionParser( description=desc ,  usage=use  , version="%prog 0.5.4"  )
+	parser = OptionParser( description=desc ,  usage=use  , version="%prog 0.6.0"  )
 
 	parser.add_option("-m", "--multithread",
 		action="store_true",
