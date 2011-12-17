@@ -27,6 +27,11 @@ def dr_rms( y ) :
 
 def u_rms( y ) :
     n = y.shape
+    rms = numpy.sqrt( numpy.sum( y**2.0 , 0 ) / float(n[0]) )
+    return rms
+
+def __u_rms( y ) :
+    n = y.shape
     
     samples_per_block = int(1e5)
     blk_cnt = int( n[0] / samples_per_block )
@@ -108,6 +113,6 @@ def compute_dr14( Y , Fs ) :
 
     y_rms = u_rms( Y )
 
-    dB_rms = decibel_u( numpy.sum( y_rms ) , 1/numpy.sqrt( 2 ) )
+    dB_rms = decibel_u( numpy.sum( y_rms ) , 1 )
 
     return ( dr14 , dB_peak , dB_rms )

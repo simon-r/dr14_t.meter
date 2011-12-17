@@ -46,6 +46,10 @@ class Table:
         txt = self.end_row(txt)
         return txt
 
+    def append_separator_line( self , txt ):
+        return txt 
+        
+
     def add_title( self , txt , title ):
         pass
     
@@ -102,6 +106,9 @@ class Table:
 
 class TextTable ( Table ):
 
+    def append_separator_line( self , txt ):
+        return self.append_row( txt , [ "----------------------------------------------------------------" ] )
+
     def add_title( self , txt , title ):
         return txt + title + self.nl()
 
@@ -132,6 +139,9 @@ class TextTable ( Table ):
     
 
 class BBcodeTable ( Table ):
+
+    def append_separator_line( self , txt ):
+        return self.append_row( txt , [ "-----------", "-----------", "-----------", "-------------------------------" ] )
 
     def add_title( self , txt , title ):
         return txt + self.nl() + "[tr]" + self.nl() + " [td  colspan=4] " + title + " [/td] " + self.nl() + "[/tr]" + self.nl()

@@ -124,16 +124,16 @@ class DynamicRangeMeter:
         
         txt = tm.new_head( txt )
         
-        txt = tm.append_row( txt , [ "-----------", "-----------", "-----------", "-------------------------------" ] )
+        txt = tm.append_separator_line( txt )
         txt = tm.add_title( txt , " Analyzed folder:  " + album_dir )
         
         txt = tm.end_head( txt )
         
         txt = tm.new_tbody( txt )
         
-        txt = tm.append_row( txt , [ "-----------", "-----------", "-----------", "-------------------------------" ] )
+        txt = tm.append_separator_line( txt )
         txt = tm.append_row( txt , [ "DR", "Peak", "RMS", "File name" ] , 'h' )
-        txt = tm.append_row( txt , [ "-----------", "-----------", "-----------", "-------------------------------" ] )
+        txt = tm.append_separator_line( txt )
         
         for i in range( len( self.res_list ) ) :
             
@@ -148,12 +148,12 @@ class DynamicRangeMeter:
         txt = tm.end_tbody( txt )
         
         txt = tm.new_foot( txt )
-        txt = tm.append_row( txt , [ "-----------", "-----------", "-----------", "-------------------------------" ] )
+        txt = tm.append_separator_line( txt )
                
         txt = tm.add_title( txt , "Number of files: \t\t " + str(len( self.res_list )) )
-        txt = tm.add_title( txt , "Official DR value: \t\t " + str(self.dr14) )
+        txt = tm.add_title( txt , "Official DR value: \t\t DR%d" % int(self.dr14) )
         
-        txt = tm.append_row( txt , [ "-----------", "-----------", "-----------", "-------------------------------" ] )
+        txt = tm.append_separator_line( txt )
         txt = tm.end_foot( txt )
         
         txt = tm.end_table(txt)
