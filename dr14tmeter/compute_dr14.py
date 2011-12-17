@@ -108,6 +108,6 @@ def compute_dr14( Y , Fs ) :
 
     y_rms = u_rms( Y )
 
-    dB_rms = decibel_u( numpy.sum( y_rms ) , 1 )
+    dB_rms = decibel_u( numpy.sum( y_rms ) , 1/numpy.sqrt( 2 ) )
 
     return ( dr14 , dB_peak , dB_rms )
