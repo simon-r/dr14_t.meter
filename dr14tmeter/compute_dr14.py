@@ -53,7 +53,7 @@ def __u_rms( y ) :
 def decibel_u( y , ref ) :
     return 20 * numpy.log10( y / ref )
 
-def compute_dr14( Y , Fs ) :
+def compute_dr14( Y , Fs , duration = None , Dr_lr = None ) :
     s = Y.shape
     ch = s[1]
 
@@ -84,9 +84,6 @@ def compute_dr14( Y , Fs ) :
     i = seg_cnt - 1 ;
     r = arange( curr_sam,s[0] )
 
-    #print( s )
-    #print( curr_sam )
-    #print ( r )
     if r.shape[0] > 0:
         rms[i,:] = dr_rms( Y[r,:] )
         peaks[i,:] = numpy.max( numpy.abs( Y[r,:] ) , 0 )
@@ -114,5 +111,12 @@ def compute_dr14( Y , Fs ) :
     y_rms = u_rms( Y )
 
     dB_rms = decibel_u( numpy.sum( y_rms ) , 1 )
+    
+    if duration != None :
+        duration.tm_min = int( s[0] * (1 / Fs) / 60 )
+        duration.tm_sec = int( (( s[0] * (1 / Fs) / 60 ) - duration.tm_min ) * 60 )
+        
+    if Dr_lr != None :
+        Dr_lr = ch_dr14
 
     return ( dr14 , dB_peak , dB_rms )
