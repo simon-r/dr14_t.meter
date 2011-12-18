@@ -1,3 +1,9 @@
+A:link { text-decoration: none}
+A:visited {text-decoration: none}
+A:active {text-decoration: none}
+A:hover {text-decoration: underline; color: red;}
+
+
 div {   
 	margin:2%;
 	padding:5px; 
@@ -6,6 +12,14 @@ div {
 	width: 80%;
 	}
 
+body {
+	font:Arial, Helvetica, sans-serif;	
+}
+
+h2 {
+	font-family:Arial, Helvetica, sans-serif;	
+	padding: 1%
+}
 
 table {
 	width: 80%;
@@ -28,7 +42,7 @@ thead th {
 	padding: 0px 7px;
 	margin: 20px 0px 0px;
 	text-align: left;
-	border-right: 1px solid #FCF1D4;
+	border-right: 1px solid #FFCA5E;
 }
 tbody tr {
 }
@@ -43,7 +57,7 @@ tbody th,td {
 	color: #777777;
 	padding: 10px 7px;
 	border-top: 1px solid #FFCA5E;
-	border-right: 1px solid #DDDDDD;
+	border-right: 1px solid #FFCA5E;
 	text-align: left;
 }
 a {
