@@ -19,10 +19,11 @@
 
 import os
 from optparse import OptionParser
-from time import  time
+import time
 import multiprocessing
 from dr14tmeter.dynamic_range_meter import *
 from dr14tmeter.table import *
+from dr14tmeter.dr14_global import dr14_version
 import subprocess
 import sys
 import re
@@ -35,7 +36,7 @@ def main():
 
 	use = "usage: %prog [options] path_name"
 
-	parser = OptionParser( description=desc ,  usage=use  , version="%prog 0.6.0"  )
+	parser = OptionParser( description=desc ,  usage=use  , version="%prog " + dr14_version()  )
 
 	parser.add_option("-m", "--multithread",
 		action="store_true",
@@ -105,7 +106,7 @@ def main():
 			return 0
 
 
-	a = time()
+	a = time.time()
 	if not options.multithread:
 	        r = dr.scan_dir( path_name )
 	else:
@@ -117,7 +118,7 @@ def main():
 
 		r = dr.scan_dir_mt( path_name , cpu )
 
-	b = time() - a
+	b = time.time() - a
 
 	print( "Elapsed time: " + str(b) )
 	

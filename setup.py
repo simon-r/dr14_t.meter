@@ -1,4 +1,5 @@
 from distutils.core import setup
+from dr14tmeter.dr14_global import dr14_version
 
 #This is a list of files to install, and where
 #(relative to the 'root' dir, where setup.py is)
@@ -6,7 +7,7 @@ from distutils.core import setup
 #iles = ["things/*"]
 
 setup(name = "dr14_tmeter",
-    version = "0.6.0",
+    version = "%s" % dr14_version() ,
     description = "Compute the DR14 value of the given audio files",
     author = "Simone Riva",
     author_email = "simone.rva [at] gmail.com",
