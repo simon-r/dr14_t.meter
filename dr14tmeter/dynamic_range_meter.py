@@ -28,7 +28,7 @@ class StructDuration:
         self.tm_sec = 0
     
     def to_str( self ):
-        return str( self.tm_min ) + ":" + str(self.tm_sec)
+        return str( self.tm_min ) + ":%02d" % int(self.tm_sec)
         
 
 class DynamicRangeMeter:   
