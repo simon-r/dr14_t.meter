@@ -162,14 +162,15 @@ class DynamicRangeMeter:
         
         for i in range( len( self.res_list ) ) :
             
-            row = []
-            row.append( "DR%d" % self.res_list[i]['dr14'] )
-            row.append( " %.2f" % self.res_list[i]['dB_peak'] + ' dB' )
-            row.append( " %.2f" % self.res_list[i]['dB_rms'] + ' dB' )
-            row.append( self.res_list[i]['duration'] )
-            row.append( self.res_list[i]['file_name'] )
+            if self.res_list[i]['dr14'] > dr14.min_dr() :
+                row = []
+                row.append( "DR%d" % self.res_list[i]['dr14'] )
+                row.append( " %.2f" % self.res_list[i]['dB_peak'] + ' dB' )
+                row.append( " %.2f" % self.res_list[i]['dB_rms'] + ' dB' )
+                row.append( self.res_list[i]['duration'] )
+                row.append( self.res_list[i]['file_name'] )
             
-            txt = tm.append_row( txt , row )
+                txt = tm.append_row( txt , row )
 
         txt = tm.end_tbody( txt )
         
