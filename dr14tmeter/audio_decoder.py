@@ -86,9 +86,12 @@ class AudioFileReader:
         r = subprocess.call( full_command , shell=True  , stderr=subprocess.PIPE , stdout=subprocess.PIPE )
         
         ( Y , Fs , channels ) = read_wav.read_wav( tmp_file )
-        #print (  "-fail- read mp3: " + tmp_file + str( ( Y , Fs , channels ) ) )
-        os.remove( tmp_file )
-
+        
+        if os.path.exists( tmp_file ) :
+            os.remove( tmp_file )
+        else:
+            print( file_name + ": unsupported encoder" )
+        
         return ( Y , Fs , channels )
 
 

@@ -21,6 +21,7 @@ from dr14tmeter.table import *
 import sys
 from dr14tmeter.audio_decoder import AudioDecoder
 import threading
+import dr14tmeter.dr14_global as dr14
 
 class StructDuration:
     def __init__( self ):
@@ -105,7 +106,7 @@ class DynamicRangeMeter:
             if ext in ad.formats:
                 jobs.append( file_name )
         
-        empty_res = { 'file_name': '' , 'dr14': 0 , 'dB_peak': -100 , 'dB_rms': -100 , 'duration':"0:0" }
+        empty_res = { 'file_name': '' , 'dr14': dr14.min_dr() , 'dB_peak': -100 , 'dB_rms': -100 , 'duration':"0:0" }
         self.res_list = [empty_res for i in range( len(jobs) )]
         
         lock_j = threading.Lock()
@@ -123,14 +124,17 @@ class DynamicRangeMeter:
         for t in range( thread_cnt ):
             threads[t].join()
             
+        succ = 0 
         for d in self.res_list:
-            self.dr14 = self.dr14 + d['dr14']
+            if d['dr14'] > dr14.min_dr():
+                self.dr14 = self.dr14 + d['dr14']
+                succ = succ + 1 
             
-            
+         
         #print( str(self.res_list ) )
-        if len( self.res_list ) > 0:
-            self.dr14 = int( round( self.dr14 / len( self.res_list ) ) )
-            return len( self.res_list )
+        if len( self.res_list ) > 0 and succ > 0 :
+            self.dr14 = int( round( self.dr14 / succ ) )
+            return succ
         else:
             return 0
         

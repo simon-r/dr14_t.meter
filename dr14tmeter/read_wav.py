@@ -32,8 +32,8 @@ def read_wav( file_name ):
 		else :
 			samples = samples / (convert_8_bit + 1.0)
 	except:
-		print ( "Unexpected error:", str( sys.exc_info() ) )
-		print (  "-Except! - read mp3: " + file_name + str( ( sample_rate , samples ) ) )
+		#print ( "Unexpected error:", str( sys.exc_info() ) )
+		print (  "\n - ERROR ! " )
 		return ( [] , 0 , 0 )
 		
 		
