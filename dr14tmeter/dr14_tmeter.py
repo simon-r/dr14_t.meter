@@ -23,12 +23,15 @@ import time
 import multiprocessing
 from dr14tmeter.dynamic_range_meter import *
 from dr14tmeter.table import *
-from dr14tmeter.dr14_global import dr14_version
+from dr14tmeter.dr14_global import dr14_version, TestVer, test_new_version, get_home_url
 import subprocess
 import sys
 import re
     
 def main():
+	
+	l_ver = TestVer()
+	l_ver.start()
 
 	desc = "Compute the DR14 value of the audio files according to the algorithm " 
 	desc =  desc + "described by the Pleasurize Music Foundation "
@@ -158,6 +161,11 @@ def main():
 
 	if sys.platform.startswith('linux'):
 		subprocess.call( "stty sane" , shell=True ) 
+
+	if test_new_version() :
+		print ( "A new version %s is available online please visit: %s" , ( get_new_version() , get_home_url() ) )
+	else:
+		print ( "no news" )
 
 	return r
 
