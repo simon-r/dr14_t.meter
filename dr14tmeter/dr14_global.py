@@ -2,11 +2,12 @@ import sys
 import re
 import threading
 
-#current version
-v_major = 0
-v_minor = 6
-v_revision = 1
-
+###########################
+# Current version
+v_major    = 0
+v_minor    = 7
+v_revision = 0
+###########################
 
 # latest version
 l_major = 0
@@ -42,7 +43,7 @@ def _dr14_get_latest_version():
     global l_revision
     global lock_ver
     
-    ver_url = "http://simon-r.github.com/dr14_t.meter/vert.txt"
+    ver_url = "http://simon-r.github.com/dr14_t.meter/ver.txt"
     
     try:
         if sys.version_info[0] > 2 :
@@ -66,7 +67,7 @@ def _dr14_get_latest_version():
     l_minor = int( m.groups()[1] )
     l_revision = int( m.groups()[2] )
     lock_ver.release() 
-    print( "%d.%d.%d" % ( l_major , l_minor , l_revision ) )
+    #print( "%d.%d.%d" % ( l_major , l_minor , l_revision ) )
 
     
 def test_new_version():
@@ -97,5 +98,5 @@ def get_new_version():
     
 
 def get_home_url():
-    return "http://simon-r.github.com/dr14_t.meter/"
+    return "http://simon-r.github.com/dr14_t.meter"
         

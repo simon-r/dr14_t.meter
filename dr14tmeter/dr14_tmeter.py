@@ -23,7 +23,7 @@ import time
 import multiprocessing
 from dr14tmeter.dynamic_range_meter import *
 from dr14tmeter.table import *
-from dr14tmeter.dr14_global import dr14_version, TestVer, test_new_version, get_home_url
+from dr14tmeter.dr14_global import dr14_version, TestVer, test_new_version, get_home_url, get_new_version
 import subprocess
 import sys
 import re
@@ -123,7 +123,7 @@ def main():
 
 	b = time.time() - a
 
-	print( "Elapsed time: " + str(b) )
+	print( "Elapsed time: %2.2f" % b )
 	
 	if r == 0:
 		print("No audio files found")
@@ -163,10 +163,10 @@ def main():
 		subprocess.call( "stty sane" , shell=True ) 
 
 	if test_new_version() :
-		print ( "A new version %s is available online please visit: %s" , ( get_new_version() , get_home_url() ) )
-	else:
-		print ( "no news" )
-
+		print( "\n----------------------------------------------------------------------" )
+		print( " A new version of dr14_t.meter [ %s ] is available for download \n please visit: %s" % ( get_new_version() , get_home_url() ) )
+		print( "----------------------------------------------------------------------\n" )
+	
 	return r
 
 if __name__ == '__main__':
