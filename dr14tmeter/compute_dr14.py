@@ -108,15 +108,15 @@ def compute_dr14( Y , Fs , duration = None , Dr_lr = None ) :
 
     dr14 = round( numpy.mean( ch_dr14 ) )
 
-    dB_peak = decibel_u( numpy.max( peaks ) , 1 )
+    dB_peak = decibel_u( numpy.max( peaks ) , 1.0 )
 
-    y_rms = numpy.sum( numpy.mean( rms , 0 ) ) / 2 
+    y_rms = numpy.sum( numpy.mean( rms , 0 ) ) / 2.0 
 
     dB_rms = decibel_u( y_rms , 1 )
     
     if duration != None :
-        duration.tm_min = int( s[0] * (1 / Fs) / 60 )
-        duration.tm_sec = int( (( s[0] * (1 / Fs) / 60 ) - duration.tm_min ) * 60 )
+        duration.tm_min = int( s[0] * (1.0 / Fs) / 60.0 )
+        duration.tm_sec = int( (( s[0] * (1.0 / Fs) / 60.0 ) - duration.tm_min ) * 60.0 )
         
     if Dr_lr != None :
         Dr_lr = ch_dr14

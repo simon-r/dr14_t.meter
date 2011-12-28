@@ -80,11 +80,15 @@ def test_new_version():
     global v_revision
     
     lock_ver.acquire()
-    if l_major > v_major or l_minor > v_minor or l_revision > v_revision :
-        lock_ver.release() 
+    l_v = l_major * 100 + l_minor * 10 + l_revision
+    lock_ver.release()
+    
+    v_v = v_major * 100 + v_minor * 10 + v_revision
+    
+    lock_ver.acquire()
+    if l_v > v_v :
         return True
     else:
-        lock_ver.release() 
         return False
     
 
