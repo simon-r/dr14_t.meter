@@ -45,20 +45,20 @@ def main():
 		action="store_true",
 		dest="multithread",
 		default=False,
-		help="Start the multithread mode")
+		help="Usees the multi-Core mode")
 
 	parser.add_option("-f", "--file",
 		action="store_true",
 		dest="scan_file",
 		default=False,
-		help="Compute the DR14 of a single file")
+		help="Compute the DR14 of a single file and exit")
 
 	parser.add_option("-o", "--outdir",
 		action="store",
 		dest="out_dir",
 		type="string" ,
 		default="" ,
-		help="Write the result files into the given directory")
+		help="Write the resultings files into the given directory")
 	
 	parser.add_option("-t", "--tables",
 		action="store",
