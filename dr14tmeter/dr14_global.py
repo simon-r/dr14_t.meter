@@ -61,18 +61,19 @@ def _dr14_get_latest_version():
     global lock_ver
     
     ver_url = "http://simon-r.github.com/dr14_t.meter/ver.txt"
+    print ( ver_url )
     
     try:
         if sys.version_info[0] > 2 :
             import urllib.request
             opener = urllib.request.FancyURLopener({})
-            f = opener.open(ver_url)
+            f = opener.open( ver_url  )
             vr = f.read()
             vr = vr.decode()
         else :
             import urllib
             opener = urllib.FancyURLopener({})
-            f = opener.open(ver_url)
+            f = opener.open( ver_url )
             vr = f.read()
     except:
         return 
@@ -84,7 +85,7 @@ def _dr14_get_latest_version():
     l_minor = int( m.groups()[1] )
     l_revision = int( m.groups()[2] )
     lock_ver.release() 
-    #print( "%d.%d.%d" % ( l_major , l_minor , l_revision ) )
+    #print( ">>>>>>>>>>>>>< %d.%d.%d" % ( l_major , l_minor , l_revision ) )
 
     
 def test_new_version():
