@@ -30,9 +30,6 @@ import re
     
 def main():
 	
-	l_ver = TestVer()
-	l_ver.start()
-
 	desc = "Compute the DR14 value of the audio files according to the algorithm " 
 	desc =  desc + "described by the Pleasurize Music Foundation "
 	desc =  desc + "Visit: http://www.dynamicrange.de/"
@@ -45,7 +42,7 @@ def main():
 		action="store_true",
 		dest="multithread",
 		default=False,
-		help="Usees the multi-Core mode")
+		help="Uses the multi-Core mode")
 
 	parser.add_option("-f", "--file",
 		action="store_true",
@@ -89,6 +86,9 @@ def main():
 		print( "Error (-t) : Invalid table code" )
 		return 
 
+	l_ver = TestVer()
+	l_ver.start()
+	
 	print ( path_name )
 
 	dr = DynamicRangeMeter()
