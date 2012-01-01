@@ -15,13 +15,32 @@
 #along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
+import os
+import shutil
+import subprocess
+import sys
+
+
 from distutils.core import setup
 from dr14tmeter.dr14_global import dr14_version
+from distutils.command.install import install
 
-#This is a list of files to install, and where
-#(relative to the 'root' dir, where setup.py is)
-#You could be more specific.
-#iles = ["things/*"]
+
+class dr14_install(install):
+    user_options = install.user_options
+ 
+    def run(self):
+
+        man_dir = abspath("./man/")
+
+        output = subprocess.Popen([os.path.join(man_dir, "install.sh")],
+                stdout=subprocess.PIPE,
+                cwd=man_dir,
+                env=dict({"PREFIX": self.prefix}, **dict(os.environ))).communicate()[0]
+        print( output )
+
+
+
 
 setup(name = "dr14_tmeter",
     version = "%s" % dr14_version() ,
@@ -29,20 +48,16 @@ setup(name = "dr14_tmeter",
     author = "Simone Riva",
     author_email = "simone.rva [at] gmail.com",
     url = "http://simon-r.github.com/dr14_t.meter",
-    #Name the folder where your packages live:
-    #(If you have other packages (dirs) or modules (py files) then
-    #put them into the package directory - they will be found 
-    #recursively.)
     packages = ['dr14tmeter'],
-    #'package' package must contain files (see list above)
-    #I called the package 'package' thus cleverly confusing the whole issue...
-    #This dict maps the package name =to=> directories
-    #It says, package *needs* these files.
-    #package_data = {'package' : files },
-    #'runner' is in the root.
     scripts = ["dr14_tmeter"],
-    long_description = "Compute the DR14 value of the given audio files according to the algorithm decribed by the Pleasurize Music Foundation" 
-    #
-    #This next part it for the Cheese Shop, look a little down the page.
-    #classifiers = []     
+    long_description = "Compute the DR14 value of the given audio files according to the algorithm decribed by the Pleasurize Music Foundation" ,
+    classifiers=[
+        'Development Status :: 0.7.1 Stable',
+        'Environment :: Console',
+        'Intended Audience :: Users',
+        'License :: OSI Approved :: GPL-3.0+',
+        'Operating System :: Linux',
+        'Programming Language :: Python',
+        'Topic :: Multimedia'] ,
+    cmdclass={"install": dr14_install }
 ) 
