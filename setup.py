@@ -30,13 +30,15 @@ class dr14_install(install):
     user_options = install.user_options
  
     def run(self):
-
-        man_dir = abspath("./man/")
+        
+        install.run(self)
+        
+        man_dir = os.path.abspath("./man/")
 
         output = subprocess.Popen([os.path.join(man_dir, "install.sh")],
                 stdout=subprocess.PIPE,
                 cwd=man_dir,
-                env=dict({"PREFIX": self.prefix}, **dict(os.environ))).communicate()[0]
+                env=dict({"PREFIX": os.path.join( self.root , self.prefix ) }, **dict(os.environ))).communicate()[0]
         print( output )
 
 
