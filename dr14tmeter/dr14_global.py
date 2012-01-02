@@ -23,7 +23,7 @@ import threading
 # Current version
 v_major    = 0
 v_minor    = 7
-v_revision = 2
+v_revision = 3
 ###########################
 
 # latest version
@@ -61,7 +61,7 @@ def _dr14_get_latest_version():
     global lock_ver
     
     ver_url = "http://simon-r.github.com/dr14_t.meter/ver.txt"
-    print ( ver_url )
+    #print ( ver_url )
     
     try:
         if sys.version_info[0] > 2 :
