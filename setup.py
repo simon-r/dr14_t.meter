@@ -19,6 +19,7 @@ import os
 import shutil
 import subprocess
 import sys
+import re
 
 
 from distutils.core import setup
@@ -35,10 +36,15 @@ class dr14_install(install):
         
         man_dir = os.path.abspath("./man/")
 
+        #print ( "root:   " + self.root )
+        #print ( "prefix: " + self.prefix )
+
+        prefix = re.sub( r'^/' , '' , self.prefix )
+
         output = subprocess.Popen([os.path.join(man_dir, "install.sh")],
                 stdout=subprocess.PIPE,
                 cwd=man_dir,
-                env=dict({"PREFIX": os.path.join( self.root , self.prefix ) }, **dict(os.environ))).communicate()[0]
+                env=dict({"PREFIX": os.path.join( self.root , prefix ) }, **dict(os.environ))).communicate()[0]
         print( output )
 
 
