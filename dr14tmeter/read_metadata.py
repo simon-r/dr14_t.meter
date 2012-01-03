@@ -3,17 +3,7 @@ import sys
 
 
 # Test example !!!!!
-cmd = ["ffmpeg" , "-i" , "/media/esterno_xfs/data/Musica/Musica/aavv/01-blitzkrieg_bop_160_lame_abr.mp3" ]
+a = subprocess.check_output( [ "ffprobe" , "-show_format" , "/media/esterno_xfs/data/Musica/Musica/aavv/01-blitzkrieg_bop_160_lame_abr.mp3" ] , stderr=subprocess.STDOUT , shell=False )
 
-#cmd = [ "ls" , "-al" ]
+print( a )
 
-process = subprocess.Popen( cmd , stdout=subprocess.PIPE, stderr=subprocess.PIPE )
-
-while True:
-    out = process.stderr.readline()
-    if out == '' and process.poll() != None:
-        break
-    if out != '':
-        #sys.stdout.write(out)
-        print ( ">> " + out )
-        sys.stdout.flush()
