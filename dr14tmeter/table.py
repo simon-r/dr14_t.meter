@@ -144,7 +144,7 @@ class BBcodeTable ( Table ):
         return self.append_row( txt , [ "-----------", "-----------", "-----------", "-----------", "-------------------------------" ] )
 
     def add_title( self , txt , title ):
-        return txt + self.nl() + "[tr]" + self.nl() + " [td  colspan=4] " + title + " [/td] " + self.nl() + "[/tr]" + self.nl()
+        return txt + self.nl() + "[tr]" + self.nl() + " [td  colspan=5] " + title + " [/td] " + self.nl() + "[/tr]" + self.nl()
 
     def new_table( self , txt ):
         return txt + '[table]' + self.nl()
@@ -174,7 +174,7 @@ class BBcodeTable ( Table ):
 class HtmlTable ( Table ):
 
     def add_title( self , txt , title ):
-        return txt + self.nl() + "<tr>" + self.nl() + " <th colspan=\"4\" > " + title + "</th>" + self.nl() + "</tr>" + self.nl() 
+        return txt + self.nl() + "<tr>" + self.nl() + " <th colspan=\"5\" > " + title + "</th>" + self.nl() + "</tr>" + self.nl() 
 
     def new_table( self , txt ):
         return txt + "<table>" + self.nl() 
