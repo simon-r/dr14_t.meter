@@ -50,9 +50,10 @@ class retirve_metadata:
         if m != None:
             print ( m.group(1) )
         
-        m = re.search( r"\:\s*Audio\s*\:\s*(\w*)" , data_txt , re_flags )
+        #Audio: flac, 44100 Hz, stereo, s16
+        m = re.search( r"\:\s*Audio\s*\:\s*(\w*)\s*,\s*(\d*)\s*Hz\s*,\s*(\w*)\s*,\s*s(\d+)" , data_txt , re_flags )
         if m != None:
-            print ( m.group(1) )
+            print ( m.group(1) + " " + m.group(2)+ " " + m.group(3)+ " " + m.group(4) )
         
         m = re.search( r"\,\s*bitrate\s*\:\s*(\d*)\s*kb" , data_txt , re_flags )
         if m != None:
