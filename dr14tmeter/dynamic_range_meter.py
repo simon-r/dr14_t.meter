@@ -15,13 +15,16 @@
 #along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import os
+import threading
+import sys
+
 from dr14tmeter.compute_dr14 import compute_dr14
 from dr14tmeter.audio_track import *
 from dr14tmeter.table import *
-import sys
+from dr14tmeter.read_metadata import RetirveMetadata
 from dr14tmeter.audio_decoder import AudioDecoder
-import threading
 import dr14tmeter.dr14_global as dr14
+
 
 class StructDuration:
     def __init__( self ):
@@ -38,7 +41,7 @@ class DynamicRangeMeter:
         self.res_list = []
         self.dir_name = '' 
         self.dr14 = 0 
-  
+        self.meta_data = RetirveMetadata()
     
     def scan_file( self , file_name):
         
@@ -71,6 +74,7 @@ class DynamicRangeMeter:
             if at.open( full_file ):
                 self.__compute_and_append( at , file_name )
 
+        self.meta_data.scan_dir( dir_name )
         if len( self.res_list ) > 0:
             self.dr14 = int( round( self.dr14 / len( self.res_list ) ) )
             return len( self.res_list )

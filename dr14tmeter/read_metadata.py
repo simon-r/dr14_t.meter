@@ -31,13 +31,14 @@ from dr14tmeter.audio_decoder import AudioDecoder
 class RetirveMetadata:
     
     def __init__( self ):
-        pass
+        self._album = {}
+        self._tracks = {}
     
     
     def scan_dir( self , dir_name , dir_list=None ):
         
         self._album = {}
-        self._traks = {}
+        self._tracks = {}
         
         if dir_list == None:
             dir_name = os.path.abspath( dir_name )
@@ -73,7 +74,7 @@ class RetirveMetadata:
         m = re.search( r"\s*album\s*\:\s*(.*)$" , data_txt , re_flags )
         if m != None:
             self._album.setdefault( m.group(1) , 0 )
-            _album[m.group(1)] += 1
+            self._album[m.group(1)] += 1
         
         m = re.search( r"\s*title\s*\:\s*(.*)$" , data_txt , re_flags )
         if m != None:
@@ -92,10 +93,12 @@ class RetirveMetadata:
         m = re.search( r"\,\s*bitrate\s*\:\s*(\d*)\s*kb" , data_txt , re_flags )
         if m != None:
             track['bitrate'] = m.group(1)
-            print ( m.group(1) )
+            #print ( m.group(1) )
             
-        self._tracks.append( track )
+        ( foo , f_key ) = os.path.split( file_name )
+        self._tracks[f_key] = track 
         
 
 
-
+    def album_len( self ):
+        return len( self._tracks )

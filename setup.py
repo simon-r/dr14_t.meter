@@ -60,7 +60,7 @@ setup(name = "dr14_tmeter",
     scripts = ["dr14_tmeter"],
     long_description = "Compute the DR14 value of the given audio files according to the algorithm decribed by the Pleasurize Music Foundation" ,
     classifiers=[
-        'Development Status :: 0.7.1 Stable',
+        'Development Status :: %s Stable' % dr14_version() ,
         'Environment :: Console',
         'Intended Audience :: Users',
         'License :: OSI Approved :: GPL-3.0+',
