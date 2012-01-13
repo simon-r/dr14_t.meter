@@ -102,3 +102,28 @@ class RetirveMetadata:
 
     def album_len( self ):
         return len( self._tracks )
+
+
+    def get_album_title( self ):
+        if len( self._album ) > 1 :
+            return "Various"
+        elif len( self._album ) == 0 :
+            return None
+        else :
+            return self._album[0]
+
+    
+    def get_value( self , file_name , field ):
+        f = self._tracks.setdefault( 'file_name' , None )
+        if f == None :
+            return None
+        
+        return f.setdefault( 'field' , None )
+
+
+
+
+
+
+
+
