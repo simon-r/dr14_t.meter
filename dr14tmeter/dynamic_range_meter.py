@@ -206,11 +206,15 @@ class DynamicRangeMeter:
         txt = tm.append_separator_line( txt )
         
         album_t = self.meta_data.get_album_title()
+        artist = self.meta_data.get_album_artist()
         
         if album_t == None :
             txt = tm.add_title( txt , " Analyzed folder:  " + album_dir )
         else:
-            txt = tm.add_title( txt , " Album:  " + album_t )    
+            txt = tm.add_title( txt , " Album: \t" + album_t )
+        
+        if artist != None :
+            txt = tm.add_title( txt , " Artist: \t" + artist )
         
         
         txt = tm.end_head( txt )
@@ -220,6 +224,10 @@ class DynamicRangeMeter:
         txt = tm.append_separator_line( txt )
         txt = tm.append_row( txt , [ "DR", "Peak", "RMS", "Duration" , "Title" ] , 'h' )
         txt = tm.append_separator_line( txt )
+        
+        list_bit = []
+        sum_kbs = 0
+        sampl_rate = []
         
         for i in range( len( self.res_list ) ) :
             
@@ -231,18 +239,30 @@ class DynamicRangeMeter:
                 row.append( self.res_list[i]['duration'] )
                 
                 #print( "> " + self.res_list[i]['file_name'] )
-                tr_title = self.meta_data.get_value( self.res_list[i]['file_name'] , 'title' )
+                
+                curr_file_name = self.res_list[i]['file_name']
+                
+                tr_title = self.meta_data.get_value( curr_file_name , 'title' )
                 #print( "> " + tr_title )
                 if tr_title == None :
                     row.append( self.res_list[i]['file_name'] )
                 else:
-                    nr = self.meta_data.get_value( self.res_list[i]['file_name'] , 'nr' )
-                    codec = self.meta_data.get_value( self.res_list[i]['file_name'] , 'codec' )
-                    bitrate = self.meta_data.get_value( self.res_list[i]['file_name'] , 'bitrate' )
-                    bit = self.meta_data.get_value( self.res_list[i]['file_name'] , 'bit' )
+                    nr = self.meta_data.get_value( curr_file_name , 'nr' )
+                    codec = self.meta_data.get_value( curr_file_name , 'codec' )
+                    bitrate = self.meta_data.get_value( curr_file_name , 'bitrate' )
+                    bit = self.meta_data.get_value( curr_file_name , 'bit' )
+                    s_rate = self.meta_data.get_value( curr_file_name , 's_rate' )
                     if nr == None :
                         nr = str( i ) 
-                    row.append( "%s - %s [%s - %sbit - %s kbit/sec]" % ( nr , tr_title , codec , bit , bitrate ) )
+                    row.append( "%s - %s \t [%s]" % ( nr , tr_title , codec ) )
+                    
+                    sum_kbs += int( self.meta_data.get_value( curr_file_name , 'bitrate' ) )
+                    
+                    if bit not in list_bit :
+                        list_bit.append( bit )    
+                        
+                    if s_rate not in sampl_rate :
+                        sampl_rate.append( s_rate )
                     
                 txt = tm.append_row( txt , row )
         
@@ -253,6 +273,12 @@ class DynamicRangeMeter:
                
         txt = tm.add_title( txt , "Number of files: \t\t " + str(len( self.res_list )) )
         txt = tm.add_title( txt , "Official DR value: \t\t DR%d" % int(self.dr14) )
+        
+        txt = tm.append_empty_line( txt )
+        
+        txt = tm.add_title( txt , "Sampling rate: \t\t %s Hz" % sampl_rate[0] )
+        txt = tm.add_title( txt , "Average bitrate: \t\t %dkbs " % ( sum_kbs / i )  )
+        txt = tm.add_title( txt , "Bits per sample: \t\t %s bit" % list_bit[0] )
         
         txt = tm.append_separator_line( txt )
         txt = tm.end_foot( txt )

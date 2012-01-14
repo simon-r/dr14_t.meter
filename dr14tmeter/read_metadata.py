@@ -32,6 +32,7 @@ class RetirveMetadata:
     
     def __init__( self ):
         self._album = {}
+        self._artist = {}
         self._tracks = {}
     
     
@@ -39,6 +40,7 @@ class RetirveMetadata:
         
         self._album = {}
         self._tracks = {}
+        self._artist = {}
         
         if dir_list == None:
             dir_name = os.path.abspath( dir_name )
@@ -83,6 +85,15 @@ class RetirveMetadata:
         if m != None:
             track['title'] = m.group(1) 
         
+        m = re.search( r"\s*artist\s*\:\s*(.*)$" , data_txt , re_flags )
+        if m != None:
+            self._artist.setdefault( m.group(1) , 0 )
+            self._artist[m.group(1)] += 1
+        
+        m = re.search( r"\s*genre\s*\:\s*(.*)$" , data_txt , re_flags )
+        if m != None:
+            track['genre'] = m.group(1)
+            
         #Audio: flac, 44100 Hz, stereo, s16
         m = re.search( r"\:\s*Audio\s*\:\s*(\w*)\s*,\s*(\d*)\s*Hz\s*,\s*(\w*)\s*,\s*s(\d+)" , data_txt , re_flags )
         if m != None:
@@ -118,6 +129,17 @@ class RetirveMetadata:
                 res = k
             return res
 
+    
+    def get_album_artist( self ):
+
+        if len( self._artist ) > 1 :
+            return "Various Artists"
+        elif len( self._album ) == 0 :
+            return None
+        else :
+            for k in self._artist.keys():
+                res = k
+            return res
     
     def get_value( self , file_name , field ):
         

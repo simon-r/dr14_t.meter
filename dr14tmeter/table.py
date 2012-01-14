@@ -49,6 +49,8 @@ class Table:
     def append_separator_line( self , txt ):
         return txt 
         
+    def append_empty_line( self , txt ):
+        return self.append_row( txt , [ "", "", "", "", "" ] )
 
     def add_title( self , txt , title ):
         pass
@@ -108,6 +110,9 @@ class TextTable ( Table ):
 
     def append_separator_line( self , txt ):
         return self.append_row( txt , [ "----------------------------------------------------------------" ] )
+
+    def append_empty_line( self , txt ):
+        return self.append_row( txt , [ "" ] ) 
 
     def add_title( self , txt , title ):
         return txt + title + self.nl()

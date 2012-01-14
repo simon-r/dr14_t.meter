@@ -56,6 +56,12 @@ def main():
 		default=False,
 		help="Write the resulting table in the extended format")
 
+	parser.add_option("-b", "--basic_table",
+		action="store_true",
+		dest="basic_table",
+		default=True,
+		help="Write the resulting table in the basic format")
+
 	parser.add_option("-o", "--outdir",
 		action="store",
 		dest="out_dir",
@@ -142,17 +148,19 @@ def main():
 		out_dir = options.out_dir
 
 
+	table_format = not( options.basic_table ) or options.ext_table
+
 	out_list = "" ;
 	if 'b' in options.out_tables:
-		dr.fwrite_dr14( os.path.join( out_dir , "dr14_bbcode.txt" ) , BBcodeTable() , options.ext_table )
+		dr.fwrite_dr14( os.path.join( out_dir , "dr14_bbcode.txt" ) , BBcodeTable() , table_format )
 		out_list = " dr14_bbcode.txt "
 		
 	if 't' in options.out_tables:
-		dr.fwrite_dr14( os.path.join( out_dir , "dr14.txt" ) , TextTable() , options.ext_table )
+		dr.fwrite_dr14( os.path.join( out_dir , "dr14.txt" ) , TextTable() , table_format )
 		out_list = out_list + " dr14.txt "
 		
 	if 'h' in options.out_tables:
-		dr.fwrite_dr14( os.path.join( out_dir , "dr14.html" ) , HtmlTable() , options.ext_table )
+		dr.fwrite_dr14( os.path.join( out_dir , "dr14.html" ) , HtmlTable() , table_format )
 		out_list = out_list + " dr14.html "
 
 	print( "DR = " + str( dr.dr14 ) )
