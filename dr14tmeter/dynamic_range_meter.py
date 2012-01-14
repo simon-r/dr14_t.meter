@@ -240,11 +240,17 @@ class DynamicRangeMeter:
                     row.append( "%s - %s [%s]" % ( nr , tr_title , codec ) )
                     
                 txt = tm.append_row( txt , row )
-                
+        
+        self.table_txt = txt   
 
     
-    def fwrite_dr14( self , file_name , tm ):
-        self.write_dr14( tm )
+    def fwrite_dr14( self , file_name , tm , ext_table=False ):
+        
+        if ext_table :
+            self.write_dr14_extended( tm )
+        else :
+            self.write_dr14( tm )
+        
         out_file = open( file_name , "wt")
         out_file.write( self.table_txt )
         out_file.close() 

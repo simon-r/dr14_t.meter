@@ -49,6 +49,12 @@ def main():
 		dest="scan_file",
 		default=False,
 		help="Compute the DR14 of a single file and exit")
+	
+	parser.add_option("-e", "--ext_table",
+		action="store_true",
+		dest="ext_table",
+		default=False,
+		help="Write the resulting table in the extended format")
 
 	parser.add_option("-o", "--outdir",
 		action="store",
@@ -138,15 +144,15 @@ def main():
 
 	out_list = "" ;
 	if 'b' in options.out_tables:
-		dr.fwrite_dr14( os.path.join( out_dir , "dr14_bbcode.txt" ) , BBcodeTable() )
+		dr.fwrite_dr14( os.path.join( out_dir , "dr14_bbcode.txt" ) , BBcodeTable() , options.ext_table )
 		out_list = " dr14_bbcode.txt "
 		
 	if 't' in options.out_tables:
-		dr.fwrite_dr14( os.path.join( out_dir , "dr14.txt" ) , TextTable() )
+		dr.fwrite_dr14( os.path.join( out_dir , "dr14.txt" ) , TextTable() , options.ext_table )
 		out_list = out_list + " dr14.txt "
 		
 	if 'h' in options.out_tables:
-		dr.fwrite_dr14( os.path.join( out_dir , "dr14.html" ) , HtmlTable() )
+		dr.fwrite_dr14( os.path.join( out_dir , "dr14.html" ) , HtmlTable() , options.ext_table )
 		out_list = out_list + " dr14.html "
 
 	print( "DR = " + str( dr.dr14 ) )

@@ -110,7 +110,9 @@ class RetirveMetadata:
         elif len( self._album ) == 0 :
             return None
         else :
-            return self._album[0]
+            for k in self._album.keys():
+                res = k
+            return res
 
     
     def get_value( self , file_name , field ):
