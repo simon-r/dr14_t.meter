@@ -53,6 +53,8 @@ class RetirveMetadata:
             
             if ext in ad.formats :
                 self.scan_file( full_file )
+                
+        #print( self._tracks )
     
     
     def scan_file( self , file_name ):
@@ -60,8 +62,8 @@ class RetirveMetadata:
         data_txt = subprocess.check_output( [ "ffprobe" , "-show_format" , file_name ] , stderr=subprocess.STDOUT , shell=False )
         data_txt = data_txt.decode()
         
-        print("")
-        print( file_name )
+        #print("")
+        #print( file_name )
         
         track = {} 
         
@@ -73,6 +75,7 @@ class RetirveMetadata:
         
         m = re.search( r"\s*album\s*\:\s*(.*)$" , data_txt , re_flags )
         if m != None:
+            #print( m.group(1) )
             self._album.setdefault( m.group(1) , 0 )
             self._album[m.group(1)] += 1
         
@@ -105,6 +108,7 @@ class RetirveMetadata:
 
 
     def get_album_title( self ):
+
         if len( self._album ) > 1 :
             return "Various"
         elif len( self._album ) == 0 :
@@ -116,11 +120,13 @@ class RetirveMetadata:
 
     
     def get_value( self , file_name , field ):
-        f = self._tracks.setdefault( 'file_name' , None )
+        
+        f = self._tracks.get( file_name , None )
+        
         if f == None :
             return None
         
-        return f.setdefault( 'field' , None )
+        return f.get( field , None )
 
 
 

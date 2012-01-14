@@ -137,6 +137,7 @@ class DynamicRangeMeter:
             
          
         #print( str(self.res_list ) )
+        self.meta_data.scan_dir( dir_name )
         if len( self.res_list ) > 0 and succ > 0 :
             self.dr14 = int( round( self.dr14 / succ ) )
             return succ
@@ -229,19 +230,37 @@ class DynamicRangeMeter:
                 row.append( " %.2f" % self.res_list[i]['dB_rms'] + ' dB' )
                 row.append( self.res_list[i]['duration'] )
                 
+                #print( "> " + self.res_list[i]['file_name'] )
                 tr_title = self.meta_data.get_value( self.res_list[i]['file_name'] , 'title' )
+                #print( "> " + tr_title )
                 if tr_title == None :
                     row.append( self.res_list[i]['file_name'] )
                 else:
                     nr = self.meta_data.get_value( self.res_list[i]['file_name'] , 'nr' )
                     codec = self.meta_data.get_value( self.res_list[i]['file_name'] , 'codec' )
+                    bitrate = self.meta_data.get_value( self.res_list[i]['file_name'] , 'bitrate' )
+                    bit = self.meta_data.get_value( self.res_list[i]['file_name'] , 'bit' )
                     if nr == None :
                         nr = str( i ) 
-                    row.append( "%s - %s [%s]" % ( nr , tr_title , codec ) )
+                    row.append( "%s - %s [%s - %sbit - %s kbit/sec]" % ( nr , tr_title , codec , bit , bitrate ) )
                     
                 txt = tm.append_row( txt , row )
         
-        self.table_txt = txt   
+        txt = tm.end_tbody( txt )
+        
+        txt = tm.new_foot( txt )
+        txt = tm.append_separator_line( txt )
+               
+        txt = tm.add_title( txt , "Number of files: \t\t " + str(len( self.res_list )) )
+        txt = tm.add_title( txt , "Official DR value: \t\t DR%d" % int(self.dr14) )
+        
+        txt = tm.append_separator_line( txt )
+        txt = tm.end_foot( txt )
+        
+        txt = tm.end_table(txt)
+        
+        self.table_txt = txt
+        return txt
 
     
     def fwrite_dr14( self , file_name , tm , ext_table=False ):
