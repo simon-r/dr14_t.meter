@@ -116,10 +116,10 @@ class FlacFileReader( AudioFileReader ):
 
 class Mp4FileReader( AudioFileReader ):
     def get_cmd(self):
-        return "faad"
+        return "ffmpeg"
     
     def get_cmd_options(self , file_name , tmp_file ):
-        return  "-q " + "\"" + file_name + "\"" + " -o \"%s\"  " % tmp_file
+        return  " -i \"" + file_name + "\"" + " -y \"%s\" -loglevel quiet -y " % tmp_file
 
 
 class OggFileReader( AudioFileReader ):
