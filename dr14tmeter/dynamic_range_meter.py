@@ -297,7 +297,7 @@ class DynamicRangeMeter:
         else :
             self.write_dr14( tm )
         
-        out_file = codecs.open( file_name , "wt" , "utf-8-sig" )
+        out_file = codecs.open( file_name , "w" , "utf-8-sig" )
         out_file.write( self.table_txt )
         out_file.close() 
     
