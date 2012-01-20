@@ -95,7 +95,7 @@ class RetirveMetadata:
             track['genre'] = m.group(1)
             
         #Audio: flac, 44100 Hz, stereo, s16
-        m = re.search( r"\:\s*Audio\s*\:\s*(\w*)\s*,\s*(\d*)\s*Hz\s*,\s*(\w*)\s*,\s*s(\d+)" , data_txt , re_flags )
+        m = re.search( r"\:\s*Audio\s*\:\s*(\w+)[^,]*,\s*(\d*)\s*Hz\s*,\s*([\w\s]*)\s*,\s*s(\d+)" , data_txt , re_flags )
         if m != None:
             track['codec'] = m.group(1)
             track['s_rate'] = m.group(2)

@@ -50,17 +50,17 @@ def main():
 		default=False,
 		help="Compute the DR14 of a single file and exit")
 	
-	parser.add_option("-e", "--ext_table",
-		action="store_true",
-		dest="ext_table",
-		default=False,
-		help="Write the resulting table in the extended format")
+	#parser.add_option("-e", "--ext_table",
+	#	action="store_true",
+	#	dest="ext_table",
+	#	default=False,
+	#	help="Write the resulting table in the extended format")
 
 	parser.add_option("-b", "--basic_table",
 		action="store_true",
 		dest="basic_table",
-		default=True,
-		help="Write the resulting table in the basic format")
+		default=False,
+		help="Write the resulting tables in the basic format")
 
 	parser.add_option("-o", "--outdir",
 		action="store",
@@ -148,7 +148,7 @@ def main():
 		out_dir = options.out_dir
 
 
-	table_format = not( options.basic_table ) or options.ext_table
+	table_format = not( options.basic_table )
 
 	out_list = "" ;
 	if 'b' in options.out_tables:
