@@ -93,8 +93,12 @@ class RetirveMetadata:
         m = re.search( r"\s*genre\s*\:\s*(.*)$" , data_txt , re_flags )
         if m != None:
             track['genre'] = m.group(1)
-            
+         
+        ##########################################
+        # string examples:   
         #Audio: flac, 44100 Hz, stereo, s16
+        #Stream #0:0(und): Audio: alac (alac / 0x63616C61), 44100 Hz, 2 channels, s16, 634 kb/s
+        #Stream #0:0: Audio: flac, 44100 Hz, stereo, s16
         m = re.search( r"\:\s*Audio\s*\:\s*(\w+)[^,]*,\s*(\d*)\s*Hz\s*,\s*([\w\s]*)\s*,\s*s(\d+)" , data_txt , re_flags )
         if m != None:
             track['codec'] = m.group(1)
