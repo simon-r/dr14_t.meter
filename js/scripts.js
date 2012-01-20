@@ -18,7 +18,7 @@ function mail_to_me() {
 
 
 function dr14_version() {
-	document.write( "Ver.: 0.7.3" ) ;
+	document.write( "Ver.: 0.8.0" ) ;
 }
 
 var http = createRequestObject();
