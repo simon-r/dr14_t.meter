@@ -17,6 +17,7 @@
 import os
 import threading
 import sys
+import codecs
 
 from dr14tmeter.compute_dr14 import compute_dr14
 from dr14tmeter.audio_track import *
@@ -296,7 +297,7 @@ class DynamicRangeMeter:
         else :
             self.write_dr14( tm )
         
-        out_file = open( file_name , "wt")
+        out_file = codecs.open( file_name , "wt" , "utf-8-sig" )
         out_file.write( self.table_txt )
         out_file.close() 
     

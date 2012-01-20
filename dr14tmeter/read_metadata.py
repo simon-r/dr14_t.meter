@@ -61,15 +61,17 @@ class RetirveMetadata:
     
     def scan_file( self , file_name ):
         
-        data_txt = subprocess.check_output( [ "ffprobe" , "-show_format" , file_name ] , stderr=subprocess.STDOUT , shell=False )
-        data_txt = data_txt.decode()
-        
         #print("")
         #print( file_name )
         
+        data_txt = subprocess.check_output( [ "ffprobe" , "-show_format" , file_name ] , stderr=subprocess.STDOUT , shell=False )
+        data_txt = data_txt.decode(encoding='UTF-8')
+        
+        
+        
         track = {} 
         
-        re_flags = ( re.MULTILINE | re.IGNORECASE )
+        re_flags = ( re.MULTILINE | re.IGNORECASE | re.UNICODE )
         
         m = re.search( r"\s*track\s*\:\s*(\d+)$" , data_txt , re_flags )
         if m != None:
