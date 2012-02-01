@@ -27,6 +27,26 @@ from dr14tmeter.dr14_global import dr14_version, TestVer, test_new_version, get_
 import subprocess
 import sys
 import re
+
+
+def listRecDirs( basedir , subdirlist=None ):
+	
+	if subdirlist == None :
+		subdirlist = []
+		subdirlist.append( basedir )
+		
+
+	for item in os.listdir( basedir ):
+		item = os.path.join( basedir , item )
+		if os.path.isdir( item ):
+			item = os.path.abspath( item )
+			#print( item )
+			subdirlist.append( item )
+			listRecDirs( item , subdirlist )
+			
+	return subdirlist
+		
+
     
 def main():
 	
@@ -50,11 +70,11 @@ def main():
 		default=False,
 		help="Compute the DR14 of a single file and exit")
 	
-	#parser.add_option("-e", "--ext_table",
-	#	action="store_true",
-	#	dest="ext_table",
-	#	default=False,
-	#	help="Write the resulting table in the extended format")
+	parser.add_option("-r", "--recursive",
+		action="store_true",
+		dest="recursive",
+		default=False,
+		help="Scan recursively the subdirectories")
 
 	parser.add_option("-b", "--basic_table",
 		action="store_true",
@@ -103,6 +123,14 @@ def main():
 	
 	print ( path_name )
 
+	if options.recursive :
+		subdirlist = listRecDirs( path_name )
+	else :
+		subdirlist = [] 
+		subdirlist.append( path_name )
+		
+	#print ( subdirlist )
+	
 	dr = DynamicRangeMeter()
 
 	
@@ -121,56 +149,65 @@ def main():
 			return 0
 
 
-	a = time.time()
-	if not options.multithread:
-	        r = dr.scan_dir( path_name )
-	else:
-		cpu = multiprocessing.cpu_count() / 2
-		if cpu <= 2:
-			cpu = 2
-		else:
-			cpu = int( round( cpu ) )
+	if options.out_dir == "" :
+		out_dir = None
+	else :
+		out_dir = options.out_dir
 
-		r = dr.scan_dir_mt( path_name , cpu )
+	table_format = not( options.basic_table )
+
+	a = time.time()
+	
+	for cur_dir in subdirlist :
+
+		print ( "Scan Dir: %s " % cur_dir )		
+		
+		if not options.multithread:
+			r = dr.scan_dir( cur_dir )
+		else:
+			cpu = multiprocessing.cpu_count() / 2
+			if cpu <= 2:
+				cpu = 2
+			else:
+				cpu = int( round( cpu ) )
+	
+			r = dr.scan_dir_mt( cur_dir , cpu )
+		
+		if r == 0:
+			print("No audio files found")
+			continue 
+			
+		out_list = "" ;
+		
+		if out_dir == None :
+			full_out_dir = os.path.join( cur_dir )
+		else :
+			full_out_dir = out_dir
+			
+		if 'b' in options.out_tables:
+			dr.fwrite_dr14( os.path.join( full_out_dir , "dr14_bbcode.txt" ) , BBcodeTable() , table_format )
+			out_list = " dr14_bbcode.txt "
+			
+		if 't' in options.out_tables:
+			dr.fwrite_dr14( os.path.join( full_out_dir , "dr14.txt" ) , TextTable() , table_format )
+			out_list = out_list + " dr14.txt "
+			
+		if 'h' in options.out_tables:
+			dr.fwrite_dr14( os.path.join( full_out_dir , "dr14.html" ) , HtmlTable() , table_format )
+			out_list = out_list + " dr14.html "
+		print( "DR = " + str( dr.dr14 ) )
+
+		print("")
+		print("- The full result has been written in the files: %s" % out_list )
+		print("- located in the directory:")
+		print( out_dir )
+		print("")
+	
 
 	b = time.time() - a
 
 	print( "Elapsed time: %2.2f" % b )
 	
-	if r == 0:
-		print("No audio files found")
-		return r
-
-
-	if options.out_dir == "" :
-		out_dir = path_name
-	else :
-		out_dir = options.out_dir
-
-
-	table_format = not( options.basic_table )
-
-	out_list = "" ;
-	if 'b' in options.out_tables:
-		dr.fwrite_dr14( os.path.join( out_dir , "dr14_bbcode.txt" ) , BBcodeTable() , table_format )
-		out_list = " dr14_bbcode.txt "
-		
-	if 't' in options.out_tables:
-		dr.fwrite_dr14( os.path.join( out_dir , "dr14.txt" ) , TextTable() , table_format )
-		out_list = out_list + " dr14.txt "
-		
-	if 'h' in options.out_tables:
-		dr.fwrite_dr14( os.path.join( out_dir , "dr14.html" ) , HtmlTable() , table_format )
-		out_list = out_list + " dr14.html "
-
-	print( "DR = " + str( dr.dr14 ) )
-
-	print("")
-	print("- The full result has been written in the files: %s" % out_list )
-	print("- located in the directory:")
-	print( out_dir )
-	print("")
-
 	print("Success! ") 
 
 	if sys.platform.startswith('linux'):

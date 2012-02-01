@@ -23,7 +23,7 @@ import threading
 # Current version
 v_major    = 0
 v_minor    = 8
-v_revision = 0
+v_revision = 1
 ###########################
 
 # latest version
@@ -61,7 +61,7 @@ def _dr14_get_latest_version():
     global lock_ver
     
     ver_url = "http://simon-r.github.com/dr14_t.meter/ver.txt"
-    #print ( ver_url )
+    print ( ver_url )
     
     try:
         if sys.version_info[0] > 2 :
@@ -99,14 +99,16 @@ def test_new_version():
     
     lock_ver.acquire()
     l_v = l_major * 100 + l_minor * 10 + l_revision
-    lock_ver.release()
+    #lock_ver.release()
     
     v_v = v_major * 100 + v_minor * 10 + v_revision
     
-    lock_ver.acquire()
+    #lock_ver.acquire()
     if l_v > v_v :
+        lock_ver.release()
         return True
     else:
+        lock_ver.release()
         return False
     
 
