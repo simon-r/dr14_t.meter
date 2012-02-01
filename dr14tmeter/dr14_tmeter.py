@@ -122,6 +122,7 @@ def main():
 	l_ver.start()
 	
 	print ( path_name )
+	print( "" )
 
 	if options.recursive :
 		subdirlist = listRecDirs( path_name )
@@ -130,11 +131,9 @@ def main():
 		subdirlist.append( path_name )
 		
 	#print ( subdirlist )
-	
-	dr = DynamicRangeMeter()
-
-	
+		
 	if options.scan_file:
+		dr = DynamicRangeMeter()
 		r = dr.scan_file( path_name )
 		
 		if r == 1:
@@ -159,7 +158,7 @@ def main():
 	a = time.time()
 	
 	for cur_dir in subdirlist :
-
+		dr = DynamicRangeMeter()
 		print ( "Scan Dir: %s " % cur_dir )		
 		
 		if not options.multithread:
@@ -174,7 +173,7 @@ def main():
 			r = dr.scan_dir_mt( cur_dir , cpu )
 		
 		if r == 0:
-			print("No audio files found")
+			print("No audio files found\n")
 			continue 
 			
 		out_list = "" ;
@@ -199,8 +198,8 @@ def main():
 
 		print("")
 		print("- The full result has been written in the files: %s" % out_list )
-		print("- located in the directory:")
-		print( out_dir )
+		print("- located in the directory: ")
+		print( full_out_dir )
 		print("")
 	
 
