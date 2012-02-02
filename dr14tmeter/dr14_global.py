@@ -61,7 +61,7 @@ def _dr14_get_latest_version():
     global lock_ver
     
     ver_url = "http://simon-r.github.com/dr14_t.meter/ver.txt"
-    print ( ver_url )
+    #print ( ver_url )
     
     try:
         if sys.version_info[0] > 2 :

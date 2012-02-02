@@ -163,7 +163,8 @@ def main():
 
     for cur_dir in subdirlist :
         dr = DynamicRangeMeter()
-        print ( "Scan Dir: %s " % cur_dir )		
+        print ( "\n------------------------------------------------------------ " )		        
+        print ( "> Scan Dir: %s \n" % cur_dir )		
 
         if not options.multithread:
             r = dr.scan_dir( cur_dir )
