@@ -67,15 +67,13 @@ class RetirveMetadata:
         data_txt = subprocess.check_output( [ "ffprobe" , "-show_format" , file_name ] , stderr=subprocess.STDOUT , shell=False )
         data_txt = data_txt.decode(encoding='UTF-8')
         
-        
-        
         track = {} 
         
         re_flags = ( re.MULTILINE | re.IGNORECASE | re.UNICODE )
         
         m = re.search( r"\s*track\s*\:\s*(\d+)$" , data_txt , re_flags )
         if m != None:
-            track['nr'] = m.group(1) 
+            track['nr'] = int( m.group(1) )
         
         m = re.search( r"\s*album\s*\:\s*(.*)$" , data_txt , re_flags )
         if m != None:
@@ -156,7 +154,7 @@ class RetirveMetadata:
         
         return f.get( field , None )
         
-        
+
 
         
 

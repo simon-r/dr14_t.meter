@@ -230,6 +230,8 @@ class DynamicRangeMeter:
         sum_kbs = 0
         sampl_rate = []
         
+        d_nr = 0 ;        
+        
         for i in range( len( self.res_list ) ) :
             
             if self.res_list[i]['dr14'] > dr14.min_dr() :
@@ -252,9 +254,10 @@ class DynamicRangeMeter:
                     codec = self.meta_data.get_value( curr_file_name , 'codec' )
                     
                     if nr == None :
-                        nr = str( i ) 
-                    row.append( "%s - %s \t [%s]" % ( nr , tr_title , codec ) )
-                   
+                        nr = i + 1
+                    
+                    row.append( "%02d - %s \t [%s]" % ( nr , tr_title , codec ) )
+                    
                    
                 bitrate = self.meta_data.get_value( curr_file_name , 'bitrate' )
                 bit = self.meta_data.get_value( curr_file_name , 'bit' )
