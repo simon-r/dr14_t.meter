@@ -250,20 +250,23 @@ class DynamicRangeMeter:
                 else:
                     nr = self.meta_data.get_value( curr_file_name , 'nr' )
                     codec = self.meta_data.get_value( curr_file_name , 'codec' )
-                    bitrate = self.meta_data.get_value( curr_file_name , 'bitrate' )
-                    bit = self.meta_data.get_value( curr_file_name , 'bit' )
-                    s_rate = self.meta_data.get_value( curr_file_name , 's_rate' )
+                    
                     if nr == None :
                         nr = str( i ) 
                     row.append( "%s - %s \t [%s]" % ( nr , tr_title , codec ) )
+                   
+                   
+                bitrate = self.meta_data.get_value( curr_file_name , 'bitrate' )
+                bit = self.meta_data.get_value( curr_file_name , 'bit' )
+                s_rate = self.meta_data.get_value( curr_file_name , 's_rate' )
+                
+                sum_kbs += int( self.meta_data.get_value( curr_file_name , 'bitrate' ) )
                     
-                    sum_kbs += int( self.meta_data.get_value( curr_file_name , 'bitrate' ) )
-                    
-                    if bit not in list_bit :
-                        list_bit.append( bit )    
+                if bit not in list_bit :
+                    list_bit.append( bit )    
                         
-                    if s_rate not in sampl_rate :
-                        sampl_rate.append( s_rate )
+                if s_rate not in sampl_rate :
+                    sampl_rate.append( s_rate )
                     
                 txt = tm.append_row( txt , row )
         

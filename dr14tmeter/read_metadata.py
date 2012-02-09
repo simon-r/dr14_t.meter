@@ -155,11 +155,8 @@ class RetirveMetadata:
             return None
         
         return f.get( field , None )
+        
+        
 
-
-
-
-
-
-
+        
 
