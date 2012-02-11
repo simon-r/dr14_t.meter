@@ -23,7 +23,7 @@ import threading
 # Current version
 v_major    = 0
 v_minor    = 8
-v_revision = 2
+v_revision = 3
 ###########################
 
 # latest version

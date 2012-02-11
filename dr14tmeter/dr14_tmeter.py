@@ -29,7 +29,7 @@ import sys
 import re
 
 
-def listRecDirs( basedir , subdirlist=None ):
+def list_rec_dirs( basedir , subdirlist=None ):
     
     if subdirlist == None :
         subdirlist = []
@@ -46,6 +46,44 @@ def listRecDirs( basedir , subdirlist=None ):
             
     return subdirlist
         
+
+def write_results( dr , options , out_dir , cur_dir ) :
+    out_list = "" ;
+    
+    table_format = not( options.basic_table )    
+    
+    if out_dir == None :
+        full_out_dir = os.path.join( cur_dir )
+    else :
+        full_out_dir = out_dir
+        
+    if options.print_std_out :
+        dr.fwrite_dr14( "" , TextTable() , table_format , True )
+        
+    if options.turn_off_out :
+        return 
+    
+    if 'b' in options.out_tables:
+        dr.fwrite_dr14( os.path.join( full_out_dir , "dr14_bbcode.txt" ) , BBcodeTable() , table_format )
+        out_list = " dr14_bbcode.txt "
+        
+    if 't' in options.out_tables:
+        dr.fwrite_dr14( os.path.join( full_out_dir , "dr14.txt" ) , TextTable() , table_format )
+        out_list = out_list + " dr14.txt "
+        
+    if 'h' in options.out_tables:
+        dr.fwrite_dr14( os.path.join( full_out_dir , "dr14.html" ) , HtmlTable() , table_format )
+        out_list = out_list + " dr14.html "
+        
+    print( "DR = " + str( dr.dr14 ) )
+
+    print("")
+    print("- The full result has been written in the files: %s" % out_list )
+    print("- located in the directory: ")
+    print( full_out_dir )
+    print("")
+
+
 
 def parse_args():
     desc = "Compute the DR14 value of the audio files according to the algorithm " 
@@ -79,6 +117,18 @@ def parse_args():
         dest="basic_table",
         default=False,
         help="Write the resulting tables in the basic format")
+
+    parser.add_option("-n", "--turn_off_out",
+        action="store_true",
+        dest="turn_off_out",
+        default=False,
+        help="turns off the output files and writes the full result on the std_out")
+
+    parser.add_option("-p", "--print_std_out",
+        action="store_true",
+        dest="print_std_out",
+        default=False,
+        help="writes the full result on the std_out")
 
     parser.add_option("-o", "--outdir",
         action="store",
@@ -128,7 +178,7 @@ def main():
     print( "" )
 
     if options.recursive :
-        subdirlist = listRecDirs( path_name )
+        subdirlist = list_rec_dirs( path_name )
     else :
         subdirlist = [] 
         subdirlist.append( path_name )
@@ -157,7 +207,6 @@ def main():
         out_dir = options.out_dir
 
 
-    table_format = not( options.basic_table )
     a = time.time()
 
 
@@ -180,35 +229,10 @@ def main():
         if r == 0:
             print("No audio files found\n")
             continue 
-            
-        out_list = "" ;
-        
-        if out_dir == None :
-            full_out_dir = os.path.join( cur_dir )
-        else :
-            full_out_dir = out_dir
-            
-        if 'b' in options.out_tables:
-            dr.fwrite_dr14( os.path.join( full_out_dir , "dr14_bbcode.txt" ) , BBcodeTable() , table_format )
-            out_list = " dr14_bbcode.txt "
-            
-        if 't' in options.out_tables:
-            dr.fwrite_dr14( os.path.join( full_out_dir , "dr14.txt" ) , TextTable() , table_format )
-            out_list = out_list + " dr14.txt "
-            
-        if 'h' in options.out_tables:
-            dr.fwrite_dr14( os.path.join( full_out_dir , "dr14.html" ) , HtmlTable() , table_format )
-            out_list = out_list + " dr14.html "
-        print( "DR = " + str( dr.dr14 ) )
 
-        print("")
-        print("- The full result has been written in the files: %s" % out_list )
-        print("- located in the directory: ")
-        print( full_out_dir )
-        print("")
+        write_results( dr , options , out_dir , cur_dir )        
+         
     
-
-
     b = time.time() - a
     print( "Elapsed time: %2.2f" % b )
     

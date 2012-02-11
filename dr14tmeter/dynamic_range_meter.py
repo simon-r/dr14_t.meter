@@ -284,7 +284,7 @@ class DynamicRangeMeter:
         txt = tm.append_empty_line( txt )
         
         txt = tm.add_title( txt , "Sampling rate: \t\t %s Hz" % sampl_rate[0] )
-        txt = tm.add_title( txt , "Average bitrate: \t\t %dkbs " % ( sum_kbs / i )  )
+        txt = tm.add_title( txt , "Average bitrate: \t\t %dkbs " % ( sum_kbs / (i+1) )  )
         txt = tm.add_title( txt , "Bits per sample: \t\t %s bit" % list_bit[0] )
         
         txt = tm.append_separator_line( txt )
@@ -296,12 +296,16 @@ class DynamicRangeMeter:
         return txt
 
     
-    def fwrite_dr14( self , file_name , tm , ext_table=False ):
+    def fwrite_dr14( self , file_name , tm , ext_table=False , std_out=False ):
         
         if ext_table :
             self.write_dr14_extended( tm )
         else :
             self.write_dr14( tm )
+        
+        if std_out:
+            print( self.table_txt )
+            return 
         
         out_file = codecs.open( file_name , "w" , "utf-8-sig" )
         out_file.write( self.table_txt )

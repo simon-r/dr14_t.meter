@@ -50,9 +50,9 @@ def __u_rms( y ) :
     rms = numpy.sqrt( s_sum / float(n[0]) )
     return rms
 
+
 def decibel_u( y , ref ) :
     return 20 * numpy.log10( y / ref )
-
 
 
 def compute_dr14( Y , Fs , duration = None , Dr_lr = None ) :
