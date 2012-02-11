@@ -213,8 +213,8 @@ def main():
     for cur_dir in subdirlist :
         dr = DynamicRangeMeter()
         print ( "\n------------------------------------------------------------ " )		        
-        print ( "> Scan Dir: %s \n" % cur_dir )		
-
+        print ( "> Scan Dir: %s \n" % cur_dir )
+        
         if not options.multithread:
             r = dr.scan_dir( cur_dir )
         else:
@@ -223,13 +223,13 @@ def main():
                 cpu = 2
             else:
                 cpu = int( round( cpu ) )
-    
+                
             r = dr.scan_dir_mt( cur_dir , cpu )
-        
+            
         if r == 0:
             print("No audio files found\n")
-            continue 
-
+            continue
+        
         write_results( dr , options , out_dir , cur_dir )        
          
     
