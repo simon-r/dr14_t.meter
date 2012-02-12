@@ -1,0 +1,8 @@
+User-agent: *
+Disallow: /index_2.html
+Allow: /index.html
+Aloow: /dr14.html
+
+User-agent: *
+Sitemap: /sitemap.xml
+
