@@ -122,7 +122,7 @@ def parse_args():
         action="store_true",
         dest="turn_off_out",
         default=False,
-        help="turns off the output files")
+        help="do not writes the output files")
 
     parser.add_option("-p", "--print_std_out",
         action="store_true",
