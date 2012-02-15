@@ -21,6 +21,8 @@ function dr14_version() {
 
 var http = createRequestObject();
 
+
+
 function createRequestObject() {
    var objAjax;
    var browser = navigator.appName;
