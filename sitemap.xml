@@ -8,14 +8,32 @@
 
 <url>
   <loc>http://simon-r.github.com/dr14_t.meter/</loc>
-  <lastmod>2012-02-12T09:40:15+00:00</lastmod>
+  <lastmod>2012-02-16T08:19:03+00:00</lastmod>
+  <changefreq>daily</changefreq>
+  <priority>1.00</priority>
 </url>
 <url>
   <loc>http://simon-r.github.com/dr14_t.meter/dr14.html</loc>
-  <lastmod>2012-02-12T09:40:15+00:00</lastmod>
+  <lastmod>2012-02-16T08:19:03+00:00</lastmod>
+  <changefreq>daily</changefreq>
+  <priority>0.80</priority>
 </url>
 <url>
   <loc>http://simon-r.github.com/dr14_t.meter/index.html</loc>
-  <lastmod>2012-02-12T09:40:15+00:00</lastmod>
+  <lastmod>2012-02-16T08:19:03+00:00</lastmod>
+  <changefreq>daily</changefreq>
+  <priority>0.80</priority>
+</url>
+<url>
+  <loc>http://simon-r.github.com/dr14_t.meter/features.html</loc>
+  <lastmod>2012-02-16T08:19:03+00:00</lastmod>
+  <changefreq>daily</changefreq>
+  <priority>0.80</priority>
+</url>
+<url>
+  <loc>http://simon-r.github.com/dr14_t.meter/man.html</loc>
+  <lastmod>2012-02-16T08:19:03+00:00</lastmod>
+  <changefreq>daily</changefreq>
+  <priority>0.80</priority>
 </url>
 </urlset>
