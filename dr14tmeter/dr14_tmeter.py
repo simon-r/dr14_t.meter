@@ -42,7 +42,7 @@ def list_rec_dirs( basedir , subdirlist=None ):
             item = os.path.abspath( item )
             #print( item )
             subdirlist.append( item )
-            listRecDirs( item , subdirlist )
+            list_rec_dirs( item , subdirlist )
             
     return subdirlist
         
