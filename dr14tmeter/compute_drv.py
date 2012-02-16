@@ -21,4 +21,26 @@ import math
 import numpy
 
 def compute_DRV( Y , Fs , duration = None , Dr_lr = None ) :
+    
+    s = Y.shape
+    ch = s[1]  
+    
+    block_time = 1
+    block_samples = block_time * ( Fs )
+    
+    threshold = 0.15    
+    seg_cnt = floor( sizeY(1) / block_samples )
+    
+    if seg_cnt < 3 :
+        return ( 0 , -100 , -100 )
+
+    curr_sam = 0   
+    
+    rms = zeros((seg_cnt,ch))
+    peaks = zeros((seg_cnt,ch))    
+    
+    for i in range( seg_cnt - 1) :
+        r = arange( curr_sam , curr_sam + block_sam )
+        
+    
     return 1
