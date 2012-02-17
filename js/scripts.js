@@ -1,5 +1,4 @@
 
-
 function mail_to_me() {
 
 	var mm = "dr14" ;
@@ -16,7 +15,7 @@ function mail_to_me() {
 
 
 function dr14_version() {
-	document.write( "Ver.: 0.8.4" ) ;
+	document.write( "Ver.: 0.8.5" ) ;
 }
 
 var http = createRequestObject();
