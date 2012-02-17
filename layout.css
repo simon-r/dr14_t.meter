@@ -4,6 +4,12 @@ A:visited {text-decoration: none}
 A:active {text-decoration: none}
 A:hover {text-decoration: underline; color: red;}
 
+img.cover {
+	width: 200px ;
+	height: 200px ;
+	border: 5px solid black ;
+}
+
 
 table.top_table {
 	border: 0px ;
