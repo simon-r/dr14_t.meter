@@ -23,7 +23,11 @@ import numpy
 
 def compute_dr14( Y , Fs , duration = None , Dr_lr = None ) :
     s = Y.shape
-    ch = s[1]
+    
+    if len( Y.shape ) > 1 :
+        ch = s[1]
+    else :
+        ch = 1
 
     if Fs == 44100:
         delta_fs = 60

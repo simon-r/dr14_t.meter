@@ -64,8 +64,13 @@ class RetirveMetadata:
         #print("")
         #print( file_name )
         
-        data_txt = subprocess.check_output( [ "ffprobe" , "-show_format" , file_name ] , stderr=subprocess.STDOUT , shell=False )
-        data_txt = data_txt.decode(encoding='UTF-8')
+        try:
+            data_txt = subprocess.check_output( [ "ffprobe" , "-show_format" , file_name ] , stderr=subprocess.STDOUT , shell=False )
+        except :
+            data_txt = "ffprobe ERROR"
+         
+        if data_txt != "ffprobe ERROR" :
+            data_txt = data_txt.decode(encoding='UTF-8')
         
         track = {} 
         

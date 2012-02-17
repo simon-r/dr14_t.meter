@@ -144,16 +144,20 @@ def parse_args():
         default="thb" ,
         help="Select the output files to be written, codes: h=html t=text b=bbcode ")
 
-    return parser.parse_args()
+    (options, args) = parser.parse_args()
+    
+    if len(args) <= 0:
+        parser.error("wrong number of arguments")
+        exit( 1 )
+    
+    return (options, args) 
 
     
 def main():
     
     (options, args) = parse_args()
 
-    if len(args) <= 0:
-        parser.error("wrong number of arguments")
-        return 1 
+ 
 
     #print( args )
 
