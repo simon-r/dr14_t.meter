@@ -16,11 +16,12 @@
 #You should have received a copy of the GNU General Public License
 #along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import dr14tmeter.dr14_tmeter
+
 import sys
+import dr14tmeter.dr14_tmeter
 
 sys.path.append( "dr14tmeter" )
-import dr14tmeter
+
 
 dr14tmeter.dr14_tmeter.main()
 
