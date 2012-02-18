@@ -85,8 +85,7 @@ def compute_dr14( Y , Fs , duration = None , Dr_lr = None ) :
     dB_rms = decibel_u( y_rms , 1 )
     
     if duration != None :
-        duration.tm_min = int( s[0] * (1.0 / Fs) / 60.0 )
-        duration.tm_sec = int( (( s[0] * (1.0 / Fs) / 60.0 ) - duration.tm_min ) * 60.0 )
+        duration.set_samples( s[0] , Fs )
         
     if Dr_lr != None :
         Dr_lr = ch_dr14

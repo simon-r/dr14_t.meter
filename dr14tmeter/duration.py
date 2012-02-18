@@ -19,6 +19,11 @@ class StructDuration:
         self.tm_min = 0
         self.tm_sec = 0
     
+    def set_samples( self , samples , Fs ) :
+        mint = int( samples * (1.0 / Fs) / 60.0 )
+        self.tm_min = mint
+        self.tm_sec = int( ( mint - self.tm_min ) * 60.0 )
+    
     def to_str( self ):
         return str( self.tm_min ) + ":%02d" % int(self.tm_sec)
         
