@@ -13,11 +13,13 @@
 #You should have received a copy of the GNU General Public License
 #along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+from dr14tmeter.duration import StructDuration
+import numpy
 
 class ComputeDr :
     def __init__(self):
-        self.duration = [] ;
-        self.Dr_lr = (0,0)
+        self.duration = StructDuration() ;
+        self.Dr_lr = numpy.zeros(2)
     
     def compute( self , Y , Fs ):
         pass

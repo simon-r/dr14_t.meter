@@ -24,16 +24,11 @@ from dr14tmeter.audio_track import *
 from dr14tmeter.table import *
 from dr14tmeter.read_metadata import RetirveMetadata
 from dr14tmeter.audio_decoder import AudioDecoder
+from dr14tmeter.duration import StructDuration
+from dr14tmeter.write_dr import WriteDr, WriteDrExtended
+
 import dr14tmeter.dr14_global as dr14
 
-
-class StructDuration:
-    def __init__( self ):
-        self.tm_min = 0
-        self.tm_sec = 0
-    
-    def to_str( self ):
-        return str( self.tm_min ) + ":%02d" % int(self.tm_sec)
         
 
 class DynamicRangeMeter:   
@@ -146,162 +141,16 @@ class DynamicRangeMeter:
             return 0
         
         
+      
     
-    def write_dr14( self , tm ):
-        txt = ''
-        
-        ( head , album_dir ) = os.path.split( self.dir_name )
-        
-        txt = tm.new_table(txt)
-        
-        txt = tm.new_head( txt )
-        
-        txt = tm.append_separator_line( txt )
-        txt = tm.add_title( txt , " Analyzed folder:  " + album_dir )
-        
-        txt = tm.end_head( txt )
-        
-        txt = tm.new_tbody( txt )
-        
-        txt = tm.append_separator_line( txt )
-        txt = tm.append_row( txt , [ "DR", "Peak", "RMS", "Duration" , "File name" ] , 'h' )
-        txt = tm.append_separator_line( txt )
-        
-        for i in range( len( self.res_list ) ) :
-            
-            if self.res_list[i]['dr14'] > dr14.min_dr() :
-                row = []
-                row.append( "DR%d" % self.res_list[i]['dr14'] )
-                row.append( " %.2f" % self.res_list[i]['dB_peak'] + ' dB' )
-                row.append( " %.2f" % self.res_list[i]['dB_rms'] + ' dB' )
-                row.append( self.res_list[i]['duration'] )
-                row.append( self.res_list[i]['file_name'] )
-            
-                txt = tm.append_row( txt , row )
-
-        txt = tm.end_tbody( txt )
-        
-        txt = tm.new_foot( txt )
-        txt = tm.append_separator_line( txt )
-               
-        txt = tm.add_title( txt , "Number of files: \t\t " + str(len( self.res_list )) )
-        txt = tm.add_title( txt , "Official DR value: \t\t DR%d" % int(self.dr14) )
-        
-        txt = tm.append_separator_line( txt )
-        txt = tm.end_foot( txt )
-        
-        txt = tm.end_table(txt)
-        
-        self.table_txt = txt
-        return txt 
-    
-    
-    def write_dr14_extended( self , tm ):
-        txt = ""
-         
-        ( head , album_dir ) = os.path.split( self.dir_name )
-        
-        txt = tm.new_table(txt)
-        
-        txt = tm.new_head( txt )
-        txt = tm.append_separator_line( txt )
-        
-        album_t = self.meta_data.get_album_title()
-        artist = self.meta_data.get_album_artist()
-        
-        if album_t == None :
-            txt = tm.add_title( txt , " Analyzed folder:  " + album_dir )
-        else:
-            txt = tm.add_title( txt , " Album: \t" + album_t )
-        
-        if artist != None :
-            txt = tm.add_title( txt , " Artist: \t" + artist )
-        
-        
-        txt = tm.end_head( txt )
-        
-        txt = tm.new_tbody( txt )
-        
-        txt = tm.append_separator_line( txt )
-        txt = tm.append_row( txt , [ "DR", "Peak", "RMS", "Duration" , "Title" ] , 'h' )
-        txt = tm.append_separator_line( txt )
-        
-        list_bit = []
-        sum_kbs = 0
-        sampl_rate = []
-        
-        d_nr = 0 ;        
-        
-        for i in range( len( self.res_list ) ) :
-            
-            if self.res_list[i]['dr14'] > dr14.min_dr() :
-                row = []
-                row.append( "DR%d" % self.res_list[i]['dr14'] )
-                row.append( " %.2f" % self.res_list[i]['dB_peak'] + ' dB' )
-                row.append( " %.2f" % self.res_list[i]['dB_rms'] + ' dB' )
-                row.append( self.res_list[i]['duration'] )
-                
-                #print( "> " + self.res_list[i]['file_name'] )
-                
-                curr_file_name = self.res_list[i]['file_name']
-                
-                tr_title = self.meta_data.get_value( curr_file_name , 'title' )
-                #print( "> " + tr_title )
-                if tr_title == None :
-                    row.append( self.res_list[i]['file_name'] )
-                else:
-                    nr = self.meta_data.get_value( curr_file_name , 'nr' )
-                    codec = self.meta_data.get_value( curr_file_name , 'codec' )
-                    
-                    if nr == None :
-                        nr = i + 1
-                    
-                    row.append( "%02d - %s \t [%s]" % ( nr , tr_title , codec ) )
-                    
-                   
-                bitrate = self.meta_data.get_value( curr_file_name , 'bitrate' )
-                bit = self.meta_data.get_value( curr_file_name , 'bit' )
-                s_rate = self.meta_data.get_value( curr_file_name , 's_rate' )
-                
-                sum_kbs += int( self.meta_data.get_value( curr_file_name , 'bitrate' ) )
-                    
-                if bit not in list_bit :
-                    list_bit.append( bit )    
-                        
-                if s_rate not in sampl_rate :
-                    sampl_rate.append( s_rate )
-                    
-                txt = tm.append_row( txt , row )
-        
-        txt = tm.end_tbody( txt )
-        
-        txt = tm.new_foot( txt )
-        txt = tm.append_separator_line( txt )
-               
-        txt = tm.add_title( txt , "Number of files: \t\t " + str(len( self.res_list )) )
-        txt = tm.add_title( txt , "Official DR value: \t\t DR%d" % int(self.dr14) )
-        
-        txt = tm.append_empty_line( txt )
-        
-        txt = tm.add_title( txt , "Sampling rate: \t\t %s Hz" % sampl_rate[0] )
-        txt = tm.add_title( txt , "Average bitrate: \t\t %dkbs " % ( sum_kbs / (i+1) )  )
-        txt = tm.add_title( txt , "Bits per sample: \t\t %s bit" % list_bit[0] )
-        
-        txt = tm.append_separator_line( txt )
-        txt = tm.end_foot( txt )
-        
-        txt = tm.end_table(txt)
-        
-        self.table_txt = txt
-        return txt
-
-    
-    def fwrite_dr14( self , file_name , tm , ext_table=False , std_out=False ):
+    def fwrite_dr( self , file_name , tm , ext_table=False , std_out=False ):
         
         if ext_table :
-            self.write_dr14_extended( tm )
+            wr = WriteDrExtended()
         else :
-            self.write_dr14( tm )
+            wr = WriteDr()
+        
+        self.table_txt = wr.write_dr( self , tm )        
         
         if std_out:
             print( self.table_txt )
@@ -310,7 +159,6 @@ class DynamicRangeMeter:
         out_file = codecs.open( file_name , "w" , "utf-8-sig" )
         out_file.write( self.table_txt )
         out_file.close() 
-    
     
 
 class ScanDirMt(threading.Thread):
