@@ -23,7 +23,7 @@ import threading
 # Current version
 v_major    = 0
 v_minor    = 8
-v_revision = 6
+v_revision = 5
 ###########################
 
 # latest version
@@ -60,7 +60,7 @@ def _dr14_get_latest_version():
     global l_revision
     global lock_ver
     
-    ver_url = "http://simon-r.github.com/dr14_t.meter/ver.txt"
+    ver_url = "http://simon-r.github.com/dr14_t.meter/ver.html"
     #print ( ver_url )
     
     try:
@@ -77,13 +77,20 @@ def _dr14_get_latest_version():
             vr = f.read()
     except:
         return 
-        
-    m = re.match( r"(\d)\.(\d)\.(\d)" , vr )
+    
+    re_flags = ( re.MULTILINE | re.IGNORECASE | re.UNICODE )
+    m = re.search( r"<div\s+id=\"version\">\s*(\d+)\.(\d+)\.(\d+)\s*</div>" , vr , re_flags )
     
     lock_ver.acquire()
-    l_major = int( m.groups()[0] )
-    l_minor = int( m.groups()[1] )
-    l_revision = int( m.groups()[2] )
+    if len( m.groups() ) == 3 :
+        l_major = int( m.groups()[0] )
+        l_minor = int( m.groups()[1] )
+        l_revision = int( m.groups()[2] )
+    else :
+        l_major = 0
+        l_minor = 0
+        l_revision = 0
+        
     lock_ver.release() 
     #print( ">>>>>>>>>>>>>< %d.%d.%d" % ( l_major , l_minor , l_revision ) )
 
@@ -98,18 +105,20 @@ def test_new_version():
     global v_revision
     
     lock_ver.acquire()
-    l_v = l_major * 100 + l_minor * 10 + l_revision
-    #lock_ver.release()
     
-    v_v = v_major * 100 + v_minor * 10 + v_revision
+    curr_ver = ( v_major , v_minor , v_revision )
+    online_ver = ( l_major , l_minor , l_revision )
     
-    #lock_ver.acquire()
-    if l_v > v_v :
-        lock_ver.release()
-        return True
-    else:
-        lock_ver.release()
-        return False
+    for i in range( 0 , 3 ) :
+        if online_ver[i] > curr_ver[i] :
+            lock_ver.release()
+            return True
+        elif online_ver[i] < curr_ver[i] :
+            lock_ver.release()
+            return False
+    
+    lock_ver.release()
+    return False
     
 
 def get_new_version():
