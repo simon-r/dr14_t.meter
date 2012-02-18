@@ -73,7 +73,7 @@ def compute_dr14( Y , Fs , duration = None , Dr_lr = None ) :
 
     ch_dr14 = -20*numpy.log10( numpy.sqrt( rms_sum / n_blk ) * 1/peaks[seg_cnt-2,:] )
 
-    err_i = (rms_sum < 1/(2**24))
+    err_i = (rms_sum < audio_min() )
     ch_dr14[err_i] = 0 ;
 
     dr14 = round( numpy.mean( ch_dr14 ) )
