@@ -20,6 +20,7 @@ import sys
 import codecs
 
 from dr14tmeter.compute_dr14 import compute_dr14
+from dr14tmeter.compute_drv import compute_DRV
 from dr14tmeter.audio_track import *
 from dr14tmeter.table import *
 from dr14tmeter.read_metadata import RetirveMetadata

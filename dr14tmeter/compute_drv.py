@@ -23,13 +23,17 @@ import numpy
 def compute_DRV( Y , Fs , duration = None , Dr_lr = None ) :
     
     s = Y.shape
-    ch = s[1]  
+    
+    if len( Y.shape ) > 1 :
+        ch = s[1]
+    else :
+        ch = 1
     
     block_time = 1
     block_samples = block_time * ( Fs )
     
     threshold = 0.15    
-    seg_cnt = floor( sizeY(1) / block_samples )
+    seg_cnt = int( floor( s[0] / block_samples ) )
     
     if seg_cnt < 3 :
         return ( 0 , -100 , -100 )
@@ -40,32 +44,43 @@ def compute_DRV( Y , Fs , duration = None , Dr_lr = None ) :
     peaks = zeros((seg_cnt,ch))    
     
     for i in range( seg_cnt - 1) :
-        r = arange( curr_sam , curr_sam + block_sam )
+        r = arange( curr_sam , curr_sam + block_samples )
+        
         rms[i,:] = decibel_u( u_rms( Y[r,:] ) , 1.0 )
-        p = decibel_u( numpy.max( numpy.abs( Y[r,:] ) ) , 1.0 )
-        peaks[i,:] = p
+        peaks[i,:] = decibel_u( numpy.max( numpy.abs( Y[r,:] ) ) , 1.0 )
+        
+        curr_sam = curr_sam + block_samples
+    
+    i = numpy.logical_or( rms == numpy.nan , rms == -numpy.inf ) 
+    rms[i] = decibel_u( audio_min() , 1.0 )
+
+    i = numpy.logical_or( peaks == numpy.nan , peaks == -numpy.inf ) 
+    peaks[i] = decibel_u( audio_min() , 1.0 )   
     
     Ydr = numpy.mean( peaks - rms , 1 )
     
     (n,bins) = numpy.histogram( Ydr , 100 )
-       
-    max_freq = numpy.max( n )
     
-    i = n > max_freq*threshold 
+    #print( peaks )
+    #print( rms )
+    
+    max_freq = numpy.max( n )
+       
+    bs = bins.shape[0]
+    bins = bins[0:bs-1] + numpy.diff( bins ) / 2.0
+    
+    i = n > max_freq*threshold
+    
     n = n[i]
     bins = bins[i]
     
-    bs = bins.shape[0]
-
-    bins = bins[0:bs-1] + numpy.diff( bins )
-    m = numpy.sum( n * numpy.diff( bins ) ) / numpy.sum( n )
+    m = numpy.sum( n * bins ) / numpy.sum( n )
     
     drV = round( m - 3 )   
     
-    dB_peak = decibel_u( numpy.max( peaks ) , 1.0 )
+    dB_peak = numpy.max( peaks )
     
-    y_rms = numpy.sum( numpy.mean( rms , 0 ) ) / 2.0 
-    dB_rms = decibel_u( y_rms , 1 )   
+    dB_rms = numpy.sum( numpy.mean( rms , 0 ) ) / 2.0 
     
     if duration != None :
         duration.tm_min = int( s[0] * (1.0 / Fs) / 60.0 )
@@ -74,4 +89,4 @@ def compute_DRV( Y , Fs , duration = None , Dr_lr = None ) :
     if Dr_lr != None :
         Dr_lr = ch_dr14    
     
-    return ( dr14 , dB_peak , dB_rms )
+    return ( drV , dB_peak , dB_rms )

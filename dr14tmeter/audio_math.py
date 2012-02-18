@@ -58,3 +58,6 @@ def decibel_u( y , ref ) :
 def decibel_p( y , ref ) :
     return 10 * numpy.log10( y / ref )
     
+def audio_min() :
+    return 1.0/(2.0**24)
+    
