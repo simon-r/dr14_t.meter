@@ -10,6 +10,16 @@ img.cover {
 	border: 5px solid black ;
 }
 
+div.cover {
+	float: left;
+}
+
+div.album_title {
+	float: left;
+	padding: 50px;
+	width:50% ;
+	background: white ;
+}
 
 table.top_table {
 	border: 0px ;
