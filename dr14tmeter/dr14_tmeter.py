@@ -27,7 +27,7 @@ from dr14tmeter.dr14_global import dr14_version, TestVer, test_new_version, get_
 import subprocess
 import sys
 import re
-from dr14tmeter.functions_main import *
+from dr14tmeter.dr14_utils import *
 
     
 def main():
@@ -49,7 +49,7 @@ def main():
         return 
 
     if re.search( ".*[^htb].*" , options.out_tables ) :
-        print( "Error (-t) : Invalid table code" )
+        print( "Error (-t): Invalid table code" )
         return 
 
     l_ver = TestVer()
@@ -63,7 +63,10 @@ def main():
     else :
         subdirlist = [] 
         subdirlist.append( path_name )
+    
+   
         
+       
     #print ( subdirlist )
         
     if options.scan_file:
@@ -87,7 +90,9 @@ def main():
     else :
         out_dir = options.out_dir
 
-
+    if options.append and out_dir == None:
+        out_dir = path_name
+        
     a = time.time()
 
 

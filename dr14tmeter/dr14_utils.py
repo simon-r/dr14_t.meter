@@ -26,6 +26,7 @@ from dr14tmeter.dr14_global import dr14_version, TestVer, test_new_version, get_
 import subprocess
 import sys
 import re
+import tempfile
 
 
 def list_rec_dirs( basedir , subdirlist=None ):
@@ -48,14 +49,25 @@ def list_rec_dirs( basedir , subdirlist=None ):
 
 def write_results( dr , options , out_dir , cur_dir ) :
     out_list = "" ;
-    
+   
     table_format = not( options.basic_table )    
     
     if out_dir == None :
         full_out_dir = os.path.join( cur_dir )
     else :
         full_out_dir = out_dir
-        
+    
+    print( "DR = " + str( dr.dr14 ) )
+    
+    if not ( os.access( full_out_dir , os.W_OK ) ) :
+        full_out_dir = tempfile.gettempdir() ; 
+        print( "--------------------------------------------------------------- " )
+        print( "- ATTENTION !" )
+        print( "- You don't have the write permission for the directory: %s " % full_out_dir )
+        print( "- The result files will be written in the tmp dir: %s " % full_out_dir )
+        print( "--------------------------------------------------------------- " )
+           
+    
     if options.print_std_out :
         dr.fwrite_dr( "" , TextTable() , table_format , True )
         
@@ -63,19 +75,18 @@ def write_results( dr , options , out_dir , cur_dir ) :
         return 
     
     if 'b' in options.out_tables:
-        dr.fwrite_dr( os.path.join( full_out_dir , "dr14_bbcode.txt" ) , BBcodeTable() , table_format )
+        dr.fwrite_dr( os.path.join( full_out_dir , "dr14_bbcode.txt" ) , BBcodeTable() , table_format , append=options.append )
         out_list = " dr14_bbcode.txt "
         
     if 't' in options.out_tables:
-        dr.fwrite_dr( os.path.join( full_out_dir , "dr14.txt" ) , TextTable() , table_format )
+        dr.fwrite_dr( os.path.join( full_out_dir , "dr14.txt" ) , TextTable() , table_format , append=options.append )
         out_list = out_list + " dr14.txt "
         
     if 'h' in options.out_tables:
-        dr.fwrite_dr( os.path.join( full_out_dir , "dr14.html" ) , HtmlTable() , table_format )
+        dr.fwrite_dr( os.path.join( full_out_dir , "dr14.html" ) , HtmlTable() , table_format , append=options.append )
         out_list = out_list + " dr14.html "
         
-    print( "DR = " + str( dr.dr14 ) )
-
+    
     print("")
     print("- The full result has been written in the files: %s" % out_list )
     print("- located in the directory: ")
@@ -89,7 +100,7 @@ def parse_args():
     desc =  desc + "described by the Pleasurize Music Foundation "
     desc =  desc + "Visit: http://www.dynamicrange.de/"
 
-    use = "usage: %prog [options] path_name"
+    use = "Usage: %prog [options] path_name \n\nfor more details type \n%prog --help"
 
     parser = OptionParser( description=desc ,  usage=use  , version="%prog " + dr14_version()  )
 
@@ -110,6 +121,12 @@ def parse_args():
         dest="recursive",
         default=False,
         help="Scan recursively the subdirectories")
+
+    parser.add_option("-a", "--append",
+        action="store_true",
+        dest="append",
+        default=False ,
+        help="Append all results in a single file; it should be used in couple with -r")
 
     parser.add_option("-b", "--basic_table",
         action="store_true",

@@ -144,7 +144,7 @@ class DynamicRangeMeter:
         
       
     
-    def fwrite_dr( self , file_name , tm , ext_table=False , std_out=False ):
+    def fwrite_dr( self , file_name , tm , ext_table=False , std_out=False , append=False):
         
         if ext_table :
             wr = WriteDrExtended()
@@ -157,7 +157,12 @@ class DynamicRangeMeter:
             print( self.table_txt )
             return 
         
-        out_file = codecs.open( file_name , "w" , "utf-8-sig" )
+        if append :
+            file_mode = "a"
+        else :
+            file_mode = "w"
+        
+        out_file = codecs.open( file_name , file_mode , "utf-8-sig" )
         out_file.write( self.table_txt )
         out_file.close() 
     
