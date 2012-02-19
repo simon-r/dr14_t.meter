@@ -40,12 +40,8 @@ def dr14_version():
     global v_revision
     return "%d.%d.%d" % ( v_major , v_minor , v_revision )
 
-
 def min_dr() :
     return -10000
-
-
-
 
 class TestVer(threading.Thread):
     def run(self):
