@@ -87,6 +87,10 @@ table.menu_table td {
   padding: 2px ;
 }
 
+table.menu_table tr:hover {
+  background-color:#e2e2e2;
+}
+
 table.dw_table {
   border: 1px dotted gray;
   width: 100%;
@@ -104,6 +108,15 @@ table.dw_table td {
   border: 0px solid gray;
   padding: 2px;
 }
+
+table.dw_table tbody tr:hover {
+  background-color:#e2e2e2;
+}
+
+table.dw_table tfoot tr:hover {
+  background-color:#e2e2e2;
+}
+
 
 div.chapter { 
  }
