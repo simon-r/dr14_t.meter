@@ -34,8 +34,6 @@ def main():
     
     (options, args) = parse_args()
 
- 
-
     #print( args )
 
     path_name = os.path.abspath( args[0] )
