@@ -16,6 +16,42 @@
 
 import scipy.io.wavfile
 import sys
+import wave
+
+
+def read_wav_new( file_name ):
+    
+    convert_8_bit = float(2**15)
+    convert_16_bit = float(2**15)
+    convert_24_bit = float(2**24)
+    convert_32_bit = float(2**31)
+    
+    try:
+        wave_read = wave.open( file_name , 'r' )
+        channels = wave_read.getnchannels()
+        sample_rate = wave_read.getframerate()
+        
+        
+        
+        wave_read.close()
+
+
+        if samples.dtype == 'int16':
+            samples = samples / (convert_16_bit + 1.0)
+        elif samples.dtype == 'int32':
+            samples = samples / (convert_32_bit + 1.0)
+        else :
+            samples = samples / (convert_8_bit + 1.0)
+    except:
+        #print ( "Unexpected error:", str( sys.exc_info() ) )
+        print (  "\n - ERROR ! " )
+        return ( [] , 0 , 0 )
+
+
+    return ( samples , sample_rate , channels )
+
+    
+
 
 def read_wav( file_name ):
 

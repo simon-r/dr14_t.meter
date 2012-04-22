@@ -21,6 +21,7 @@ import tempfile
 import subprocess
 import re
 
+
 class AudioDecoder:
 
     def __init__(self):
@@ -95,7 +96,6 @@ class AudioFileReader:
             print( file_name + ": unsupported encoder" )
         
         return ( Y , Fs , channels )
-
 
 
 class Mp3FileReader( AudioFileReader ):

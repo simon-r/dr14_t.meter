@@ -22,7 +22,7 @@ import sys
 class Table:
     
     def nl(self):
-        if sys.platform.startswith('linux'):
+        if sys.platform.startswith('linux') or sys.platform.startswith('darwin'):
             return '\n'
         elif sys.platform.startswith('win'):
             return '\n\r'
