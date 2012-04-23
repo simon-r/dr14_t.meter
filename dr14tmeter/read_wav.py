@@ -17,38 +17,52 @@
 import scipy.io.wavfile
 import sys
 import wave
+import numpy
 
-
-def read_wav_new( file_name ):
+class AudioArray(object):
     
-    convert_8_bit = float(2**15)
-    convert_16_bit = float(2**15)
-    convert_24_bit = float(2**24)
-    convert_32_bit = float(2**31)
+    def __init__(self,*args):
+        self.samples = numpy.zeros(1,1)
+        self.sampling_rate = 0 
+        self.channels = 0 
+
+
+    def read_wav( file_name , audio_array ):
+        
+        convert_8_bit = float(2**15)
+        convert_16_bit = float(2**15)
+        convert_32_bit = float(2**31)
+        
+        try:
+            wave_read = wave.open( file_name , 'r' )
+            self.channels = wave_read.getnchannels()
+            self.sampling_rate = wave_read.getframerate()
+            sample_width = wave_read.getsampwidth()
+            
+            #print( str(channels) + " " + str(sample_width ) + " " + str( sampling_rate ) + " " + str( wave_read.getnframes() ) )
+            
+            X = wave_read.readframes( wave_read.getnframes() )
+            
+            sample_type = "int%d" % (sample_width*8)
+            self.samples = numpy.fromstring(X, dtype=sample_type)
+            
+            wave_read.close()
     
-    try:
-        wave_read = wave.open( file_name , 'r' )
-        channels = wave_read.getnchannels()
-        sample_rate = wave_read.getframerate()
-        
-        
-        
-        wave_read.close()
-
-
-        if samples.dtype == 'int16':
-            samples = samples / (convert_16_bit + 1.0)
-        elif samples.dtype == 'int32':
-            samples = samples / (convert_32_bit + 1.0)
-        else :
-            samples = samples / (convert_8_bit + 1.0)
-    except:
-        #print ( "Unexpected error:", str( sys.exc_info() ) )
-        print (  "\n - ERROR ! " )
-        return ( [] , 0 , 0 )
-
-
-    return ( samples , sample_rate , channels )
+    
+            if sample_type == 'int16':
+                self.samples = self.samples / (convert_16_bit + 1.0)
+            elif sample_type == 'int32':
+                self.samples = self.samples / (convert_32_bit + 1.0)
+            else :
+                self.samples = self.samples / (convert_8_bit + 1.0)
+                
+        except:
+            
+            print ( "Unexpected error:", str( sys.exc_info() ) )
+            print (  "\n - ERROR ! " )
+            return False
+     
+        return True
 
     
 
