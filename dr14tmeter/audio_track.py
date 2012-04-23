@@ -26,6 +26,7 @@ class AudioTrack:
         self.Y = numpy.array([])
         self.Fs = 0
         self.channels = 0
+        self.sample_width = 0 
 
     def time(self):
         return 1/self.Fs * self.Y.shape[0]
@@ -53,4 +54,41 @@ class AudioTrack:
         if self.channels == 0:
             return False
         else:
-            return True    
+            return True
+        
+        
+    def read_wav( self , file_name ):
+    
+        convert_8_bit = float(2**15)
+        convert_16_bit = float(2**15)
+        convert_32_bit = float(2**31)
+        
+        try:
+            wave_read = wave.open( file_name , 'r' )
+            self.channels = wave_read.getnchannels()
+            self.Fs = wave_read.getframerate()
+            self.sample_width = wave_read.getsampwidth()
+            
+            #print( str(channels) + " " + str(sample_width ) + " " + str( sampling_rate ) + " " + str( wave_read.getnframes() ) )
+            
+            X = wave_read.readframes( wave_read.getnframes() )
+            
+            sample_type = "int%d" % (sample_width*8)
+            self.Y = numpy.fromstring(X, dtype=sample_type)
+            
+            wave_read.close()
+    
+            if sample_type == 'int16':
+                self.Y = self.Y / (convert_16_bit + 1.0)
+            elif sample_type == 'int32':
+                self.Y = self.Y / (convert_32_bit + 1.0)
+            else :
+                self.Y = self.Y / (convert_8_bit + 1.0)
+                
+        except:
+            self.__init__()
+            print ( "Unexpected error:", str( sys.exc_info() ) )
+            print (  "\n - ERROR ! " )
+            return False
+     
+        return True

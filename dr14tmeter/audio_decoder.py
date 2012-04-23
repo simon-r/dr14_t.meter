@@ -71,6 +71,27 @@ class AudioFileReader:
     def get_cmd_options( self , file_name , tmp_file ):
         pass
 
+    def to_wav( self , file_name ):
+        
+        full_command = self.__cmd
+        
+        (head, file) = os.path.split( file_name )
+        tmp_dir = tempfile.gettempdir()
+        tmp_file = os.path.join( tmp_dir , file ) + ".wav"
+        
+        file_name = re.sub( "(\"|`)" , r"\\\1" , file_name )
+        tmp_file = re.sub( "(\"|`)" , r"_xyz_" , tmp_file )
+        
+        full_command = full_command + " " + self.get_cmd_options( file_name , tmp_file )
+        
+        r = subprocess.call( full_command , shell=True  , stderr=subprocess.PIPE , stdout=subprocess.PIPE )
+        
+        if os.path.exists( tmp_file ) :
+            return tmp_file
+        else :
+            return "" 
+  
+
     def read_audio_file( self , file_name ):
         
         full_command = self.__cmd
@@ -88,8 +109,7 @@ class AudioFileReader:
         
         r = subprocess.call( full_command , shell=True  , stderr=subprocess.PIPE , stdout=subprocess.PIPE )
         
-        aar = read_wav.AudioArray()
-        read_wav.read_wav_new( tmp_file , aar )
+        read_wav.read_wav( tmp_file )
         
         #( Y , Fs , channels ) = read_wav.read_wav( tmp_file )
         
