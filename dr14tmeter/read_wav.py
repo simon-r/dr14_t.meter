@@ -19,50 +19,52 @@ import sys
 import wave
 import numpy
 
-class AudioArray(object):
+#class AudioArray(object):
+#    
+#    def __init__(self,*args):
+#        self.Y = numpy.array([])
+#        self.sampling_rate = 0 
+#        self.channels = 0 
+
+
+
+def read_wav_new( file_name , audio_track ):
     
-    def __init__(self,*args):
-        self.Y = numpy.array([])
-        self.sampling_rate = 0 
-        self.channels = 0 
+    convert_8_bit = float(2**15)
+    convert_16_bit = float(2**15)
+    convert_32_bit = float(2**31)
+    
+    try:
+        wave_read = wave.open( file_name , 'r' )
+        audio_track.channels = wave_read.getnchannels()
+        audio_track.Fs = wave_read.getframerate()
+        
+        audio_track.sample_width = int ( wave_read.getsampwidth() * 8 )
+        
+        #print( str(channels) + " " + str(sample_width ) + " " + str( sampling_rate ) + " " + str( wave_read.getnframes() ) )
+        
+        X = wave_read.readframes( wave_read.getnframes() )
+        
+        sample_type = "int%d" % (audio_track.sample_width)
+        
+        audio_track.Y = numpy.fromstring(X, dtype=sample_type)
+        
+        wave_read.close()
 
-
-
-#def read_wav_new( file_name , aar ):
-#    
-#    convert_8_bit = float(2**15)
-#    convert_16_bit = float(2**15)
-#    convert_32_bit = float(2**31)
-#    
-#    try:
-#        wave_read = wave.open( file_name , 'r' )
-#        aar.channels = wave_read.getnchannels()
-#        aar.sampling_rate = wave_read.getframerate()
-#        sample_width = wave_read.getsampwidth()
-#        
-#        #print( str(channels) + " " + str(sample_width ) + " " + str( sampling_rate ) + " " + str( wave_read.getnframes() ) )
-#        
-#        X = wave_read.readframes( wave_read.getnframes() )
-#        
-#        sample_type = "int%d" % (sample_width*8)
-#        aar.Y = numpy.fromstring(X, dtype=sample_type)
-#        
-#        wave_read.close()
-#
-#        if sample_type == 'int16':
-#            aar.Y = aar.Y / (convert_16_bit + 1.0)
-#        elif sample_type == 'int32':
-#            aar.Y = aar.Y / (convert_32_bit + 1.0)
-#        else :
-#            aar.Y = aar.Y / (convert_8_bit + 1.0)
-#            
-#    except:
-#        aar.__init__()
-#        print ( "Unexpected error:", str( sys.exc_info() ) )
-#        print (  "\n - ERROR ! " )
-#        return False
-# 
-#    return True
+        if sample_type == 'int16':
+            audio_track.Y = audio_track.Y / (convert_16_bit + 1.0)
+        elif sample_type == 'int32':
+            audio_track.Y = audio_track.Y / (convert_32_bit + 1.0)
+        else :
+            audio_track.Y = audio_track.Y / (convert_8_bit + 1.0)
+            
+    except:
+        audio_track.__init__()
+        print ( "Unexpected error:", str( sys.exc_info() ) )
+        print (  "\n - ERROR ! " )
+        return False
+ 
+    return True
 
     
 
