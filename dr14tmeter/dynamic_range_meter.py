@@ -80,10 +80,13 @@ class DynamicRangeMeter:
  
 
     def __compute_and_append( self , at , file_name ):
+        
         duration = StructDuration()
         
         ( dr14, dB_peak, dB_rms ) = compute_dr14( at.Y , at.Fs , duration )
+        
         self.dr14 = self.dr14 + dr14
+        
         res = { 'file_name': file_name , 'dr14': dr14 , 'dB_peak': dB_peak , 'dB_rms': dB_rms , 'duration':duration.to_str() }
         self.res_list.append(res)
         
