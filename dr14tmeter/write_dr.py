@@ -109,7 +109,7 @@ class WriteDrExtended( WriteDr ) :
             
             if drm.res_list[i]['dr14'] > dr14.min_dr() :
                 row = []
-                row.append( "DR%d" % drm.res_list[i]['dr14'] )
+                row.append( " DR%d" % drm.res_list[i]['dr14'] )
                 row.append( " %.2f" % drm.res_list[i]['dB_peak'] + ' dB' )
                 row.append( " %.2f" % drm.res_list[i]['dB_rms'] + ' dB' )
                 row.append( drm.res_list[i]['duration'] )
@@ -151,16 +151,16 @@ class WriteDrExtended( WriteDr ) :
         txt = tm.new_foot( txt )
         txt = tm.append_separator_line( txt )
                
-        txt = tm.add_title( txt , "Number of files: \t\t " + str(len( drm.res_list )) )
-        txt = tm.add_title( txt , "Official DR value: \t\t DR%d" % int(drm.dr14) )
+        txt = tm.add_title( txt , " Number of files:    " + str(len( drm.res_list )) )
+        txt = tm.add_title( txt , " Official DR value:  DR%d" % int(drm.dr14) )
         
         txt = tm.append_empty_line( txt )
         
-        txt = tm.add_title( txt , "Sampling rate: \t\t %s Hz" % sampl_rate[0] )
-        txt = tm.add_title( txt , "Average bitrate: \t\t %dkbs " % ( sum_kbs / (i+1) )  )
-        txt = tm.add_title( txt , "Bits per sample: \t\t %s bit" % list_bit[0] )
+        txt = tm.add_title( txt , " Sampling rate: \t\t %s Hz" % sampl_rate[0] )
+        txt = tm.add_title( txt , " Average bitrate: \t\t %dkbs " % ( sum_kbs / (i+1) )  )
+        txt = tm.add_title( txt , " Bits per sample: \t\t %s bit" % list_bit[0] )
         
-        txt = tm.append_separator_line( txt )
+        txt = tm.append_closing_line( txt )
         txt = tm.end_foot( txt )
         
         txt = tm.end_table(txt)
