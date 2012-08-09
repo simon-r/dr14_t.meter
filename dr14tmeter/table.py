@@ -233,13 +233,13 @@ class HtmlTable ( Table ):
 class MediaWikiTable ( Table ):
 
     def add_title( self , txt , title ):
-        return txt + self.nl() + "|-" + self.nl() + "!align=\"left\" colspan=\"5\" | " + title + self.nl()
+        return txt + "|-" + self.nl() + "!align=\"left\" colspan=\"5\" | " + title + self.nl()
 
     def new_table( self , txt ):
         return txt + "{| " + self.nl() 
     
     def end_table( self , txt ):
-        return txt + self.nl() + " |}" + self.nl()
+        return txt + "|}" + self.nl()
         
     def new_head( self , txt ):
         return txt 
@@ -260,7 +260,7 @@ class MediaWikiTable ( Table ):
         return txt
     
     def new_row( self , txt ):
-        return txt + self.nl() + "|-" + self.nl() 
+        return txt + "|-" + self.nl() 
     
     def end_row( self , txt ):
         return txt + self.nl()
