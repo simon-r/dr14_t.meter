@@ -74,19 +74,23 @@ def write_results( dr , options , out_dir , cur_dir ) :
     if options.turn_off_out :
         return 
     
-    if 'b' in options.out_tables:
+    all_tables = False
+    if 'a' in options.out_tables:
+        all_tables = True 
+    
+    if 'b' in options.out_tables or all_tables :
         dr.fwrite_dr( os.path.join( full_out_dir , "dr14_bbcode.txt" ) , BBcodeTable() , table_format , append=options.append )
         out_list = " dr14_bbcode.txt "
         
-    if 't' in options.out_tables:
+    if 't' in options.out_tables or all_tables :
         dr.fwrite_dr( os.path.join( full_out_dir , "dr14.txt" ) , TextTable() , table_format , append=options.append )
         out_list = out_list + " dr14.txt "
         
-    if 'h' in options.out_tables:
+    if 'h' in options.out_tables or all_tables :
         dr.fwrite_dr( os.path.join( full_out_dir , "dr14.html" ) , HtmlTable() , table_format , append=options.append )
         out_list = out_list + " dr14.html "
     
-    if 'w' in options.out_tables:
+    if 'w' in options.out_tables or all_tables :
         dr.fwrite_dr( os.path.join( full_out_dir , "dr14_mediawiki.txt" ) , MediaWikiTable() , table_format , append=options.append )
         out_list = out_list + " dr14_mediawiki.txt "
         
@@ -167,7 +171,7 @@ def parse_args():
         action="store",
         dest="out_tables",
         type="string" ,
-        default="thbw" ,
+        default="t" ,
         help="Select the output files to be written, codes: h=html t=text b=bbcode w=mediawiki")
 
     (options, args) = parser.parse_args()
