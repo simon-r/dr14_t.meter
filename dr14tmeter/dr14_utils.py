@@ -110,9 +110,15 @@ def parse_args():
 
     parser.add_option("-m", "--multithread",
         action="store_true",
-        dest="multithread",
+        dest="disable_multithread",
+        default=True,
+        help="Uses the multi-Core mode [Depreceted!]")
+
+    parser.add_option("-d", "--disable_multithread",
+        action="store_true",
+        dest="disable_multithread",
         default=False,
-        help="Uses the multi-Core mode")
+        help="Disable the multi-Core mode")
 
     parser.add_option("-f", "--file",
         action="store_true",
@@ -162,12 +168,13 @@ def parse_args():
         dest="out_tables",
         type="string" ,
         default="thbw" ,
-        help="Select the output files to be written, codes: h=html t=text b=bbcode ")
+        help="Select the output files to be written, codes: h=html t=text b=bbcode w=mediawiki")
 
     (options, args) = parser.parse_args()
     
     if len(args) <= 0:
-        parser.error("wrong number of arguments")
-        exit( 1 )
+        args = ["."]
+        #parser.error("wrong number of arguments")
+        #exit( 1 )
     
     return (options, args) 

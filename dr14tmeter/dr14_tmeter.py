@@ -62,9 +62,7 @@ def main():
         subdirlist = [] 
         subdirlist.append( path_name )
     
-   
-        
-       
+          
     #print ( subdirlist )
         
     if options.scan_file:
@@ -99,10 +97,12 @@ def main():
         print ( "\n------------------------------------------------------------ " )		        
         print ( "> Scan Dir: %s \n" % cur_dir )
         
-        if not options.multithread:
+        cpu = multiprocessing.cpu_count()
+        
+        if cpu == 1 or options.disable_multithread:
             r = dr.scan_dir( cur_dir )
         else:
-            cpu = multiprocessing.cpu_count() / 2
+            cpu = cpu / 2
             if cpu <= 2:
                 cpu = 2
             else:
