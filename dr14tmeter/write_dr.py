@@ -36,18 +36,18 @@ class WriteDr :
         txt = tm.new_tbody( txt )
         
         txt = tm.append_separator_line( txt )
-        txt = tm.append_row( txt , [ "DR", "Peak", "RMS", "Duration" , "File name" ] , 'h' )
+        txt = tm.append_row( txt , [ " DR", "Peak", "RMS", "Duration" , "File name" ] , 'h' )
         txt = tm.append_separator_line( txt )
         
         for i in range( len( drm.res_list ) ) :
             
             if drm.res_list[i]['dr14'] > dr14.min_dr() :
                 row = []
-                row.append( "DR%d" % drm.res_list[i]['dr14'] )
+                row.append( " DR%d" % drm.res_list[i]['dr14'] )
                 row.append( " %.2f" % drm.res_list[i]['dB_peak'] + ' dB' )
                 row.append( " %.2f" % drm.res_list[i]['dB_rms'] + ' dB' )
-                row.append( drm.res_list[i]['duration'] )
-                row.append( drm.res_list[i]['file_name'] )
+                row.append( " %s" % drm.res_list[i]['duration'] )
+                row.append( " %s" % drm.res_list[i]['file_name'] )
             
                 txt = tm.append_row( txt , row )
 
@@ -56,10 +56,10 @@ class WriteDr :
         txt = tm.new_foot( txt )
         txt = tm.append_separator_line( txt )
                
-        txt = tm.add_title( txt , "Number of files: \t\t " + str(len( drm.res_list )) )
-        txt = tm.add_title( txt , "Official DR value: \t\t DR%d" % int(drm.dr14) )
+        txt = tm.add_title( txt , "Number of files:    " + str(len( drm.res_list )) )
+        txt = tm.add_title( txt , "Official DR value:  DR%d" % int(drm.dr14) )
         
-        txt = tm.append_separator_line( txt )
+        txt = tm.append_closing_line( txt )
         txt = tm.end_foot( txt )
         
         txt = tm.end_table(txt)
