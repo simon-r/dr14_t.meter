@@ -230,3 +230,56 @@ class HtmlTable ( Table ):
         return txt + '</b>'
 
 
+class MediaWikiTable ( Table ):
+
+    def add_title( self , txt , title ):
+        return txt + self.nl() + "|-" + self.nl() + "!align=\"left\" colspan=\"5\" | " + title + self.nl()
+
+    def new_table( self , txt ):
+        return txt + "{| " + self.nl() 
+    
+    def end_table( self , txt ):
+        return txt + self.nl() + " |}" + self.nl()
+        
+    def new_head( self , txt ):
+        return txt 
+    
+    def end_head( self , txt ):
+        return txt
+        
+    def new_tbody( self , txt ):
+        return txt
+    
+    def end_tbody( self , txt ):
+        return txt
+    
+    def new_foot( self , txt ):
+        return txt
+    
+    def end_foot( self , txt ):
+        return txt
+    
+    def new_row( self , txt ):
+        return txt + self.nl() + "|-" + self.nl() 
+    
+    def end_row( self , txt ):
+        return txt + self.nl()
+    
+    def new_cell( self , txt ):
+        return txt + '||'
+    
+    def end_cell( self , txt ):
+        return txt
+    
+    def new_hcell( self , txt ):
+        return txt + '||'
+    
+    def end_hcell( self , txt ):
+        return txt 
+    
+    def new_bold( self , txt ):
+        return txt 
+    
+    def end_bold( self , txt ):
+        return txt
+

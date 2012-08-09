@@ -85,6 +85,10 @@ def write_results( dr , options , out_dir , cur_dir ) :
     if 'h' in options.out_tables:
         dr.fwrite_dr( os.path.join( full_out_dir , "dr14.html" ) , HtmlTable() , table_format , append=options.append )
         out_list = out_list + " dr14.html "
+    
+    if 'w' in options.out_tables:
+        dr.fwrite_dr( os.path.join( full_out_dir , "dr14_mediawiki.txt" ) , MediaWikiTable() , table_format , append=options.append )
+        out_list = out_list + " dr14_mediawiki.txt "
         
     
     print("")
@@ -157,7 +161,7 @@ def parse_args():
         action="store",
         dest="out_tables",
         type="string" ,
-        default="thb" ,
+        default="thbw" ,
         help="Select the output files to be written, codes: h=html t=text b=bbcode ")
 
     (options, args) = parser.parse_args()

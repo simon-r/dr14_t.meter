@@ -46,7 +46,7 @@ def main():
         print( "Error (-o): The target directory \"%s\" don't exixst! " % options.out_dir )
         return 
 
-    if re.search( ".*[^htb].*" , options.out_tables ) :
+    if re.search( ".*[^htbw].*" , options.out_tables ) :
         print( "Error (-t): Invalid table code" )
         return 
 
@@ -131,6 +131,7 @@ def main():
         print( "----------------------------------------------------------------------\n" )
     
     return r
+
 
 if __name__ == '__main__':
     main()
