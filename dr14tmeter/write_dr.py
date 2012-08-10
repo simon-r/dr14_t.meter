@@ -25,6 +25,9 @@ class WriteDr :
     def set_dr_database( self , f ):
         self.__dr_database_compatible = f
         
+    def get_dr_database(self):
+        return self.__dr_database_compatible
+    
     def write_dr( self , drm , tm ):
         txt = ''
         
@@ -76,7 +79,7 @@ class WriteDr :
 class WriteDrExtended( WriteDr ) :
 
     def __init__(self):
-        self.__dr_database_compatible = True
+        WriteDr.__init__(self)
 
     def write_dr( self , drm , tm ):
         txt = ""
@@ -91,7 +94,7 @@ class WriteDrExtended( WriteDr ) :
         album_t = drm.meta_data.get_album_title()
         artist = drm.meta_data.get_album_artist()
         
-        if self.__dr_database_compatible :
+        if self.get_dr_database() :
         
             title = "" 
             
@@ -110,7 +113,7 @@ class WriteDrExtended( WriteDr ) :
             else:
                 txt = tm.add_title( txt , " Analyzed: " + album_t )
                 if artist != None :
-                    txt = tm.add_title( txt , "  Artist: " + artist )
+                    txt = tm.add_title( txt , " Artist: " + artist )
             
         
         txt = tm.end_head( txt )
