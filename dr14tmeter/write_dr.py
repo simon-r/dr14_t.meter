@@ -16,6 +16,7 @@
 
 import os
 import dr14tmeter.dr14_global as dr14
+import dr14tmeter.table as table
 
 class WriteDr :
     
@@ -93,6 +94,9 @@ class WriteDrExtended( WriteDr ) :
         
         album_t = drm.meta_data.get_album_title()
         artist = drm.meta_data.get_album_artist()
+        
+        if not isinstance( tm , table.TextTable ) :
+            self.set_dr_database( False )
         
         if self.get_dr_database() :
         
