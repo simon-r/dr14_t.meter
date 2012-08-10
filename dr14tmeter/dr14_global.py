@@ -22,8 +22,8 @@ import threading
 ###########################
 # Current version
 v_major    = 0
-v_minor    = 8
-v_revision = 6
+v_minor    = 9
+v_revision = 0
 ###########################
 
 # latest version

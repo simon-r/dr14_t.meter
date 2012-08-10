@@ -147,12 +147,14 @@ class DynamicRangeMeter:
         
       
     
-    def fwrite_dr( self , file_name , tm , ext_table=False , std_out=False , append=False):
+    def fwrite_dr( self , file_name , tm , ext_table=False , std_out=False , append=False , dr_database=True ):
         
         if ext_table :
             wr = WriteDrExtended()
         else :
             wr = WriteDr()
+        
+        wr.set_dr_database( dr_database )
         
         self.table_txt = wr.write_dr( self , tm )        
         

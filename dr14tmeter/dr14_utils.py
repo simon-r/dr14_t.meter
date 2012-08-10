@@ -79,19 +79,19 @@ def write_results( dr , options , out_dir , cur_dir ) :
         all_tables = True 
     
     if 'b' in options.out_tables or all_tables :
-        dr.fwrite_dr( os.path.join( full_out_dir , "dr14_bbcode.txt" ) , BBcodeTable() , table_format , append=options.append )
+        dr.fwrite_dr( os.path.join( full_out_dir , "dr14_bbcode.txt" ) , BBcodeTable() , table_format , append=options.append , dr_database=options.dr_database )
         out_list = " dr14_bbcode.txt "
         
     if 't' in options.out_tables or all_tables :
-        dr.fwrite_dr( os.path.join( full_out_dir , "dr14.txt" ) , TextTable() , table_format , append=options.append )
+        dr.fwrite_dr( os.path.join( full_out_dir , "dr14.txt" ) , TextTable() , table_format , append=options.append , dr_database=options.dr_database )
         out_list = out_list + " dr14.txt "
         
     if 'h' in options.out_tables or all_tables :
-        dr.fwrite_dr( os.path.join( full_out_dir , "dr14.html" ) , HtmlTable() , table_format , append=options.append )
+        dr.fwrite_dr( os.path.join( full_out_dir , "dr14.html" ) , HtmlTable() , table_format , append=options.append , dr_database=options.dr_database )
         out_list = out_list + " dr14.html "
     
     if 'w' in options.out_tables or all_tables :
-        dr.fwrite_dr( os.path.join( full_out_dir , "dr14_mediawiki.txt" ) , MediaWikiTable() , table_format , append=options.append )
+        dr.fwrite_dr( os.path.join( full_out_dir , "dr14_mediawiki.txt" ) , MediaWikiTable() , table_format , append=options.append , dr_database=options.dr_database )
         out_list = out_list + " dr14_mediawiki.txt "
         
     
@@ -112,13 +112,8 @@ def parse_args():
 
     parser = OptionParser( description=desc ,  usage=use  , version="%prog " + dr14_version()  )
 
-    parser.add_option("-m", "--multithread",
-        action="store_true",
-        dest="disable_multithread",
-        default=True,
-        help="Uses the multi-Core mode [Depreceted!]")
 
-    parser.add_option("-d", "--disable_multithread",
+    parser.add_option("-1", "--disable_multithread",
         action="store_true",
         dest="disable_multithread",
         default=False,
@@ -146,7 +141,7 @@ def parse_args():
         action="store_true",
         dest="basic_table",
         default=False,
-        help="Write the resulting tables in the basic format")
+        help="Write the resulting tables in the basic format [dr database compatible]")
 
     parser.add_option("-n", "--turn_off_out",
         action="store_true",
@@ -173,6 +168,20 @@ def parse_args():
         type="string" ,
         default="t" ,
         help="Select the output files to be written, codes: h=html t=text b=bbcode w=mediawiki")
+
+    parser.add_option("-d", "--dr_database",
+        action="store",
+        dest="dr_database",
+        type="int" ,
+        default=True ,
+        help="Set the compatibility with the DR database: www.dr.loudness-war.info; default: 1 (True) or 0=False" )
+
+
+    parser.add_option("-m", "--multithread",
+        action="store_true",
+        dest="multithread",
+        default=True,
+        help="Uses the multi-Core mode [Depreceted!]")
 
     (options, args) = parser.parse_args()
     

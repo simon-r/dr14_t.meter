@@ -18,6 +18,12 @@ import os
 import dr14tmeter.dr14_global as dr14
 
 class WriteDr :
+    
+    def __init__(self):
+        self.__dr_database_compatible = True
+    
+    def set_dr_database( self , f ):
+        self.__dr_database_compatible = f
         
     def write_dr( self , drm , tm ):
         txt = ''
@@ -69,6 +75,9 @@ class WriteDr :
 
 class WriteDrExtended( WriteDr ) :
 
+    def __init__(self):
+        self.__dr_database_compatible = True
+
     def write_dr( self , drm , tm ):
         txt = ""
          
@@ -82,14 +91,27 @@ class WriteDrExtended( WriteDr ) :
         album_t = drm.meta_data.get_album_title()
         artist = drm.meta_data.get_album_artist()
         
-        if album_t == None :
-            txt = tm.add_title( txt , " Analyzed folder:  " + album_dir )
+        if self.__dr_database_compatible :
+        
+            title = "" 
+            
+            if album_t == None :
+                title = title + " Analyzed folder:  " + album_dir 
+            else:
+                title = title + " Analyzed: " + album_t 
+                if artist != None :
+                    title = title + " /  Artist: " + artist
+            txt = tm.add_title( txt , title )
+        
         else:
-            txt = tm.add_title( txt , " Album: \t" + album_t )
         
-        if artist != None :
-            txt = tm.add_title( txt , " Artist: \t" + artist )
-        
+            if album_t == None :
+                txt = tm.add_title( txt , " Analyzed folder:  " + album_dir )
+            else:
+                txt = tm.add_title( txt , " Analyzed: " + album_t )
+                if artist != None :
+                    txt = tm.add_title( txt , "  Artist: " + artist )
+            
         
         txt = tm.end_head( txt )
         
