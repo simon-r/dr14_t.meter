@@ -167,9 +167,15 @@ class DynamicRangeMeter:
         else :
             file_mode = "w"
         
-        out_file = codecs.open( file_name , file_mode , "utf-8-sig" )
+        try:
+            out_file = codecs.open( file_name , file_mode , "utf-8-sig" )
+        except:
+            print ( "File opening error [%s] :" % file_name , sys.exc_info()[0] )
+            return False
+        
         out_file.write( self.table_txt )
-        out_file.close() 
+        out_file.close()
+        return True
     
 
 class ScanDirMt(threading.Thread):
