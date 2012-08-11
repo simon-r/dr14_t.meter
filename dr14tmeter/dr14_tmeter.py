@@ -23,8 +23,9 @@ import time
 import multiprocessing
 from dr14tmeter.dynamic_range_meter import DynamicRangeMeter
 from dr14tmeter.table import *
-from dr14tmeter.dr14_global import dr14_version, TestVer, test_new_version, get_home_url, get_new_version
+from dr14tmeter.dr14_global import dr14_version, TestVer, test_new_version, get_home_url, get_new_version, get_exe_name
 import subprocess
+import inspect
 import sys
 import re
 from dr14tmeter.dr14_utils import *
@@ -91,6 +92,7 @@ def main():
         
     a = time.time()
 
+    success = False
 
     for cur_dir in subdirlist :
         dr = DynamicRangeMeter()
@@ -111,16 +113,22 @@ def main():
             r = dr.scan_dir_mt( cur_dir , cpu )
             
         if r == 0:
-            print("No audio files found\n")
             continue
+        else:
+            sucess = True
+            
         
         write_results( dr , options , out_dir , cur_dir )        
          
     
     b = time.time() - a
-    print( "Elapsed time: %2.2f" % b )
     
-    print("Success! ") 
+    if success :
+        print("Success! ")
+        print( "Elapsed time: %2.2f" % b )
+    else:
+        print("No audio files found\n")
+        print(" Usage: %s [options] path_name \n\nfor more details type \n%s --help\n" % ( get_exe_name() , get_exe_name() ) )
 
     if sys.platform.startswith('linux'):
         subprocess.call( "stty sane" , shell=True ) 

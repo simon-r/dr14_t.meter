@@ -152,7 +152,7 @@ def parse_args():
         action="store_true",
         dest="basic_table",
         default=False,
-        help="Write the resulting tables in the basic format [dr database compatible]")
+        help="Write the resulting tables in the basic format")
 
     parser.add_option("-n", "--turn_off_out",
         action="store_true",
@@ -178,7 +178,7 @@ def parse_args():
         dest="out_tables",
         type="string" ,
         default="t" ,
-        help="Select the output files to be written, codes: h=html t=text b=bbcode w=mediawiki")
+        help="Select the output files to be written, codes: h=html t=text b=bbcode w=mediawiki a=all_formats")
 
     parser.add_option("-d", "--dr_database",
         action="store",
@@ -192,7 +192,7 @@ def parse_args():
         action="store_true",
         dest="multithread",
         default=True,
-        help="Uses the multi-Core mode [Depreceted!]")
+        help="[Depreceted!] Uses the multi-Core mode")
 
     (options, args) = parser.parse_args()
     

@@ -43,6 +43,9 @@ def dr14_version():
 def min_dr() :
     return -10000
 
+def get_exe_name():
+    return "dr14_tmenter"
+
 class TestVer(threading.Thread):
     def run(self):
         _dr14_get_latest_version()
