@@ -1,12 +1,12 @@
 .\" 
-.TH "dr14_tmeter" "7" "0.8" "Simone Riva" "Sound"
+.TH "dr14_tmeter" "7" "0.9.0" "Simone Riva" "Sound"
 .SH "NAME"
 \fBdr14_tmeter\fR \- compute the DR14 value of the audio files according to the algorithm described
 by the Pleasurize Music Foundation.
 Visit: http://www.dynamicrange.de/ 
 
 .SH "HOMEPAGE"
-http://simon\-r.github.com/dr14_t.meter
+http://dr14tmeter.iblogger.org/
 .SH "DESCRIPTION"
 \fBDR14 T.meter\fR is a free and opens source command line tool for computing the Dynamic Range of your music according to the procedure used in the off\-line meter released by the Pleasurize Music Foundation.
 
@@ -16,15 +16,18 @@ This tool is very useful to measure how is loud your music and for understanding
 \fBOptions:\fR
 \fB  \-\-version\fR             show program's version number and exit
 
-\fB  \-h, \-\-help \fR           show this help message and exit
+\fB  \-h, \-\-help\fR            show this help message and exit
 
-\fB  \-m, \-\-multithread \fR    Uses the multi\-Core mode
+\fB  \-1, \-\-disable_multithread\fR
+                        Disable the multi\-Core mode
 
 \fB  \-f, \-\-file\fR            Compute the DR14 of a single file and exit
 
-\fB  \-r, \-\-recursive \fR      Scan recursively the subdirectories
+\fB  \-r, \-\-recursive\fR       Scan recursively the subdirectories
 
-\fB  \-b, \-\-basic_table \fR    Write the resulting tables in the basic format
+\fB  \-a, \-\-append\fR          Append all results in a single file; it should be used in couple with \-r
+
+\fB  \-b, \-\-basic_table\fR     Write the resulting tables in the basic format
 
 \fB  \-n, \-\-turn_off_out\fR    do not writes the output files
 
@@ -35,7 +38,13 @@ This tool is very useful to measure how is loud your music and for understanding
 
 \fB  \-t OUT_TABLES, \-\-tables=OUT_TABLES\fR
                         Select the output files to be written, codes: h=html
-                        t=text b=bbcode
+                         t=text b=bbcode w=mediawiki a=all_formats
+
+\fB  \-d DR_DATABASE, \-\-dr_database=DR_DATABASE\fR
+                        Set the compatibility with the DR database: www.dr.loudness\-war.info; default: 1 (True) or 0=False
+
+\fB  \-m, \-\-multithread\fR  [Depreceted!] Uses the multi\-Core mode
+
 
 .SH "AUTHOR"
 Written by Simone Riva.

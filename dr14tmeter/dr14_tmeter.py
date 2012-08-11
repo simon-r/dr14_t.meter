@@ -115,7 +115,7 @@ def main():
         if r == 0:
             continue
         else:
-            sucess = True
+            success = True
             
         
         write_results( dr , options , out_dir , cur_dir )        
