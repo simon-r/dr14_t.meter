@@ -46,6 +46,9 @@ class Table:
         txt = self.end_row(txt)
         return txt
 
+    def col_cnt( self ):
+        return 5
+
     def append_separator_line( self , txt ):
         return txt
     
@@ -127,7 +130,7 @@ class TextTable ( Table ):
         return txt
     
     def end_table( self , txt ):
-        return txt
+        return txt + self.nl()
     
     def new_row( self , txt ):
         return txt + ''
@@ -155,7 +158,7 @@ class BBcodeTable ( Table ):
         return self.append_row( txt , [ "-----------", "-----------", "-----------", "-----------", "-------------------------------" ] )
 
     def add_title( self , txt , title ):
-        return txt + self.nl() + "[tr]" + self.nl() + " [td  colspan=5] " + title + " [/td] " + self.nl() + "[/tr]" + self.nl()
+        return txt + self.nl() + "[tr]" + self.nl() + " [td  colspan=%d] " % self.col_cnt() + title + " [/td] " + self.nl() + "[/tr]" + self.nl()
 
     def new_table( self , txt ):
         return txt + '[table]' + self.nl()
@@ -185,7 +188,7 @@ class BBcodeTable ( Table ):
 class HtmlTable ( Table ):
 
     def add_title( self , txt , title ):
-        return txt + self.nl() + "<tr>" + self.nl() + " <th colspan=\"5\" > " + title + "</th>" + self.nl() + "</tr>" + self.nl() 
+        return txt + self.nl() + "<tr>" + self.nl() + " <th colspan=\"%d\" > " % self.col_cnt() + title + "</th>" + self.nl() + "</tr>" + self.nl() 
 
     def new_table( self , txt ):
         return txt + "<table>" + self.nl() 
@@ -239,7 +242,7 @@ class HtmlTable ( Table ):
 class MediaWikiTable ( Table ):
 
     def add_title( self , txt , title ):
-        return txt + "|-" + self.nl() + "!align=\"left\" colspan=\"5\" | " + title + self.nl()
+        return txt + "|-" + self.nl() + "!align=\"left\" colspan=\"%d\" | " % self.col_cnt() + title + self.nl()
 
     def new_table( self , txt ):
         return txt + "{| " + self.nl() 
@@ -247,24 +250,6 @@ class MediaWikiTable ( Table ):
     def end_table( self , txt ):
         return txt + "|}" + self.nl()
         
-    def new_head( self , txt ):
-        return txt 
-    
-    def end_head( self , txt ):
-        return txt
-        
-    def new_tbody( self , txt ):
-        return txt
-    
-    def end_tbody( self , txt ):
-        return txt
-    
-    def new_foot( self , txt ):
-        return txt
-    
-    def end_foot( self , txt ):
-        return txt
-    
     def new_row( self , txt ):
         return txt + "|-" + self.nl() 
     
@@ -276,16 +261,10 @@ class MediaWikiTable ( Table ):
     
     def end_cell( self , txt ):
         return txt
-    
-    def new_hcell( self , txt ):
-        return txt + '||'
-    
-    def end_hcell( self , txt ):
-        return txt 
-    
+        
     def new_bold( self , txt ):
-        return txt 
+        return txt + "\'\'\'"
     
     def end_bold( self , txt ):
-        return txt
+        return txt + "\'\'\'"
 
