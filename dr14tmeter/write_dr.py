@@ -134,6 +134,7 @@ class WriteDrExtended( WriteDr ) :
         
         d_nr = 0 ;        
         
+        cnt = 0
         for i in range( len( drm.res_list ) ) :
             
             if drm.res_list[i]['dr14'] > dr14.min_dr() :
@@ -155,8 +156,8 @@ class WriteDrExtended( WriteDr ) :
                     nr = drm.meta_data.get_value( curr_file_name , 'nr' )
                     codec = drm.meta_data.get_value( curr_file_name , 'codec' )
                     
-                    #if nr == None :
-                    #    nr = i + 1
+                    if nr == None :
+                        nr = i + 1
                     
                     row.append( "%02d - %s \t [%s]" % ( nr , tr_title , codec ) )
                     
@@ -168,7 +169,7 @@ class WriteDrExtended( WriteDr ) :
                 
                 if kbs != None :
                     sum_kbs += int( kbs )
-                    i = i + 1
+                    cnt = cnt + 1
                     
                 if bit not in list_bit :
                     list_bit.append( bit )    
@@ -189,7 +190,10 @@ class WriteDrExtended( WriteDr ) :
         txt = tm.append_empty_line( txt )
         
         txt = tm.add_title( txt , " Sampling rate: \t\t %s Hz" % sampl_rate[0] )
-        txt = tm.add_title( txt , " Average bitrate: \t\t %dkbs " % ( sum_kbs / (i+1) )  )
+        
+        if cnt > 0:
+            txt = tm.add_title( txt , " Average bitrate: \t\t %dkbs " % ( sum_kbs / cnt )  )
+        
         txt = tm.add_title( txt , " Bits per sample: \t\t %s bit" % list_bit[0] )
         
         txt = tm.append_closing_line( txt )
