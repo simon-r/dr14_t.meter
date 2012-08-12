@@ -155,17 +155,20 @@ class WriteDrExtended( WriteDr ) :
                     nr = drm.meta_data.get_value( curr_file_name , 'nr' )
                     codec = drm.meta_data.get_value( curr_file_name , 'codec' )
                     
-                    if nr == None :
-                        nr = i + 1
+                    #if nr == None :
+                    #    nr = i + 1
                     
                     row.append( "%02d - %s \t [%s]" % ( nr , tr_title , codec ) )
                     
-                   
                 bitrate = drm.meta_data.get_value( curr_file_name , 'bitrate' )
                 bit = drm.meta_data.get_value( curr_file_name , 'bit' )
                 s_rate = drm.meta_data.get_value( curr_file_name , 's_rate' )
                 
-                sum_kbs += int( drm.meta_data.get_value( curr_file_name , 'bitrate' ) )
+                kbs = drm.meta_data.get_value( curr_file_name , 'bitrate' )
+                
+                if kbs != None :
+                    sum_kbs += int( kbs )
+                    i = i + 1
                     
                 if bit not in list_bit :
                     list_bit.append( bit )    

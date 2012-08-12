@@ -83,10 +83,10 @@ class RetirveMetadata:
             #print( m.group(1) )
             self._album.setdefault( m.group(1) , 0 )
             self._album[m.group(1)] += 1
-        
+            
         m = re.search( r"\s*title\s*\:\s*(.*)$" , data_txt , re_flags )
         if m != None:
-            track['title'] = m.group(1) 
+            track['title'] = m.group(1)
         
         m = re.search( r"\s*artist\s*\:\s*(.*)$" , data_txt , re_flags )
         if m != None:

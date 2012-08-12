@@ -144,9 +144,7 @@ class DynamicRangeMeter:
         else:
             return 0
         
-        
-      
-    
+
     def fwrite_dr( self , file_name , tm , ext_table=False , std_out=False , append=False , dr_database=True ):
         
         if ext_table :
