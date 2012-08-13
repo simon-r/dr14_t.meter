@@ -29,37 +29,37 @@ class AudioDecoder:
     def __init__(self):
         self.formats = [ '.flac' , '.mp3' , '.ogg' , '.mp4' , '.m4a' , '.wav' , '.ape' , '.wma' ]
 
-    def read_track( self , file_name ):
-
-        ( f , ext ) = os.path.splitext( file_name )
-
-        if ext not in self.formats :
-            return ( [] , 0 , 0 )
-
-        af = AudioFileReader()
-    
-        if ext == '.mp3':
-            af = Mp3FileReader()
-        elif ext == '.flac':
-            af = FlacFileReader()
-        elif ext == '.ogg':
-            af = OggFileReader()
-        elif ext in ['.mp4' , '.m4a' ]:
-            af = Mp4FileReader()
-        elif ext == '.wav':
-            af = WavFileReader()
-        elif ext == '.ape':
-            af = ApeFileReader()
-        elif ext == '.wma':
-            af = WmaFileReader()
-        elif ext == '.wav':
-            af = WavFileReader()
-        else:
-            return ( [] , 0 , 0 )
-
-        ( Y , Fs , channels ) = af.read_audio_file( file_name )
-
-        return ( Y , Fs , channels )
+    #def read_track( self , file_name ):
+    #
+    #    ( f , ext ) = os.path.splitext( file_name )
+    #
+    #    if ext not in self.formats :
+    #        return ( [] , 0 , 0 )
+    #
+    #    af = AudioFileReader()
+    #
+    #    if ext == '.mp3':
+    #        af = Mp3FileReader()
+    #    elif ext == '.flac':
+    #        af = FlacFileReader()
+    #    elif ext == '.ogg':
+    #        af = OggFileReader()
+    #    elif ext in ['.mp4' , '.m4a' ]:
+    #        af = Mp4FileReader()
+    #    elif ext == '.wav':
+    #        af = WavFileReader()
+    #    elif ext == '.ape':
+    #        af = ApeFileReader()
+    #    elif ext == '.wma':
+    #        af = WmaFileReader()
+    #    elif ext == '.wav':
+    #        af = WavFileReader()
+    #    else:
+    #        return ( [] , 0 , 0 )
+    #
+    #    ( Y , Fs , channels ) = af.read_audio_file( file_name )
+    #
+    #    return ( Y , Fs , channels )
     
     
     def read_track_new( self , file_name , target ):
@@ -129,33 +129,33 @@ class AudioFileReader:
             return "" 
   
 
-    def read_audio_file( self , file_name ):
-        
-        full_command = self.__cmd
-        
-        (head, file) = os.path.split( file_name )
-        tmp_dir = tempfile.gettempdir()
-        tmp_file = os.path.join( tmp_dir , file ) + ".wav"
-        
-        file_name = re.sub( "(\"|`)" , r"\\\1" , file_name )
-        tmp_file = re.sub( "(\"|`)" , r"_xyz_" , tmp_file )
-    
-        full_command = full_command + " " + self.get_cmd_options( file_name , tmp_file )
-            
-        #print( full_command )
-        
-        r = subprocess.call( full_command , shell=True  , stderr=subprocess.PIPE , stdout=subprocess.PIPE )
-        
-        #read_wav.read_wav( tmp_file )
-        
-        ( Y , Fs , channels ) = read_wav.read_wav( tmp_file )
-        
-        if os.path.exists( tmp_file ) :
-            os.remove( tmp_file )
-        else:
-            print( file_name + ": unsupported encoder" )
-        
-        return ( Y , Fs , channels )
+    #def read_audio_file( self , file_name ):
+    #    
+    #    full_command = self.__cmd
+    #    
+    #    (head, file) = os.path.split( file_name )
+    #    tmp_dir = tempfile.gettempdir()
+    #    tmp_file = os.path.join( tmp_dir , file ) + ".wav"
+    #    
+    #    file_name = re.sub( "(\"|`)" , r"\\\1" , file_name )
+    #    tmp_file = re.sub( "(\"|`)" , r"_xyz_" , tmp_file )
+    #
+    #    full_command = full_command + " " + self.get_cmd_options( file_name , tmp_file )
+    #        
+    #    #print( full_command )
+    #    
+    #    r = subprocess.call( full_command , shell=True  , stderr=subprocess.PIPE , stdout=subprocess.PIPE )
+    #    
+    #    #read_wav.read_wav( tmp_file )
+    #    
+    #    ( Y , Fs , channels ) = read_wav.read_wav( tmp_file )
+    #    
+    #    if os.path.exists( tmp_file ) :
+    #        os.remove( tmp_file )
+    #    else:
+    #        print( file_name + ": unsupported encoder" )
+    #    
+    #    return ( Y , Fs , channels )
 
 
     def read_audio_file_new( self , file_name , target ):
