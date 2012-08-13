@@ -99,21 +99,23 @@ class AudioFileReader:
             target.Fs = wave_read.getframerate()
             target.sample_width = wave_read.getsampwidth()
             
-            #print( str(channels) + " " + str(sample_width ) + " " + str( sampling_rate ) + " " + str( wave_read.getnframes() ) )
+            nframes = wave_read.getnframes()
+            print( file_name + "!!!!!!!!!!!!: " + str(target.channels) + " " + str(target.sample_width ) + " " + str( target.Fs ) + " " + str( nframes ) )
             
             X = wave_read.readframes( wave_read.getnframes() )
             
             # 24 bit support ??
-            if target.sample_width == 3:
-                new_X = ""
-                for i in range(0, len(X)/3):
-                    new_X += '\x00' + X[3*i:3*i+3]
-                X = new_X
-                sample_width = 4
-            
+            #if target.sample_width == 3:
+            #    new_X = ""
+            #    for i in range(0, len(X)/3):
+            #        new_X += '\x00' + X[3*i:3*i+3]
+            #    X = new_X
+            #    sample_width = 4
+            #
             sample_type = "int%d" % ( target.sample_width * 8 )
-            target.Y = numpy.fromstring(X, dtype=sample_type)
             
+            target.Y = numpy.fromstring(X, dtype=sample_type).reshape( nframes , target.channels )
+        
             wave_read.close()
     
             if sample_type == 'int16':
