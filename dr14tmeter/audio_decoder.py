@@ -20,6 +20,8 @@ import sys
 import tempfile
 import subprocess
 import re
+import wave
+import numpy
 
 
 class AudioDecoder:
@@ -50,12 +52,47 @@ class AudioDecoder:
             af = ApeFileReader()
         elif ext == '.wma':
             af = WmaFileReader()
+        elif ext == '.wav':
+            af = WavFileReader()
         else:
             return ( [] , 0 , 0 )
 
         ( Y , Fs , channels ) = af.read_audio_file( file_name )
+
         return ( Y , Fs , channels )
-        
+    
+    
+    def read_track_new( self , file_name , target ):
+
+        ( f , ext ) = os.path.splitext( file_name )
+
+        if ext not in self.formats :
+            return ( [] , 0 , 0 )
+
+        af = AudioFileReader()
+    
+        if ext == '.mp3':
+            af = Mp3FileReader()
+        elif ext == '.flac':
+            af = FlacFileReader()
+        elif ext == '.ogg':
+            af = OggFileReader()
+        elif ext in ['.mp4' , '.m4a' ]:
+            af = Mp4FileReader()
+        elif ext == '.wav':
+            af = WavFileReader()
+        elif ext == '.ape':
+            af = ApeFileReader()
+        elif ext == '.wma':
+            af = WmaFileReader()
+        elif ext == '.wav':
+            af = WavFileReader()
+        else:
+            return ( [] , 0 , 0 )
+
+        ret_f = af.read_audio_file_new( file_name , target )
+
+        return ret_f
  
 class AudioFileReader:
     
@@ -121,6 +158,74 @@ class AudioFileReader:
         return ( Y , Fs , channels )
 
 
+    def read_audio_file_new( self , file_name , target ):
+        
+        full_command = self.__cmd
+        
+        (head, file) = os.path.split( file_name )
+        tmp_dir = tempfile.gettempdir()
+        tmp_file = os.path.join( tmp_dir , file ) + ".wav"
+        
+        file_name = re.sub( "(\"|`)" , r"\\\1" , file_name )
+        tmp_file = re.sub( "(\"|`)" , r"_xyz_" , tmp_file )
+    
+        full_command = full_command + " " + self.get_cmd_options( file_name , tmp_file )
+            
+        #print( full_command )
+        
+        r = subprocess.call( full_command , shell=True  , stderr=subprocess.PIPE , stdout=subprocess.PIPE )
+        
+        #read_wav.read_wav( tmp_file )
+        
+        ret_f = self.read_wav( tmp_file , target )
+        
+        if os.path.exists( tmp_file ) :
+            os.remove( tmp_file )
+        else:
+            print( file_name + ": unsupported encoder" )
+        
+        return ret_f 
+
+
+    def read_wav( self , file_name , target ):
+    
+        convert_8_bit = float(2**15)
+        convert_16_bit = float(2**15)
+        convert_32_bit = float(2**31)
+        
+        try:
+            wave_read = wave.open( file_name , 'r' )
+            target.channels = wave_read.getnchannels()
+            target.Fs = wave_read.getframerate()
+            target.sample_width = wave_read.getsampwidth()
+            
+            #print( str(channels) + " " + str(sample_width ) + " " + str( sampling_rate ) + " " + str( wave_read.getnframes() ) )
+            
+            X = wave_read.readframes( wave_read.getnframes() )
+            
+            sample_type = "int%d" % ( target.sample_width * 8 )
+            target.Y = numpy.fromstring(X, dtype=sample_type)
+            
+            wave_read.close()
+    
+            if sample_type == 'int16':
+                target.Y = target.Y / (convert_16_bit + 1.0)
+            elif sample_type == 'int32':
+                target.Y = target.Y / (convert_32_bit + 1.0)
+            else :
+                target.Y = target.Y / (convert_8_bit + 1.0)
+                
+        except:
+            self.__init__()
+            print ( "Unexpected error:", str( sys.exc_info() ) )
+            print (  "\n - ERROR ! " )
+            return False
+     
+        return True
+
+
+
+
 class Mp3FileReader( AudioFileReader ):
     def get_cmd(self):
         return "lame"
@@ -169,6 +274,12 @@ class WmaFileReader( AudioFileReader ):
 
 
 class WavFileReader( AudioFileReader ):
-    def read_audio_file( self , file_name ):
-        return read_wav.read_wav( file_name )
+    def read_audio_file_new( self , file_name , target ):
+        return self.read_wav( file_name , target )
+    
+    def get_cmd(self):
+        return ""
+
+    def get_cmd_options( self , file_name , tmp_file ):
+        return ""
 
