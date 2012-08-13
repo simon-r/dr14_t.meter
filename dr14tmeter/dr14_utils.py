@@ -88,23 +88,7 @@ def write_results( dr , options , out_dir , cur_dir ) :
         if code in options.out_tables or all_tables :
             dr.fwrite_dr( os.path.join( full_out_dir , tables_list[code][0] ) , tables_list[code][1] , table_format , append=options.append , dr_database=options.dr_database )
             out_list = out_list + " %s " % tables_list[code][0]
-    
-    #if 'b' in options.out_tables or all_tables :
-    #    dr.fwrite_dr( os.path.join( full_out_dir , "dr14_bbcode.txt" ) , BBcodeTable() , table_format , append=options.append , dr_database=options.dr_database )
-    #    out_list = " dr14_bbcode.txt "
-    #    
-    #if 't' in options.out_tables or all_tables :
-    #    dr.fwrite_dr( os.path.join( full_out_dir , "dr14.txt" ) , TextTable() , table_format , append=options.append , dr_database=options.dr_database )
-    #    out_list = out_list + " dr14.txt "
-    #    
-    #if 'h' in options.out_tables or all_tables :
-    #    dr.fwrite_dr( os.path.join( full_out_dir , "dr14.html" ) , HtmlTable() , table_format , append=options.append , dr_database=options.dr_database )
-    #    out_list = out_list + " dr14.html "
-    #
-    #if 'w' in options.out_tables or all_tables :
-    #    dr.fwrite_dr( os.path.join( full_out_dir , "dr14_mediawiki.txt" ) , MediaWikiTable() , table_format , append=options.append , dr_database=options.dr_database )
-    #    out_list = out_list + " dr14_mediawiki.txt "
-        
+            
     
     print("")
     print("- The full result has been written in the files: %s" % out_list )
