@@ -99,7 +99,7 @@ class AudioFileReader:
             target.Fs = wave_read.getframerate()
             target.sample_width = wave_read.getsampwidth()
             
-            print( str(channels) + " " + str(sample_width ) + " " + str( sampling_rate ) + " " + str( wave_read.getnframes() ) )
+            #print( str(channels) + " " + str(sample_width ) + " " + str( sampling_rate ) + " " + str( wave_read.getnframes() ) )
             
             X = wave_read.readframes( wave_read.getnframes() )
             
