@@ -16,7 +16,6 @@
 
 import numpy
 import wave
-import dr14tmeter.read_wav as read_wav
 import os
 from dr14tmeter.audio_decoder import AudioDecoder
 
@@ -45,20 +44,9 @@ class AudioTrack:
 
         de = AudioDecoder()
 
-        #if ext == '.wav':
-        #    ( self.Y , self.Fs , self.channels ) = read_wav.read_wav( file_name )
-        #elif ext in de.formats:
-        
-        #( self.Y , self.Fs , self.channels ) = de.read_track( file_name )
         res_f = de.read_track_new( file_name , self )
 
         #print( file_name )
 
         return res_f 
-        #
-        #if self.channels == 0:
-        #    return False
-        #else:
-        #    return True
-        
-        
+  

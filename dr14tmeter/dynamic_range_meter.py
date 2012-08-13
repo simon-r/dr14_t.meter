@@ -217,6 +217,6 @@ class ScanDirMt(threading.Thread):
                 self.res_list[curr_job] = { 'file_name': file_name , 'dr14': dr14 , 'dB_peak': dB_peak , 'dB_rms': dB_rms , 'duration':duration.to_str() }
                 self.lock_res_list.release()
             else:
-                print( "- fail -" + full_file )
+                print( "- fail - " + full_file )
    
    

@@ -14,7 +14,6 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import dr14tmeter.read_wav as read_wav
 import os
 import sys
 import tempfile
@@ -22,45 +21,13 @@ import subprocess
 import re
 import wave
 import numpy
+from dr14tmeter.audio_file_reader import *
 
 
 class AudioDecoder:
 
     def __init__(self):
         self.formats = [ '.flac' , '.mp3' , '.ogg' , '.mp4' , '.m4a' , '.wav' , '.ape' , '.wma' ]
-
-    #def read_track( self , file_name ):
-    #
-    #    ( f , ext ) = os.path.splitext( file_name )
-    #
-    #    if ext not in self.formats :
-    #        return ( [] , 0 , 0 )
-    #
-    #    af = AudioFileReader()
-    #
-    #    if ext == '.mp3':
-    #        af = Mp3FileReader()
-    #    elif ext == '.flac':
-    #        af = FlacFileReader()
-    #    elif ext == '.ogg':
-    #        af = OggFileReader()
-    #    elif ext in ['.mp4' , '.m4a' ]:
-    #        af = Mp4FileReader()
-    #    elif ext == '.wav':
-    #        af = WavFileReader()
-    #    elif ext == '.ape':
-    #        af = ApeFileReader()
-    #    elif ext == '.wma':
-    #        af = WmaFileReader()
-    #    elif ext == '.wav':
-    #        af = WavFileReader()
-    #    else:
-    #        return ( [] , 0 , 0 )
-    #
-    #    ( Y , Fs , channels ) = af.read_audio_file( file_name )
-    #
-    #    return ( Y , Fs , channels )
-    
     
     def read_track_new( self , file_name , target ):
 
@@ -85,8 +52,6 @@ class AudioDecoder:
             af = ApeFileReader()
         elif ext == '.wma':
             af = WmaFileReader()
-        elif ext == '.wav':
-            af = WavFileReader()
         else:
             return ( [] , 0 , 0 )
 
@@ -94,192 +59,3 @@ class AudioDecoder:
 
         return ret_f
  
-class AudioFileReader:
-    
-    def __init__(self):
-        if sys.platform.startswith('linux'):
-            self.__cmd = "%s " % self.get_cmd()
-        elif sys.platform.startswith('win'):
-            self.__cmd = ".\\decoder\\%s " % self.get_cmd()
-
-    def get_cmd(self):
-        pass
-
-    def get_cmd_options( self , file_name , tmp_file ):
-        pass
-
-    def to_wav( self , file_name ):
-        
-        full_command = self.__cmd
-        
-        (head, file) = os.path.split( file_name )
-        tmp_dir = tempfile.gettempdir()
-        tmp_file = os.path.join( tmp_dir , file ) + ".wav"
-        
-        file_name = re.sub( "(\"|`)" , r"\\\1" , file_name )
-        tmp_file = re.sub( "(\"|`)" , r"_xyz_" , tmp_file )
-        
-        full_command = full_command + " " + self.get_cmd_options( file_name , tmp_file )
-        
-        r = subprocess.call( full_command , shell=True  , stderr=subprocess.PIPE , stdout=subprocess.PIPE )
-        
-        if os.path.exists( tmp_file ) :
-            return tmp_file
-        else :
-            return "" 
-  
-
-    #def read_audio_file( self , file_name ):
-    #    
-    #    full_command = self.__cmd
-    #    
-    #    (head, file) = os.path.split( file_name )
-    #    tmp_dir = tempfile.gettempdir()
-    #    tmp_file = os.path.join( tmp_dir , file ) + ".wav"
-    #    
-    #    file_name = re.sub( "(\"|`)" , r"\\\1" , file_name )
-    #    tmp_file = re.sub( "(\"|`)" , r"_xyz_" , tmp_file )
-    #
-    #    full_command = full_command + " " + self.get_cmd_options( file_name , tmp_file )
-    #        
-    #    #print( full_command )
-    #    
-    #    r = subprocess.call( full_command , shell=True  , stderr=subprocess.PIPE , stdout=subprocess.PIPE )
-    #    
-    #    #read_wav.read_wav( tmp_file )
-    #    
-    #    ( Y , Fs , channels ) = read_wav.read_wav( tmp_file )
-    #    
-    #    if os.path.exists( tmp_file ) :
-    #        os.remove( tmp_file )
-    #    else:
-    #        print( file_name + ": unsupported encoder" )
-    #    
-    #    return ( Y , Fs , channels )
-
-
-    def read_audio_file_new( self , file_name , target ):
-        
-        full_command = self.__cmd
-        
-        (head, file) = os.path.split( file_name )
-        tmp_dir = tempfile.gettempdir()
-        tmp_file = os.path.join( tmp_dir , file ) + ".wav"
-        
-        file_name = re.sub( "(\"|`)" , r"\\\1" , file_name )
-        tmp_file = re.sub( "(\"|`)" , r"_xyz_" , tmp_file )
-    
-        full_command = full_command + " " + self.get_cmd_options( file_name , tmp_file )
-            
-        #print( full_command )
-        
-        r = subprocess.call( full_command , shell=True  , stderr=subprocess.PIPE , stdout=subprocess.PIPE )
-        
-        #read_wav.read_wav( tmp_file )
-        
-        ret_f = self.read_wav( tmp_file , target )
-        
-        if os.path.exists( tmp_file ) :
-            os.remove( tmp_file )
-        else:
-            print( file_name + ": unsupported encoder" )
-        
-        return ret_f 
-
-
-    def read_wav( self , file_name , target ):
-    
-        convert_8_bit = float(2**15)
-        convert_16_bit = float(2**15)
-        convert_32_bit = float(2**31)
-        
-        try:
-            wave_read = wave.open( file_name , 'r' )
-            target.channels = wave_read.getnchannels()
-            target.Fs = wave_read.getframerate()
-            target.sample_width = wave_read.getsampwidth()
-            
-            #print( str(channels) + " " + str(sample_width ) + " " + str( sampling_rate ) + " " + str( wave_read.getnframes() ) )
-            
-            X = wave_read.readframes( wave_read.getnframes() )
-            
-            sample_type = "int%d" % ( target.sample_width * 8 )
-            target.Y = numpy.fromstring(X, dtype=sample_type)
-            
-            wave_read.close()
-    
-            if sample_type == 'int16':
-                target.Y = target.Y / (convert_16_bit + 1.0)
-            elif sample_type == 'int32':
-                target.Y = target.Y / (convert_32_bit + 1.0)
-            else :
-                target.Y = target.Y / (convert_8_bit + 1.0)
-                
-        except:
-            self.__init__()
-            print ( "Unexpected error:", str( sys.exc_info() ) )
-            print (  "\n - ERROR ! " )
-            return False
-     
-        return True
-
-
-
-
-class Mp3FileReader( AudioFileReader ):
-    def get_cmd(self):
-        return "lame"
-    
-    def get_cmd_options(self , file_name , tmp_file ):
-        return "--silent " + "--decode " + "\"" + file_name + "\"" + " \"%s\" " % tmp_file
-
-
-class FlacFileReader( AudioFileReader ):
-    def get_cmd(self):
-        return "flac"
-    
-    def get_cmd_options(self , file_name , tmp_file ):
-        return "-s " + "-d " + "\"" + file_name + "\"" + " -o \"%s\" " % tmp_file
-
-
-class Mp4FileReader( AudioFileReader ):
-    def get_cmd(self):
-        return "ffmpeg"
-    
-    def get_cmd_options(self , file_name , tmp_file ):
-        return  " -i \"" + file_name + "\"" + " -y \"%s\" -loglevel quiet -y " % tmp_file
-
-
-class OggFileReader( AudioFileReader ):
-    def get_cmd(self):
-        return "oggdec"
-    
-    def get_cmd_options(self , file_name , tmp_file ):
-        return  "--quiet " + "\"" + file_name + "\"" + " --output \"%s\"  " % tmp_file
-
-class ApeFileReader( AudioFileReader ):
-    def get_cmd(self):
-        return "ffmpeg"
-    
-    def get_cmd_options(self , file_name , tmp_file ):
-        return  " -i \"" + file_name + "\"" + " -y \"%s\" -loglevel quiet -y " % tmp_file
-
-
-class WmaFileReader( AudioFileReader ):
-    def get_cmd(self):
-        return "ffmpeg"
-    
-    def get_cmd_options(self , file_name , tmp_file ):
-        return  " -i \"" + file_name + "\"" + " -y \"%s\" -loglevel quiet " % tmp_file
-
-
-class WavFileReader( AudioFileReader ):
-    def read_audio_file_new( self , file_name , target ):
-        return self.read_wav( file_name , target )
-    
-    def get_cmd(self):
-        return ""
-
-    def get_cmd_options( self , file_name , tmp_file ):
-        return ""
-
