@@ -60,4 +60,6 @@ def decibel_p( y , ref ) :
     
 def audio_min() :
     return 1.0/(2.0**24)
-    
+
+def audio_min16():
+    return 1.0/(2.0**16)

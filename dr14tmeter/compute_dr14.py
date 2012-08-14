@@ -15,7 +15,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
-from numpy  import *
+
 from dr14tmeter.audio_math import *
 import math
 import numpy
