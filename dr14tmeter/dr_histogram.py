@@ -40,7 +40,7 @@ def compute_hist ( Y , Fs , duration=None , bins=None , block_duration = 0.2 , p
     
     #peaks = zeros((seg_cnt,ch))
     
-    for i in range(seg_cnt - 1):
+    for i in range( seg_cnt - 1 ):
         r = arange( curr_sam , curr_sam + saples_per_block )
         rms[i,:] = u_rms( Y[r,:] )
         curr_sam = curr_sam + saples_per_block
@@ -49,28 +49,31 @@ def compute_hist ( Y , Fs , duration=None , bins=None , block_duration = 0.2 , p
     r = arange( curr_sam,s[0] )
     
     if r.shape[0] > 0:
-        rms[i,:] = dr_rms( Y[r,:] )
+        rms[i,:] = dr_rms( Y[r,:] ) 
     
-    rms[rms == 0.0] = audio_min16()
-    rms = decibel_u( rms , sqrt(2.0) )
+    rms = numpy.sum( rms , 1 ) / float(ch)
+    
+    rms[rms==0.0] = audio_min16()
+    rms = decibel_u( rms , 1.0 )
     
     if bins == None :
         bins = 100
     
     if plot == True :
-        ( hst , bin_edges , patches ) = pyplot.hist( rms[:,1] , bins=bins)
+        ( hist , bin_edges , patches ) = pyplot.hist( rms , 100 )
                 
         pyplot.xlabel('RMS dB')
         pyplot.ylabel('Frequancy')
         
-        pyplot.title(r'$\mathrm{Histograo\ of\ DR}')
+        pyplot.title(r'Histograon of dynamic')
         
-        #pyplot.grid(True)
-
+        pyplot.grid(True)
         pyplot.show()
         
     else:
         ( hist , bin_edges ) = numpy.histogram( rms , bins=bins )
+        
+        
     return ( hist , bin_edges )
     
     
