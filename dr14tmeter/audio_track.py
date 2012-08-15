@@ -40,8 +40,6 @@ class AudioTrack:
         if not ( os.path.exists( file_name ) ) :
             return False
 
-        ( f , ext ) = os.path.splitext( file_name )
-
         de = AudioDecoder()
 
         res_f = de.read_track_new( file_name , self )

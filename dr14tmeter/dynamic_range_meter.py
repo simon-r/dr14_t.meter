@@ -21,6 +21,7 @@ import codecs
 
 from dr14tmeter.compute_dr14 import compute_dr14
 from dr14tmeter.compute_drv import compute_DRV
+from dr14tmeter.compute_dr import *
 from dr14tmeter.audio_track import *
 from dr14tmeter.table import *
 from dr14tmeter.dr_histogram import *
@@ -41,6 +42,8 @@ class DynamicRangeMeter:
         self.dr14 = 0 
         self.meta_data = RetirveMetadata()
         self.histogram = False
+        
+        self.compute_dr = ComputeDR14()
     
     def scan_file( self , file_name):
         
@@ -75,6 +78,7 @@ class DynamicRangeMeter:
         for file_name in dir_list:
             full_file = os.path.join( dir_name , file_name )
             
+            #print( full_file )
             if at.open( full_file ):
                 self.__compute_and_append( at , file_name )
 
@@ -90,6 +94,7 @@ class DynamicRangeMeter:
         
         duration = StructDuration()
         
+        #( dr14, dB_peak, dB_rms ) = self.compute_dr.compute( at.Y , at.Fs )
         ( dr14, dB_peak, dB_rms ) = compute_dr14( at.Y , at.Fs , duration )
         
         self.dr14 = self.dr14 + dr14
@@ -102,8 +107,8 @@ class DynamicRangeMeter:
     def __compute_histogram( self , at , file_name ):
         
         duration = StructDuration()
-        
         compute_hist( at.Y , at.Fs , duration )
+    
     
     def scan_dir_mt( self , dir_name , thread_cnt ):
         

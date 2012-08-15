@@ -114,7 +114,7 @@ def main():
         
         cpu = multiprocessing.cpu_count()
                 
-        if ( cpu == 1 ) or ( options.disable_multithread == True ) :
+        if ( options.disable_multithread == True ) :
             r = dr.scan_dir( cur_dir )
         else:
             cpu = cpu / 2

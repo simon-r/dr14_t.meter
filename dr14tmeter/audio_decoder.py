@@ -34,7 +34,7 @@ class AudioDecoder:
         ( f , ext ) = os.path.splitext( file_name )
 
         if ext not in self.formats :
-            return ( [] , 0 , 0 )
+            return False
 
         af = AudioFileReader()
     
@@ -53,7 +53,7 @@ class AudioDecoder:
         elif ext == '.wma':
             af = WmaFileReader()
         else:
-            return ( [] , 0 , 0 )
+            return False
 
         ret_f = af.read_audio_file_new( file_name , target )
 

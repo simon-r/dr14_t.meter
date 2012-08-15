@@ -16,8 +16,12 @@
 
 import numpy
 from dr14tmeter.audio_math import *
-import matplotlib.pyplot as pyplot
-import matplotlib.mlab as mlab
+
+try:
+    import matplotlib.pyplot as pyplot
+    import matplotlib.mlab as mlab
+except:
+    print ("xx")
 
 
 def compute_hist ( Y , Fs , duration=None , bins=100 , block_duration = 0.2 , plot=True , title=None ):
