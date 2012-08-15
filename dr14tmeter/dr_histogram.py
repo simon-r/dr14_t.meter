@@ -20,7 +20,7 @@ import matplotlib.pyplot as pyplot
 import matplotlib.mlab as mlab
 
 
-def compute_hist ( Y , Fs , duration=None , bins=None , block_duration = 0.2 , plot=True ):
+def compute_hist ( Y , Fs , duration=None , bins=100 , block_duration = 0.2 , plot=True , title=None ):
     s = Y.shape
     
     if len( Y.shape ) > 1 :
@@ -55,17 +55,18 @@ def compute_hist ( Y , Fs , duration=None , bins=None , block_duration = 0.2 , p
     
     rms[rms==0.0] = audio_min16()
     rms = decibel_u( rms , 1.0 )
-    
-    if bins == None :
-        bins = 100
-    
-    if plot == True :
-        ( hist , bin_edges , patches ) = pyplot.hist( rms , 100 )
-                
-        pyplot.xlabel('RMS dB')
-        pyplot.ylabel('Frequancy')
         
-        pyplot.title(r'Histograon of dynamic')
+    if plot == True :
+        ( hist , bin_edges , patches ) = pyplot.hist( rms , 100 , normed=1 )
+        
+        print( hist )
+        
+        pyplot.axis([-92, 0, 0, numpy.max(hist)*1.05 ])
+        
+        pyplot.xlabel('RMS dB')
+        pyplot.ylabel('Probability')
+        
+        pyplot.title(r'Histogram of dynamic')
         
         pyplot.grid(True)
         pyplot.show()

@@ -40,6 +40,7 @@ class DynamicRangeMeter:
         self.dir_name = '' 
         self.dr14 = 0 
         self.meta_data = RetirveMetadata()
+        self.histogram = False
     
     def scan_file( self , file_name):
         
@@ -47,8 +48,13 @@ class DynamicRangeMeter:
         
         duration = StructDuration() 
         
+        if self.histogram :
+            compute_fun = self.__compute_histogram
+        else:
+            compute_fun = self.__compute_and_append
+        
         if at.open( file_name ):
-            self.__compute_and_append( at , file_name )
+            compute_fun( at , file_name )
             return 1
         else:
             return 0
@@ -93,6 +99,11 @@ class DynamicRangeMeter:
         
         print( file_name + ": \t DR " + str( int(dr14) ) )
   
+    def __compute_histogram( self , at , file_name ):
+        
+        duration = StructDuration()
+        
+        compute_hist( at.Y , at.Fs , duration )
     
     def scan_dir_mt( self , dir_name , thread_cnt ):
         

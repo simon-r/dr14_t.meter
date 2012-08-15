@@ -23,7 +23,7 @@ import time
 import multiprocessing
 from dr14tmeter.dynamic_range_meter import DynamicRangeMeter
 from dr14tmeter.table import *
-from dr14tmeter.dr14_global import dr14_version, TestVer, test_new_version, get_home_url, get_new_version, get_exe_name
+from dr14tmeter.dr14_global import dr14_version, TestVer, test_new_version, get_home_url, get_new_version, get_exe_name, test_hist_modules
 import subprocess
 import inspect
 import sys
@@ -65,6 +65,19 @@ def main():
     
           
     #print ( subdirlist )
+
+    print( options.histogram )
+    if options.histogram:
+        if test_hist_modules() == False:
+            return 0
+        
+        print("Start histo:")
+        
+        dr = DynamicRangeMeter() ;
+        dr.histogram = True
+        r = dr.scan_file( path_name )
+        
+        return 1 
         
     if options.scan_file:
         dr = DynamicRangeMeter()

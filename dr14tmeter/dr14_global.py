@@ -23,7 +23,7 @@ import threading
 # Current version
 v_major    = 0
 v_minor    = 9
-v_revision = 2
+v_revision = 3
 ###########################
 
 # latest version
@@ -132,3 +132,12 @@ def get_new_version():
 def get_home_url():
     return "http://simon-r.github.com/dr14_t.meter"
         
+        
+def test_hist_modules():
+    try:
+        import matplotlib
+    except ImportError:
+        print( "The histogram function require the installation of MatPlotLib: http://matplotlib.sourceforge.net" )
+        return False
+    
+    return True

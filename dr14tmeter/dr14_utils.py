@@ -171,12 +171,11 @@ def parse_args():
         default=True ,
         help="Set the compatibility with the DR database: www.dr.loudness-war.info; default: 1 (True) or 0=False" )
 
-
-    parser.add_option("-m", "--multithread",
+    parser.add_option( "--hist" ,
         action="store_true",
-        dest="multithread",
-        default=True,
-        help="[Depreceted!] Uses the multi-Core mode")
+        dest="histogram" ,
+        default=False ,
+        help="Plot the dynamic histogram and exit" )
 
     (options, args) = parser.parse_args()
     
