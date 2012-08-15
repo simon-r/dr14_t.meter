@@ -15,9 +15,12 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from dr14tmeter.duration import StructDuration
+from dr14tmeter.compute_dr14 import compute_dr14
+from dr14tmeter.compute_drv import compute_DRV
+
 import numpy
 
-class ComputeDr :
+class ComputeAudio :
     def __init__(self):
         self.duration = StructDuration() ;
         self.Dr_lr = numpy.zeros(2)
@@ -32,11 +35,11 @@ class ComputeDr :
         return self.Dr_lr
     
 
-class ComputeDR14( ComputeDr ) :
+class ComputeDR14( ComputeAudio ) :
     def compute( self , Y , Fs ):
        return compute_dr14(  Y , Fs , self.duration , self.Dr_lr )
        
 
-class ComputeDRV( ComputeDr ) :
+class ComputeDRV( ComputeAudio ) :
     def compute( self , Y , Fs ):
        return compute_DRV(  Y , Fs , self.duration , self.Dr_lr )
