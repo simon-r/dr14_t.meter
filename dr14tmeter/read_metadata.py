@@ -68,7 +68,10 @@ class RetirveMetadata:
             data_txt = "ffprobe ERROR"
          
         if data_txt != "ffprobe ERROR" :
-            data_txt = data_txt.decode(encoding='UTF-8')
+            try:
+                data_txt = data_txt.decode(encoding='UTF-8')
+            except:
+                data_txt = data_txt.decode(encoding='ISO-8859-1')
         
         track = {} 
         
