@@ -66,7 +66,6 @@ def main():
           
     #print ( subdirlist )
 
-    print( options.histogram )
     if options.histogram:
         if test_hist_modules() == False:
             return 0

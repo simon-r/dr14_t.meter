@@ -115,7 +115,7 @@ class WriteDrExtended( WriteDr ) :
             if album_t == None :
                 txt = tm.add_title( txt , " Analyzed folder:  " + album_dir )
             else:
-                txt = tm.add_title( txt , " Analyzed: " + album_t )
+                txt = tm.add_title( txt , " Album: " + album_t )
                 if artist != None :
                     txt = tm.add_title( txt , " Artist: " + artist )
             

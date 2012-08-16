@@ -21,7 +21,7 @@ try:
     import matplotlib.pyplot as pyplot
     import matplotlib.mlab as mlab
 except:
-    print ("xx")
+    print ("")
 
 
 def compute_hist ( Y , Fs , duration=None , bins=100 , block_duration = 0.2 , plot=True , title=None ):
@@ -63,7 +63,7 @@ def compute_hist ( Y , Fs , duration=None , bins=100 , block_duration = 0.2 , pl
     if plot == True :
         ( hist , bin_edges , patches ) = pyplot.hist( rms , 100 , normed=1 )
         
-        print( hist )
+        #print( hist )
         
         pyplot.axis([-92, 0, 0, numpy.max(hist)*1.05 ])
         

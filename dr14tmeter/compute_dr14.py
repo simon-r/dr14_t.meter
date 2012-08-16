@@ -71,7 +71,7 @@ def compute_dr14( Y , Fs , duration = None , Dr_lr = None ) :
 
     rms_sum = numpy.sum( rms[r,:]**2 , 0 )
 
-    ch_dr14 = -20*numpy.log10( numpy.sqrt( rms_sum / n_blk ) * 1/peaks[seg_cnt-2,:] )
+    ch_dr14 = -20.0 * numpy.log10( numpy.sqrt( rms_sum / n_blk ) * 1.0/peaks[seg_cnt-2,:] )
 
     err_i = (rms_sum < audio_min() )
     ch_dr14[err_i] = 0 ;
