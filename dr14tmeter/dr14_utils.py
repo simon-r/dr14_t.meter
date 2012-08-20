@@ -175,7 +175,7 @@ def parse_args():
         action="store_true",
         dest="histogram" ,
         default=False ,
-        help="Plot the dynamic histogram of a single file and exit (beta)" )
+        help="Plot the histogram of dynamic of a single file and exit (beta)" )
 
     (options, args) = parser.parse_args()
     
