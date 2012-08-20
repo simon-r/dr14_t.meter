@@ -1,7 +1,7 @@
 Source: dr14tmeter
 Section: sound
 Priority: extra
-Maintainer: Your Name <your.email@example.com>
+Maintainer: Your_Name <your.email@example.com>
 XS-Python-Version: >= 2.4
 Build-Depends: cdbs (>= 0.4.49), debhelper (>= 7), python (>= 2.4), python-support
 Standards-Version: 3.9.2
@@ -10,6 +10,7 @@ Homepage: http://simon-r.github.com/dr14_t.meter
 Package: dr14tmeter
 Architecture: all
 Depends: python, python-support (>=0.90), python-numpy, lame, flac, faad, ffmpeg
+Recommends: python-matplotlib
 Description: Compute the DR14 value of the given audio files
  Compute the Dynamic Range (DR14) of the given audio files according 
  to the algorithm decribed by the Pleasurize Music Foundation.
