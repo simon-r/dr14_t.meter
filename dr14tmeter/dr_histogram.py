@@ -62,7 +62,10 @@ def compute_hist ( Y , Fs , duration=None , bins=100 , block_duration = 0.2 , pl
     
     rms_mean = numpy.mean( rms )
     rms_std = numpy.std( rms )
-        
+    rms_max = numpy.max( rms )
+    
+    abs_peak = decibel_u( numpy.max( numpy.abs( Y ) ) , 1.0 )
+    
     if plot == True :
         ( hist , bin_edges , patches ) = pyplot.hist( rms , 100 , normed=1 )
         
@@ -78,8 +81,11 @@ def compute_hist ( Y , Fs , duration=None , bins=100 , block_duration = 0.2 , pl
         
         pyplot.axis([-92, 0, 0, numpy.max(hist)*1.05 ])
         
-        pyplot.text(-85,numpy.max(hist)*0.90,"mean:    %.3f dB"%rms_mean , fontsize=18,)
-        pyplot.text(-85,numpy.max(hist)*0.85,"std dev:  %.3f dB"%rms_std , fontsize=18,)
+        text_rel_pos = 0.9
+        pyplot.text( -85 , numpy.max(hist)*text_rel_pos        ,"mean:    %.3f dB"%rms_mean , fontsize=15,)
+        pyplot.text( -85 , numpy.max(hist)*(text_rel_pos-0.05) ,"std dev:  %.3f dB"%rms_std , fontsize=15,)
+        pyplot.text( -85 , numpy.max(hist)*(text_rel_pos-0.10) ,"peak:     %.3f dB"%abs_peak , fontsize=15,)
+        pyplot.text( -85 , numpy.max(hist)*(text_rel_pos-0.15) ,"max rms:  %.3f dB"%rms_max , fontsize=15,)
         
         pyplot.xlabel('RMS dB')
         pyplot.ylabel('Probability')
@@ -87,9 +93,9 @@ def compute_hist ( Y , Fs , duration=None , bins=100 , block_duration = 0.2 , pl
         if title != None:
             hist_title = title
         else:
-            hist_title = "dynamic"
+            hist_title = "Hystogram of dynamic"
         
-        pyplot.title(r'Histogram of "%s"'%hist_title)
+        pyplot.title(r'%s'%hist_title)
         
         pyplot.plot( mean_x , mean_y )
         
@@ -98,8 +104,7 @@ def compute_hist ( Y , Fs , duration=None , bins=100 , block_duration = 0.2 , pl
         
     else:
         ( hist , bin_edges ) = numpy.histogram( rms , bins=bins )
-        
-        
+             
     return ( hist , bin_edges )
     
     

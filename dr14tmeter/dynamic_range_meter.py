@@ -107,7 +107,15 @@ class DynamicRangeMeter:
     def __compute_histogram( self , at , file_name ):
         
         duration = StructDuration()
-        compute_hist( at.Y , at.Fs , duration , title=os.path.basename(file_name) ) 
+        
+        self.meta_data.scan_file( file_name )
+        
+        (foo,fn) = os.path.split( file_name )
+        title = self.meta_data.get_value( fn , "title" )
+        
+        print( title )
+        
+        compute_hist( at.Y , at.Fs , duration , title=title ) 
     
     
     def scan_dir_mt( self , dir_name , thread_cnt ):
