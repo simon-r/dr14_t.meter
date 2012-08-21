@@ -59,18 +59,39 @@ def compute_hist ( Y , Fs , duration=None , bins=100 , block_duration = 0.2 , pl
     
     rms[rms==0.0] = audio_min16()
     rms = decibel_u( rms , 1.0 )
+    
+    rms_mean = numpy.mean( rms )
+    rms_std = numpy.std( rms )
         
     if plot == True :
         ( hist , bin_edges , patches ) = pyplot.hist( rms , 100 , normed=1 )
         
+        mean_x = numpy.array([ rms_mean , rms_mean ])
+        mean_y = numpy.array([ 0.0 , numpy.max(hist)*1.01 ])
+        
+        std_x = numpy.array([ rms_mean - rms_std , rms_mean + rms_std ])
+        std_y = numpy.array([ numpy.max(hist)*0.7 , numpy.max(hist)*0.7 ])
+        
+        pyplot.plot( mean_x , mean_y , linewidth=2 , color='g')
+        pyplot.plot( std_x , std_y , linewidth=2 , color='c')
         #print( hist )
         
         pyplot.axis([-92, 0, 0, numpy.max(hist)*1.05 ])
         
+        pyplot.text(-85,numpy.max(hist)*0.90,"mean:    %.3f dB"%rms_mean , fontsize=18,)
+        pyplot.text(-85,numpy.max(hist)*0.85,"std dev:  %.3f dB"%rms_std , fontsize=18,)
+        
         pyplot.xlabel('RMS dB')
         pyplot.ylabel('Probability')
         
-        pyplot.title(r'Histogram of dynamic')
+        if title != None:
+            hist_title = title
+        else:
+            hist_title = "dynamic"
+        
+        pyplot.title(r'Histogram of "%s"'%hist_title)
+        
+        pyplot.plot( mean_x , mean_y )
         
         pyplot.grid(True)
         pyplot.show()
