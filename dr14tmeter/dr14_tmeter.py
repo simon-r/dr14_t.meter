@@ -18,7 +18,6 @@
     
 
 import os
-from optparse import OptionParser
 import time
 import multiprocessing
 from dr14tmeter.dynamic_range_meter import DynamicRangeMeter
@@ -33,22 +32,18 @@ from dr14tmeter.dr14_utils import *
     
 def main():
     
-    (options, args) = parse_args()
+    options = parse_args()
 
-    #print( args )
+    #print( options )
 
-    path_name = os.path.abspath( args[0] )
+    path_name = os.path.abspath( options.path_name )
 
     if not( os.path.exists( path_name ) ) :
         print( "Error: The input directory \"%s\" don't exixst! " % path_name )
         return 
 
-    if options.out_dir != "" and not( os.path.exists( options.out_dir ) ) :
+    if options.out_dir and not( os.path.exists( options.out_dir ) ) :
         print( "Error (-o): The target directory \"%s\" don't exixst! " % options.out_dir )
-        return 
-
-    if re.search( ".*[^htbwa].*" , options.out_tables ) :
-        print( "Error (-t): Invalid table code" )
         return 
 
     l_ver = TestVer()

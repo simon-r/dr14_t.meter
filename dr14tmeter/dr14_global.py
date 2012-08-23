@@ -44,7 +44,7 @@ def min_dr() :
     return -10000
 
 def get_exe_name():
-    return "dr14_tmenter"
+    return "dr14_tmeter"
 
 class TestVer(threading.Thread):
     def run(self):
