@@ -17,7 +17,7 @@
     
 
 import os
-from optparse import OptionParser
+import argparse
 import time
 import multiprocessing
 from dr14tmeter.dynamic_range_meter import DynamicRangeMeter
@@ -103,85 +103,71 @@ def parse_args():
     desc =  desc + "described by the Pleasurize Music Foundation "
     desc =  desc + "Visit: http://www.dynamicrange.de/"
 
-    use = "Usage: %prog [options] path_name \n\nfor more details type \n%prog --help"
-
-    parser = OptionParser( description=desc ,  usage=use  , version="%prog " + dr14_version()  )
+    parser = argparse.ArgumentParser( description=desc , version="%(prog)s " + dr14_version()  )
 
 
-    parser.add_option("-1", "--disable_multithread",
+    parser.add_argument("-1", "--disable_multithread",
         action="store_true",
         dest="disable_multithread",
-        default=False,
         help="Disable the multi-Core mode")
-
-    parser.add_option("-f", "--file",
-        action="store_true",
-        dest="scan_file",
-        default=False,
-        help="Compute the DR14 of a single file and exit")
     
-    parser.add_option("-r", "--recursive",
+    parser.add_argument("-r", "--recursive",
         action="store_true",
         dest="recursive",
-        default=False,
         help="Scan recursively the subdirectories")
 
-    parser.add_option("-a", "--append",
+    parser.add_argument("-a", "--append",
         action="store_true",
         dest="append",
-        default=False ,
         help="Append all results in a single file; it should be used in couple with -r")
 
-    parser.add_option("-b", "--basic_table",
+    parser.add_argument("-b", "--basic_table",
         action="store_true",
         dest="basic_table",
-        default=False,
         help="Write the resulting tables in the basic format")
 
-    parser.add_option("-n", "--turn_off_out",
+    parser.add_argument("-n", "--turn_off_out",
         action="store_true",
         dest="turn_off_out",
-        default=False,
         help="do not writes the output files")
 
-    parser.add_option("-p", "--print_std_out",
+    parser.add_argument("-p", "--print_std_out",
         action="store_true",
         dest="print_std_out",
-        default=False,
         help="writes the full result on the std_out")
 
-    parser.add_option("-o", "--outdir",
+    parser.add_argument("-o", "--outdir",
         action="store",
         dest="out_dir",
-        type="string" ,
-        default="" ,
+        type=str,
         help="Write the resultings files into the given directory")
     
-    parser.add_option("-t", "--tables",
+    parser.add_argument("-t", "--tables",
         action="store",
+        choices = 'htbwa',
         dest="out_tables",
-        type="string" ,
         default="t" ,
-        help="Select the output files to be written, codes: h=html t=text b=bbcode w=mediawiki a=all_formats")
+        help="Select the output files to be written. h=html t=text b=bbcode w=mediawiki a=all_formats")
 
-    parser.add_option("-d", "--dr_database",
-        action="store",
+    parser.add_argument("-d", "--dr_database",
+        action="store_false",
         dest="dr_database",
-        type="int" ,
-        default=True ,
-        help="Set the compatibility with the DR database: www.dr.loudness-war.info; default: 1 (True) or 0=False" )
+        help="Output file compatible with the DR database at http:///www.dr.loudness-war.info" )
 
-    parser.add_option( "--hist" ,
+    parser.add_argument( "--hist" ,
         action="store_true",
         dest="histogram" ,
-        default=False ,
         help="Plot the histogram of dynamic of a single file and exit (beta)" )
+    
+    parser.add_argument("-f", "--file",
+        action='store_true',
+        dest="scan_file",
+        help="Compute the DR14 of a single file and exit")
 
-    (options, args) = parser.parse_args()
+    parser.add_argument(
+        dest="path_name",
+        nargs='?',
+        default='.'
+        )
     
-    if len(args) <= 0:
-        args = ["."]
-        #parser.error("wrong number of arguments")
-        #exit( 1 )
-    
-    return (options, args) 
+    return parser.parse_args()
