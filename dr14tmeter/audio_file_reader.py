@@ -21,6 +21,7 @@ import subprocess
 import re
 import wave
 import numpy
+from dr14tmeter.out_messages import print_msg
 
 
 class AudioFileReader:
@@ -71,7 +72,7 @@ class AudioFileReader:
     
         full_command = full_command + " " + self.get_cmd_options( file_name , tmp_file )
             
-        #print( full_command )
+        #print_msg( full_command )
         
         r = subprocess.call( full_command , shell=True  , stderr=subprocess.PIPE , stdout=subprocess.PIPE )
         
@@ -82,7 +83,7 @@ class AudioFileReader:
         if os.path.exists( tmp_file ) :
             os.remove( tmp_file )
         else:
-            print( file_name + ": unsupported encoder" )
+            print_msg( file_name + ": unsupported encoder" )
         
         return ret_f 
 
@@ -100,7 +101,7 @@ class AudioFileReader:
             target.sample_width = wave_read.getsampwidth()
             
             nframes = wave_read.getnframes()
-            #print( file_name + "!!!!!!!!!!!!: " + str(target.channels) + " " + str(target.sample_width ) + " " + str( target.Fs ) + " " + str( nframes ) )
+            #print_msg( file_name + "!!!!!!!!!!!!: " + str(target.channels) + " " + str(target.sample_width ) + " " + str( target.Fs ) + " " + str( nframes ) )
             
             X = wave_read.readframes( wave_read.getnframes() )
             
@@ -127,8 +128,8 @@ class AudioFileReader:
                 
         except:
             self.__init__()
-            print ( "Unexpected error:", str( sys.exc_info() ) )
-            print (  "\n - ERROR ! " )
+            print_msg ( "Unexpected error:", str( sys.exc_info() ) )
+            print_msg (  "\n - ERROR ! " )
             return False
      
         return True

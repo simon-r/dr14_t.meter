@@ -32,6 +32,8 @@ from dr14tmeter.write_dr import WriteDr, WriteDrExtended
 
 import dr14tmeter.dr14_global as dr14
 
+from dr14tmeter.out_messages import print_msg, print_out
+
         
 
 class DynamicRangeMeter:   
@@ -78,7 +80,7 @@ class DynamicRangeMeter:
         for file_name in dir_list:
             full_file = os.path.join( dir_name , file_name )
             
-            #print( full_file )
+            #print_msg( full_file )
             if at.open( full_file ):
                 self.__compute_and_append( at , file_name )
 
@@ -102,7 +104,7 @@ class DynamicRangeMeter:
         res = { 'file_name': file_name , 'dr14': dr14 , 'dB_peak': dB_peak , 'dB_rms': dB_rms , 'duration':duration.to_str() }
         self.res_list.append(res)
         
-        print( file_name + ": \t DR " + str( int(dr14) ) )
+        print_msg( file_name + ": \t DR " + str( int(dr14) ) )
   
     def __compute_histogram( self , at , file_name ):
         
@@ -113,7 +115,7 @@ class DynamicRangeMeter:
         (foo,fn) = os.path.split( file_name )
         title = self.meta_data.get_value( fn , "title" )
         
-        print( title )
+        print_msg( title )
         
         compute_hist( at.Y , at.Fs , duration , title=title ) 
     
@@ -161,7 +163,7 @@ class DynamicRangeMeter:
                 succ = succ + 1 
             
          
-        #print( str(self.res_list ) )
+        #print_msg( str(self.res_list ) )
         self.meta_data.scan_dir( dir_name )
         if len( self.res_list ) > 0 and succ > 0 :
             self.dr14 = int( round( self.dr14 / succ ) )
@@ -182,7 +184,7 @@ class DynamicRangeMeter:
         self.table_txt = wr.write_dr( self , tm )        
         
         if std_out:
-            print( self.table_txt )
+            print_out( self.table_txt )
             return 
         
         if append :
@@ -193,7 +195,7 @@ class DynamicRangeMeter:
         try:
             out_file = codecs.open( file_name , file_mode , "utf-8-sig" )
         except:
-            print ( "File opening error [%s] :" % file_name , sys.exc_info()[0] )
+            print_msg ( "File opening error [%s] :" % file_name , sys.exc_info()[0] )
             return False
         
         out_file.write( self.table_txt )
@@ -216,7 +218,7 @@ class ScanDirMt(threading.Thread):
         at = AudioTrack() 
         duration = StructDuration()
         
-        #print("start .... ")
+        #print_msg("start .... ")
         
         while True:
             
@@ -238,10 +240,10 @@ class ScanDirMt(threading.Thread):
             if at.open( full_file ):
                 ( dr14, dB_peak, dB_rms ) = compute_dr14( at.Y , at.Fs , duration )
                 self.lock_res_list.acquire()
-                print( file_name + ": \t DR " + str( int(dr14) ) )
+                print_msg( file_name + ": \t DR " + str( int(dr14) ) )
                 self.res_list[curr_job] = { 'file_name': file_name , 'dr14': dr14 , 'dB_peak': dB_peak , 'dB_rms': dB_rms , 'duration':duration.to_str() }
                 self.lock_res_list.release()
             else:
-                print( "- fail - " + full_file )
+                print_msg( "- fail - " + full_file )
    
    

@@ -28,6 +28,7 @@ import inspect
 import sys
 import re
 from dr14tmeter.dr14_utils import *
+from dr14tmeter.out_messages import print_msg
 
     
 def main():
@@ -39,18 +40,18 @@ def main():
     path_name = os.path.abspath( options.path_name )
 
     if not( os.path.exists( path_name ) ) :
-        print( "Error: The input directory \"%s\" don't exixst! " % path_name )
+        print_msg( "Error: The input directory \"%s\" don't exixst! " % path_name )
         return 
 
     if options.out_dir and not( os.path.exists( options.out_dir ) ) :
-        print( "Error (-o): The target directory \"%s\" don't exixst! " % options.out_dir )
+        print_msg( "Error (-o): The target directory \"%s\" don't exixst! " % options.out_dir )
         return 
 
     l_ver = TestVer()
     l_ver.start()
     
-    print ( path_name )
-    print( "" )
+    print_msg( path_name )
+    print_msg( "" )
 
     if options.recursive :
         subdirlist = list_rec_dirs( path_name )
@@ -65,7 +66,7 @@ def main():
         if test_hist_modules() == False:
             return 0
         
-        print("Start histo:")
+        print_msg("Start histo:")
         
         dr = DynamicRangeMeter() ;
         dr.histogram = True
@@ -78,11 +79,11 @@ def main():
         r = dr.scan_file( path_name )
         
         if r == 1:
-            print( "" )
-            print( dr.res_list[0]['file_name'] + " :" )
-            print( "DR      = %d" % dr.res_list[0]['dr14'] )
-            print( "Peak dB = %.2f" % dr.res_list[0]['dB_peak'] )
-            print( "Rms dB  = %.2f" % dr.res_list[0]['dB_rms'] )
+            print_msg( "" )
+            print_msg( dr.res_list[0]['file_name'] + " :" )
+            print_msg( "DR      = %d" % dr.res_list[0]['dr14'] )
+            print_msg( "Peak dB = %.2f" % dr.res_list[0]['dB_peak'] )
+            print_msg( "Rms dB  = %.2f" % dr.res_list[0]['dB_rms'] )
             return 1 
         else:
             print ( "Error: invalid audio file" )
@@ -103,8 +104,8 @@ def main():
 
     for cur_dir in subdirlist :
         dr = DynamicRangeMeter()
-        print ( "\n------------------------------------------------------------ " )		        
-        print ( "> Scan Dir: %s \n" % cur_dir )
+        print_msg ( "\n------------------------------------------------------------ " )		        
+        print_msg ( "> Scan Dir: %s \n" % cur_dir )
         
         cpu = multiprocessing.cpu_count()
                 
@@ -131,19 +132,19 @@ def main():
     b = time.time() - a
     
     if success :
-        print("Success! ")
-        print( "Elapsed time: %2.2f" % b )
+        print_msg("Success! ")
+        print_msg( "Elapsed time: %2.2f" % b )
     else:
-        print("No audio files found\n")
-        print(" Usage: %s [options] path_name \n\nfor more details type \n%s --help\n" % ( get_exe_name() , get_exe_name() ) )
+        print_msg("No audio files found\n")
+        print_msg(" Usage: %s [options] path_name \n\nfor more details type \n%s --help\n" % ( get_exe_name() , get_exe_name() ) )
 
     if sys.platform.startswith('linux'):
         subprocess.call( "stty sane" , shell=True ) 
 
     if test_new_version() :
-        print( "\n----------------------------------------------------------------------" )
-        print( " A new version of dr14_t.meter [ %s ] is available for download \n please visit: %s" % ( get_new_version() , get_home_url() ) )
-        print( "----------------------------------------------------------------------\n" )
+        print_msg( "\n----------------------------------------------------------------------" )
+        print_msg( " A new version of dr14_t.meter [ %s ] is available for download \n please visit: %s" % ( get_new_version() , get_home_url() ) )
+        print_msg( "----------------------------------------------------------------------\n" )
     
     return r
 

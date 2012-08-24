@@ -19,11 +19,14 @@ import sys
 import re
 import threading
 
+from dr14tmeter.out_messages import print_msg
+
+
 ###########################
 # Current version
 v_major    = 0
 v_minor    = 9
-v_revision = 5
+v_revision = 6
 ###########################
 
 # latest version
@@ -60,7 +63,7 @@ def _dr14_get_latest_version():
     global lock_ver
     
     ver_url = "http://simon-r.github.com/dr14_t.meter/ver.html"
-    #print ( ver_url )
+    #print_msg ( ver_url )
     
     try:
         if sys.version_info[0] > 2 :
@@ -91,7 +94,7 @@ def _dr14_get_latest_version():
         l_revision = 0
         
     lock_ver.release() 
-    #print( ">>>>>>>>>>>>>< %d.%d.%d" % ( l_major , l_minor , l_revision ) )
+    #print_msg( ">>>>>>>>>>>>>< %d.%d.%d" % ( l_major , l_minor , l_revision ) )
 
     
 def test_new_version():
@@ -137,7 +140,7 @@ def test_hist_modules():
     try:
         import matplotlib
     except ImportError:
-        print( "The histogram function require the installation of MatPlotLib: http://matplotlib.sourceforge.net" )
+        print_msg( "The histogram function require the installation of MatPlotLib: http://matplotlib.sourceforge.net" )
         return False
     
     return True

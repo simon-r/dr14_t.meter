@@ -27,6 +27,7 @@ import subprocess
 import sys
 import re
 import tempfile
+from dr14tmeter.out_messages import print_msg
 
 
 def list_rec_dirs( basedir , subdirlist=None ):
@@ -40,7 +41,7 @@ def list_rec_dirs( basedir , subdirlist=None ):
         item = os.path.join( basedir , item )
         if os.path.isdir( item ):
             item = os.path.abspath( item )
-            #print( item )
+            #print_msg( item )
             subdirlist.append( item )
             list_rec_dirs( item , subdirlist )
             
@@ -57,15 +58,15 @@ def write_results( dr , options , out_dir , cur_dir ) :
     else :
         full_out_dir = out_dir
     
-    print( "DR = " + str( dr.dr14 ) )
+    print_msg( "DR = " + str( dr.dr14 ) )
     
     if not ( os.access( full_out_dir , os.W_OK ) ) :
         full_out_dir = tempfile.gettempdir() ; 
-        print( "--------------------------------------------------------------- " )
-        print( "- ATTENTION !" )
-        print( "- You don't have the write permission for the directory: %s " % full_out_dir )
-        print( "- The result files will be written in the tmp dir: %s " % full_out_dir )
-        print( "--------------------------------------------------------------- " )
+        print_msg( "--------------------------------------------------------------- " )
+        print_msg( "- ATTENTION !" )
+        print_msg( "- You don't have the write permission for the directory: %s " % full_out_dir )
+        print_msg( "- The result files will be written in the tmp dir: %s " % full_out_dir )
+        print_msg( "--------------------------------------------------------------- " )
            
     
     if options.print_std_out :
@@ -90,11 +91,11 @@ def write_results( dr , options , out_dir , cur_dir ) :
             out_list = out_list + " %s " % tables_list[code][0]
             
     
-    print("")
-    print("- The full result has been written in the files: %s" % out_list )
-    print("- located in the directory: ")
-    print( full_out_dir )
-    print("")
+    print_msg("")
+    print_msg("- The full result has been written in the files: %s" % out_list )
+    print_msg("- located in the directory: ")
+    print_msg( full_out_dir )
+    print_msg("")
 
 
 
