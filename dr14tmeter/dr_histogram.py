@@ -21,7 +21,7 @@ try:
     import matplotlib.pyplot as pyplot
     import matplotlib.mlab as mlab
 except:
-    print ("")
+    ____foo = None
 
 
 def compute_hist ( Y , Fs , duration=None , bins=100 , block_duration = 0.2 , plot=True , title=None ):
@@ -76,7 +76,7 @@ def compute_hist ( Y , Fs , duration=None , bins=100 , block_duration = 0.2 , pl
         std_y = numpy.array([ numpy.max(hist)*0.7 , numpy.max(hist)*0.7 ])
         
         pyplot.plot( mean_x , mean_y , linewidth=2 , color='g')
-        pyplot.plot( std_x , std_y , linewidth=2 , color='c')
+        pyplot.plot( std_x , std_y , linewidth=2 , ls='--' , color='c')
         #print( hist )
         
         pyplot.axis([-92, 0, 0, numpy.max(hist)*1.05 ])
