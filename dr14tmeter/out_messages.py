@@ -15,6 +15,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import sys
+import os
 
 message_file = sys.stderr
 out_file = sys.stdout
@@ -32,6 +33,7 @@ def print_out( string ) :
     
 def set_verbose_msg() :
     global message_file
+    global mode
     
     if mode == "verbose" :
         return 

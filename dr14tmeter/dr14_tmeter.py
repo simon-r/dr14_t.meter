@@ -28,7 +28,7 @@ import inspect
 import sys
 import re
 from dr14tmeter.dr14_utils import *
-from dr14tmeter.out_messages import print_msg
+from dr14tmeter.out_messages import *
 
     
 def main():
@@ -46,6 +46,9 @@ def main():
     if options.out_dir and not( os.path.exists( options.out_dir ) ) :
         print_msg( "Error (-o): The target directory \"%s\" don't exixst! " % options.out_dir )
         return 
+
+    if options.quiet :
+        set_quiet_msg()
 
     l_ver = TestVer()
     l_ver.start()

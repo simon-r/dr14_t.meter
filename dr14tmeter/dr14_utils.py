@@ -165,6 +165,11 @@ def parse_args():
         dest="scan_file",
         help="Compute the DR14 of a single file and exit")
 
+    parser.add_argument("--quiet",
+        action="store_true",
+        dest="quiet",
+        help="Quite mode")
+
     parser.add_argument(
         dest="path_name",
         nargs='?',
