@@ -20,6 +20,7 @@
 import os
 import time
 import multiprocessing
+from dr14tmeter.parse_args import parse_args
 from dr14tmeter.dynamic_range_meter import DynamicRangeMeter
 from dr14tmeter.table import *
 from dr14tmeter.dr14_global import dr14_version, TestVer, test_new_version, get_home_url, get_new_version, get_exe_name, test_hist_modules
@@ -100,43 +101,16 @@ def main():
 
     if options.append and out_dir == None:
         out_dir = path_name
-        
-    a = time.time()
-
-    success = False
-
-    for cur_dir in subdirlist :
-        dr = DynamicRangeMeter()
-        print_msg ( "\n------------------------------------------------------------ " )		        
-        print_msg ( "> Scan Dir: %s \n" % cur_dir )
-        
-        cpu = multiprocessing.cpu_count()
-                
-        if ( options.disable_multithread == True ) :
-            r = dr.scan_dir( cur_dir )
-        else:
-            cpu = cpu / 2
-            if cpu <= 2:
-                cpu = 2
-            else:
-                cpu = int( round( cpu ) )
-                
-            r = dr.scan_dir_mt( cur_dir , cpu )
-            
-        if r == 0:
-            continue
-        else:
-            success = True
-            
-        
-        write_results( dr , options , out_dir , cur_dir )        
-         
     
-    b = time.time() - a
-    
+    if options.files_list:
+        pass
+        #(success,clock,r) = scan_files_list(input_file,options,out_dir)
+    else:    
+        (success,clock,r) = scan_dir_list(subdirlist,options,out_dir)
+            
     if success :
         print_msg("Success! ")
-        print_msg( "Elapsed time: %2.2f" % b )
+        print_msg( "Elapsed time: %2.2f" % clock )
     else:
         print_msg("No audio files found\n")
         print_msg(" Usage: %s [options] path_name \n\nfor more details type \n%s --help\n" % ( get_exe_name() , get_exe_name() ) )

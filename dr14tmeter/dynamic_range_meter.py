@@ -120,16 +120,21 @@ class DynamicRangeMeter:
         compute_hist( at.Y , at.Fs , duration , title=title ) 
     
     
-    def scan_dir_mt( self , dir_name , thread_cnt ):
+    
+    def scan_mt( self , dir_name="" , thread_cnt=2 , files_list=[] ):
         
-        if not os.path.isdir(dir_name) :
-            return 0
-        
-        dir_list = sorted( os.listdir( dir_name ) )
-        
-        self.dir_name = dir_name 
         self.dr14 = 0
         
+        if files_list == [] :
+            
+            if not os.path.isdir(dir_name) :
+                return 0
+            dir_list = sorted( os.listdir( dir_name ) )
+            self.dir_name = dir_name
+            
+        else:
+            dir_list = sorted( files_list )
+            
         ad = AudioDecoder()
         
         jobs = []

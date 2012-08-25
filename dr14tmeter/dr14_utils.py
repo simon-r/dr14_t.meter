@@ -30,6 +30,46 @@ import tempfile
 from dr14tmeter.out_messages import print_msg
 
 
+def scan_files_list( input_file , options , out_dir ):
+    pass
+    
+
+def scan_dir_list( subdirlist , options , out_dir ):
+    a = time.time()
+
+    success = False
+
+    for cur_dir in subdirlist :
+        dr = DynamicRangeMeter()
+        print_msg ( "\n------------------------------------------------------------ " )		        
+        print_msg ( "> Scan Dir: %s \n" % cur_dir )
+        
+        cpu = multiprocessing.cpu_count()
+                
+        if ( options.disable_multithread == True ) :
+            r = dr.scan_dir( cur_dir )
+        else:
+            cpu = cpu / 2
+            if cpu <= 2:
+                cpu = 2
+            else:
+                cpu = int( round( cpu ) )
+                
+            r = dr.scan_mt( cur_dir , cpu )
+            
+        if r == 0:
+            continue
+        else:
+            success = True
+            
+        
+        write_results( dr , options , out_dir , cur_dir )        
+         
+    
+    clock = time.time() - a
+    
+    return (success,clock,r)
+
 def list_rec_dirs( basedir , subdirlist=None ):
     
     if subdirlist == None :
@@ -98,82 +138,3 @@ def write_results( dr , options , out_dir , cur_dir ) :
     print_msg("")
 
 
-
-def parse_args():
-    desc = "Compute the DR14 value of the audio files according to the algorithm " 
-    desc =  desc + "described by the Pleasurize Music Foundation "
-    desc =  desc + "Visit: http://www.dynamicrange.de/"
-
-    parser = argparse.ArgumentParser( description=desc , version="%(prog)s " + dr14_version()  )
-
-
-    parser.add_argument("-1", "--disable_multithread",
-        action="store_true",
-        dest="disable_multithread",
-        help="Disable the multi-Core mode")
-    
-    parser.add_argument("-r", "--recursive",
-        action="store_true",
-        dest="recursive",
-        help="Scan recursively the subdirectories")
-
-    parser.add_argument("-a", "--append",
-        action="store_true",
-        dest="append",
-        help="Append all results in a single file; it should be used in couple with -r")
-
-    parser.add_argument("-b", "--basic_table",
-        action="store_true",
-        dest="basic_table",
-        help="Write the resulting tables in the basic format")
-
-    parser.add_argument("-n", "--turn_off_out",
-        action="store_true",
-        dest="turn_off_out",
-        help="do not writes the output files")
-
-    parser.add_argument("-p", "--print_std_out",
-        action="store_true",
-        dest="print_std_out",
-        help="writes the full result on the std_out")
-
-    parser.add_argument("-o", "--outdir",
-        action="store",
-        dest="out_dir",
-        type=str,
-        help="Write the resultings files into the given directory")
-    
-    parser.add_argument("-t", "--tables",
-        action="store",
-        choices = 'htbwa',
-        dest="out_tables",
-        default="t" ,
-        help="Select the output files to be written. h=html t=text b=bbcode w=mediawiki a=all_formats")
-
-    parser.add_argument("-d", "--dr_database",
-        action="store_false",
-        dest="dr_database",
-        help="Output file compatible with the DR database at http:///www.dr.loudness-war.info" )
-
-    parser.add_argument( "--hist" ,
-        action="store_true",
-        dest="histogram" ,
-        help="Plot the histogram of dynamic of a single file and exit (beta)" )
-    
-    parser.add_argument("-f", "--file",
-        action='store_true',
-        dest="scan_file",
-        help="Compute the DR14 of a single file and exit")
-
-    parser.add_argument("--quiet",
-        action="store_true",
-        dest="quiet",
-        help="Quite mode")
-
-    parser.add_argument(
-        dest="path_name",
-        nargs='?',
-        default='.'
-        )
-    
-    return parser.parse_args()
