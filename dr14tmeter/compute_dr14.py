@@ -19,9 +19,11 @@
 from dr14tmeter.audio_math import *
 import math
 import numpy
+import time
 
 
 def compute_dr14( Y , Fs , duration = None , Dr_lr = None ) :
+    
     s = Y.shape
     
     if len( Y.shape ) > 1 :
@@ -48,13 +50,13 @@ def compute_dr14( Y , Fs , duration = None , Dr_lr = None ) :
     peaks = zeros((seg_cnt,ch))
     
     for i in range(seg_cnt - 1):
-        r = arange(curr_sam,curr_sam+block_samples)
+        r = numpy.arange(curr_sam,curr_sam+block_samples)
         rms[i,:] = dr_rms( Y[r,:] )
         peaks[i,:] = numpy.max( numpy.abs( Y[r,:] ) , 0 )
         curr_sam = curr_sam + block_samples
 
     i = seg_cnt - 1 ;
-    r = arange( curr_sam,s[0] )
+    r = numpy.arange( curr_sam,s[0] )
 
     if r.shape[0] > 0:
         rms[i,:] = dr_rms( Y[r,:] )
@@ -68,7 +70,7 @@ def compute_dr14( Y , Fs , duration = None , Dr_lr = None ) :
         n_blk = 1
 
     r = arange(seg_cnt-n_blk,seg_cnt)
-
+    
     rms_sum = numpy.sum( rms[r,:]**2 , 0 )
 
     ch_dr14 = -20.0 * numpy.log10( numpy.sqrt( rms_sum / n_blk ) * 1.0/peaks[seg_cnt-2,:] )

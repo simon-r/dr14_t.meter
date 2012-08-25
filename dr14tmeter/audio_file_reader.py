@@ -14,6 +14,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+import time
 import os
 import sys
 import tempfile
@@ -60,7 +61,7 @@ class AudioFileReader:
   
 
     def read_audio_file_new( self , file_name , target ):
-        
+                
         full_command = self.__cmd
         
         (head, file) = os.path.split( file_name )
@@ -84,7 +85,7 @@ class AudioFileReader:
             os.remove( tmp_file )
         else:
             print_msg( file_name + ": unsupported encoder" )
-        
+                
         return ret_f 
 
 

@@ -22,41 +22,19 @@ import numpy
 
 def dr_rms( y ) :
     n = y.shape
-    rms = numpy.sqrt( 2 * numpy.sum( y**2.0 , 0 ) / float(n[0]) )
-    return rms
+    return numpy.sqrt( 2.0 * numpy.sum( y**2.0 , 0 ) / float(n[0]) )
 
 def u_rms( y ) :
     n = y.shape
-    rms = numpy.sqrt( numpy.sum( y**2.0 , 0 ) / float(n[0]) )
-    return rms
-
-def __u_rms( y ) :
-    n = y.shape
-    
-    samples_per_block = int(1e5)
-    blk_cnt = int( n[0] / samples_per_block )
-    
-    s_sum = numpy.array([0.0,0.0])
-    
-    curr_sam = 0 
-    for i in range( 0 , blk_cnt ):
-        r = arange( curr_sam , curr_sam + samples_per_block )
-        s_sum = s_sum + numpy.sum( y[r,:]**2.0 , 0 )
-        curr_sam = curr_sam + samples_per_block
-       
-    r = arange( curr_sam , n[0] )
-    s_sum = s_sum + numpy.sum( y[r,:]**2.0 , 0 )
-     
-    rms = numpy.sqrt( s_sum / float(n[0]) )
-    return rms
+    return numpy.sqrt( numpy.sum( y**2.0 , 0 ) / float(n[0]) )
 
 
 def decibel_u( y , ref ) :
-    return 20 * numpy.log10( y / ref )
+    return 20.0 * numpy.log10( y / ref )
 
 
 def decibel_p( y , ref ) :
-    return 10 * numpy.log10( y / ref )
+    return 10.0 * numpy.log10( y / ref )
     
 def audio_min() :
     return 1.0/(2.0**24)
