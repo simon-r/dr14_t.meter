@@ -98,7 +98,7 @@ def parse_args():
     parser.add_argument(
         dest="path_name",
         nargs='?',
-        default='.'
+        default=None
         )
     
     return parser.parse_args()

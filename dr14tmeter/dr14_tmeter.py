@@ -38,8 +38,11 @@ def main():
 
     #print( options )
 
-    path_name = os.path.abspath( options.path_name )
-
+    if options.path_name != None:
+        path_name = os.path.abspath( options.path_name )
+    else:
+        path_name = os.path.abspath( '.' )
+        
     if not( os.path.exists( path_name ) ) :
         print_msg( "Error: The input directory \"%s\" don't exixst! " % path_name )
         return 
@@ -103,8 +106,7 @@ def main():
         out_dir = path_name
     
     if options.files_list:
-        pass
-        #(success,clock,r) = scan_files_list(input_file,options,out_dir)
+        (success,clock,r) = scan_files_list(options.path_name,options,out_dir)
     else:    
         (success,clock,r) = scan_dir_list(subdirlist,options,out_dir)
             

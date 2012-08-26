@@ -28,10 +28,38 @@ import sys
 import re
 import tempfile
 from dr14tmeter.out_messages import print_msg
+import fileinput
 
 
 def scan_files_list( input_file , options , out_dir ):
-    pass
+    
+    success = False
+    r = 0 ;
+    
+    a = time.time()
+    
+    if input_file == None:
+        input_file = '-'
+    
+    files_list = []
+    
+    for line in fileinput.input( input_file ):
+        files_list.append( os.path.abspath( line ) )
+    
+    print(files_list)
+    
+    dr = DynamicRangeMeter()
+    
+    r = dr.scan_mt( files_list=files_list , thread_cnt=get_thread_cnt() )
+    
+    if r == 0:
+        success = False
+    else:
+        write_results( dr , options , out_dir , cur_dir )
+        success = True
+    
+    clock = time.time() - a
+    return (success,clock,r)
     
 
 def scan_dir_list( subdirlist , options , out_dir ):
@@ -69,6 +97,15 @@ def scan_dir_list( subdirlist , options , out_dir ):
     clock = time.time() - a
     
     return (success,clock,r)
+
+def get_thread_cnt():
+    cpu = multiprocessing.cpu_count()
+    cpu = cpu / 2
+    if cpu <= 2:
+        cpu = 2
+    else:
+        cpu = int( round( cpu ) )
+    return cpu
 
 def list_rec_dirs( basedir , subdirlist=None ):
     
