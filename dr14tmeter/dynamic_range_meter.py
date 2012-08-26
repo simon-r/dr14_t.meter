@@ -126,12 +126,11 @@ class DynamicRangeMeter:
         self.dr14 = 0
         
         if files_list == [] :
-            
             if not os.path.isdir(dir_name) :
                 return 0
             dir_list = sorted( os.listdir( dir_name ) )
             self.dir_name = dir_name
-            
+            files_list = None
         else:
             dir_list = sorted( files_list )
             
@@ -169,7 +168,7 @@ class DynamicRangeMeter:
             
          
         #print_msg( str(self.res_list ) )
-        self.meta_data.scan_dir( dir_name )
+        self.meta_data.scan_dir( dir_name , files_list )
         if len( self.res_list ) > 0 and succ > 0 :
             self.dr14 = int( round( self.dr14 / succ ) )
             return succ

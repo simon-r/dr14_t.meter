@@ -44,7 +44,5 @@ class AudioTrack:
 
         res_f = de.read_track_new( file_name , self )
 
-        #print( file_name )
-
         return res_f 
   

@@ -36,6 +36,11 @@ def scan_files_list( input_file , options , out_dir ):
     success = False
     r = 0 ;
     
+    if out_dir == None:
+        out_dir = tempfile.gettempdir()
+    else:
+        out_dir = os.path.abspath( out_dir )
+    
     a = time.time()
     
     if input_file == None:
@@ -44,10 +49,8 @@ def scan_files_list( input_file , options , out_dir ):
     files_list = []
     
     for line in fileinput.input( input_file ):
-        files_list.append( os.path.abspath( line ) )
-    
-    print(files_list)
-    
+        files_list.append( os.path.abspath( line.rstrip() ) )
+        
     dr = DynamicRangeMeter()
     
     r = dr.scan_mt( files_list=files_list , thread_cnt=get_thread_cnt() )
@@ -55,7 +58,7 @@ def scan_files_list( input_file , options , out_dir ):
     if r == 0:
         success = False
     else:
-        write_results( dr , options , out_dir , cur_dir )
+        write_results( dr , options , out_dir , "" )
         success = True
     
     clock = time.time() - a

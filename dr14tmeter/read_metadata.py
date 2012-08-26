@@ -34,19 +34,19 @@ class RetirveMetadata:
         self._tracks = {}
     
     
-    def scan_dir( self , dir_name , dir_list=None ):
+    def scan_dir( self , dir_name , files_list=None ):
         
         self._album = {}
         self._tracks = {}
         self._artist = {}
         
-        if dir_list == None:
+        if files_list == None:
             dir_name = os.path.abspath( dir_name )
-            dir_list = sorted( os.listdir( dir_name ) )
+            files_list = sorted( os.listdir( dir_name ) )
         
         ad = AudioDecoder()
         
-        for file_name in dir_list :
+        for file_name in files_list :
             
             ( fn , ext ) = os.path.splitext( file_name )
             full_file = os.path.join( dir_name , file_name )

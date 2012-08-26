@@ -22,7 +22,7 @@ import subprocess
 import re
 import wave
 import numpy
-from dr14tmeter.out_messages import print_msg
+from dr14tmeter.out_messages import print_msg 
 
 
 class AudioFileReader:
@@ -129,7 +129,7 @@ class AudioFileReader:
                 
         except:
             self.__init__()
-            print_msg ( "Unexpected error:", str( sys.exc_info() ) )
+            print_msg ( "Unexpected error: %s" % str( sys.exc_info() ) )
             print_msg (  "\n - ERROR ! " )
             return False
      
