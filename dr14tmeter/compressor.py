@@ -23,22 +23,23 @@ except:
     ____foo = None
 
 
-def compress( Y , Fs ):
+def dyn_compressor( Y , Fs , maxDB=-3.0 , linear_limit=0.3 ):
     
     x = numpy.linspace( -1 , 1 , 21 )
-    y = c_fun( x )
+    y = c_fun( x , maxDB , linear_limit )
     
     int_f = interp1d( x , y , kind='cubic' )
-    
+       
     cY = int_f( Y )
-    cY = normalize( cY )
     
+    cY = normalize( cY )
+        
     return cY
 
-        
-def c_fun( x , maxDB=-3.0 ):
+
+def c_fun( x , maxDB=-3.0 , linear_limit=0.3 ):
     
-    z = 0.3
+    z = linear_limit
     
     y = numpy.zeros( x.shape )
     

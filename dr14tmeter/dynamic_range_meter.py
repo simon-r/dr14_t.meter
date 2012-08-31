@@ -18,6 +18,7 @@ import os
 import threading
 import sys
 import codecs
+import tempfile
 
 from dr14tmeter.compute_dr14 import compute_dr14
 from dr14tmeter.compute_drv import compute_DRV
@@ -26,6 +27,8 @@ from dr14tmeter.audio_track import *
 from dr14tmeter.table import *
 from dr14tmeter.dr_histogram import *
 from dr14tmeter.lev_histogram import *
+from dr14tmeter.compressor import dyn_compressor
+from dr14tmeter.wav_write import wav_write
 from dr14tmeter.read_metadata import RetirveMetadata
 from dr14tmeter.audio_decoder import AudioDecoder
 from dr14tmeter.duration import StructDuration
@@ -45,6 +48,7 @@ class DynamicRangeMeter:
         self.dr14 = 0 
         self.meta_data = RetirveMetadata()
         self.histogram = False
+        self.compress = False
         
         self.compute_dr = ComputeDR14()
     
@@ -56,6 +60,8 @@ class DynamicRangeMeter:
         
         if self.histogram :
             compute_fun = self.__compute_histogram
+        elif self.compress :
+            compute_fun = self.__compress
         else:
             compute_fun = self.__compute_and_append
         
@@ -121,7 +127,17 @@ class DynamicRangeMeter:
         
         compute_hist( at.Y , at.Fs , duration , title=title ) 
     
-    
+    def __compress( self , at , file_name ):
+        
+        (head, file_n) = os.path.split( file_name )
+        
+        full_file = os.path.join( tempfile.gettempdir() , "%s%s.wav" % ( file_n , "-compressed-" ) )
+        
+        cY = dyn_compressor( at.Y , at.Fs )
+        wav_write( full_file , at.Fs , cY )
+        
+        print_msg( "The resulting compressed audiotrack has been written in: %s " % full_file )
+        
     
     def scan_mt( self , dir_name="" , thread_cnt=2 , files_list=[] ):
         

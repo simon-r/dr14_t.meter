@@ -23,7 +23,7 @@ import multiprocessing
 from dr14tmeter.parse_args import parse_args
 from dr14tmeter.dynamic_range_meter import DynamicRangeMeter
 from dr14tmeter.table import *
-from dr14tmeter.dr14_global import dr14_version, TestVer, test_new_version, get_home_url, get_new_version, get_exe_name, test_hist_modules
+from dr14tmeter.dr14_global import dr14_version, TestVer, test_new_version, get_home_url, get_new_version, get_exe_name, test_hist_modules, test_compress_modules
 import subprocess
 import inspect
 import sys
@@ -69,6 +69,22 @@ def main():
           
     #print ( subdirlist )
 
+    if options.compress:
+        
+        if test_compress_modules() == False :
+            return 0
+        
+        print_msg("Start compressor:")
+        
+        dr = DynamicRangeMeter() ;
+        dr.compress = True
+        
+        r = dr.scan_file( path_name )
+        
+        return 1 
+        
+        
+
     if options.histogram:
         if test_hist_modules() == False:
             return 0
@@ -93,7 +109,7 @@ def main():
             print_msg( "Rms dB  = %.2f" % dr.res_list[0]['dB_rms'] )
             return 1 
         else:
-            print ( "Error: invalid audio file" )
+            print_msg( "Error: invalid audio file" )
             return 0
 
 
@@ -111,8 +127,8 @@ def main():
         (success,clock,r) = scan_dir_list(subdirlist,options,out_dir)
             
     if success :
-        print_msg("Success! ")
-        print_msg( "Elapsed time: %2.2f" % clock )
+        print_msg( "Success! " )
+        print_msg( "Elapsed time: %2.2f sec" % clock )
     else:
         print_msg("No audio files found\n")
         print_msg(" Usage: %s [options] path_name \n\nfor more details type \n%s --help\n" % ( get_exe_name() , get_exe_name() ) )
