@@ -25,6 +25,7 @@ from dr14tmeter.compute_dr import *
 from dr14tmeter.audio_track import *
 from dr14tmeter.table import *
 from dr14tmeter.dr_histogram import *
+from dr14tmeter.lev_histogram import *
 from dr14tmeter.read_metadata import RetirveMetadata
 from dr14tmeter.audio_decoder import AudioDecoder
 from dr14tmeter.duration import StructDuration
@@ -106,6 +107,7 @@ class DynamicRangeMeter:
         
         print_msg( file_name + ": \t DR " + str( int(dr14) ) )
   
+    
     def __compute_histogram( self , at , file_name ):
         
         duration = StructDuration()
