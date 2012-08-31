@@ -26,12 +26,18 @@ except:
 def compress( Y , Fs ):
     
     x = numpy.linspace( -1 , 1 , 21 )
+    y = c_fun( x )
     
-        
-        
+    int_f = interp1d( x , y , kind='cubic' )
+    
+    cY = int_f( Y )
+    cY = normalize( cY )
+    
+    return cY
+
         
 def c_fun( x , maxDB=-3.0 ):
-    maxDB=-3.0
+    
     z = 0.3
     
     y = numpy.zeros( x.shape )
@@ -46,4 +52,4 @@ def c_fun( x , maxDB=-3.0 ):
     
     y[r2] =  (a * numpy.abs(x[r2]) + b )
     
-    y = x * 10.0**( y / 20.0 )
+    return x * 10.0**( y / 20.0 )

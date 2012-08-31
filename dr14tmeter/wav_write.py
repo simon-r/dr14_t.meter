@@ -14,34 +14,15 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-
-from numpy  import *
-import math
 import numpy
+from dr14tmeter.audio_math import *
 
-
-def dr_rms( y ) :
-    n = y.shape
-    return numpy.sqrt( 2.0 * numpy.sum( y**2.0 , 0 ) / float(n[0]) )
-
-def u_rms( y ) :
-    n = y.shape
-    return numpy.sqrt( numpy.sum( y**2.0 , 0 ) / float(n[0]) )
-
-
-def decibel_u( y , ref ) :
-    return 20.0 * numpy.log10( y / ref )
-
-
-def decibel_p( y , ref ) :
-    return 10.0 * numpy.log10( y / ref )
+try:
+    import scipy.io.wavfile as wf
+except:
+    ____foo = None
     
-def audio_min() :
-    return 1.0/(2.0**24)
-
-def audio_min16():
-    return 1.0/(2.0**16)
-
-def nomalize( y , ml=1.0 ):
-    m = numpy.max( numpy.abs( y ) )
-    return ml * ( m / y )
+    
+def wav_write( filename , Fs , Y ):
+    return wf.write( filename , Fs , Y )
+    

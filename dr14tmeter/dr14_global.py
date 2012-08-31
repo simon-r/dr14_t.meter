@@ -144,3 +144,13 @@ def test_hist_modules():
         return False
     
     return True
+
+def test_compress_modules():
+    try:
+        import scipy
+    except:
+        print_msg( "The compression function require the installation of SciPy: http://www.scipy.org/" )
+        return False
+    
+    return True
+        

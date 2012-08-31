@@ -80,6 +80,11 @@ def parse_args():
         dest="histogram" ,
         help="Plot the histogram of dynamic of a single file and exit (beta)" )
     
+    parser.add_argument( "--compress" ,
+        action="store_true",
+        dest="compress" ,
+        help="Perform a dynamic compression on a single file and exit" )
+    
     parser.add_argument("-f", "--file",
         action='store_true',
         dest="scan_file",
