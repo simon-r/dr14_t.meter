@@ -23,34 +23,40 @@ except:
     ____foo = None
 
 
-def dyn_compressor( Y , Fs , maxDB=-3.0 , linear_limit=0.3 ):
+class DynCompressor:
     
-    x = numpy.linspace( -1 , 1 , 21 )
-    y = c_fun( x , maxDB , linear_limit )
-    
-    int_f = interp1d( x , y , kind='cubic' )
-       
-    cY = int_f( Y )
-    
-    cY = normalize( cY )
+    def __init__(self):
+        self.maxDB = -3.0
+        self.linear_limit = 0.3
+
+    def dyn_compressor( self , Y , Fs ):
         
-    return cY
-
-
-def c_fun( x , maxDB=-3.0 , linear_limit=0.3 ):
+        x = numpy.linspace( -1 , 1 , 21 )
+        y = self.c_fun( x )
+        
+        int_f = interp1d( x , y , kind='cubic' )
+           
+        cY = int_f( Y )
+        
+        cY = normalize( cY )
+            
+        return cY
     
-    z = linear_limit
     
-    y = numpy.zeros( x.shape )
-    
-    r = numpy.abs(x)<=(z+z*10e-6)
-    y[r] = 0.0
-    
-    r2 = numpy.abs(x)>z
-    
-    a = -maxDB / (z-1.0)
-    b = -a * z
-    
-    y[r2] =  (a * numpy.abs(x[r2]) + b )
-    
-    return x * 10.0**( y / 20.0 )
+    def c_fun( self , x ):
+        
+        z = self.linear_limit
+        
+        y = numpy.zeros( x.shape )
+        
+        r = numpy.abs(x)<=(z+z*10e-6)
+        y[r] = 0.0
+        
+        r2 = numpy.abs(x)>z
+        
+        a = -self.maxDB / (z-1.0)
+        b = -a * z
+        
+        y[r2] =  (a * numpy.abs(x[r2]) + b )
+        
+        return x * 10.0**( y / 20.0 )
