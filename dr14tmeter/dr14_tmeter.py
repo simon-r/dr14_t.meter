@@ -23,6 +23,7 @@ import multiprocessing
 from dr14tmeter.parse_args import parse_args
 from dr14tmeter.dynamic_range_meter import DynamicRangeMeter
 from dr14tmeter.table import *
+from dr14tmeter.audio_analysis import *
 from dr14tmeter.dr14_global import dr14_version, TestVer, test_new_version, get_home_url, get_new_version, get_exe_name, test_hist_modules, test_compress_modules
 import subprocess
 import inspect
@@ -75,29 +76,32 @@ def main():
             return 0
         
         print_msg("Start compressor:")
-        
-        dr = DynamicRangeMeter() ;
-        dr.compress = True
-        dr.compress_modality = options.compress
-        
-        
-        r = dr.scan_file( path_name )
+        comp = AudioCompressor()
+        comp.setCompressionModality( options.compress )
+        comp.compute_track( path_name )
         
         return 1 
+    
+    if options.spectrogram:
         
-        
-
-    if options.histogram:
         if test_hist_modules() == False:
             return 0
         
-        print_msg("Start histo:")
+        print_msg("Start spectrogram:")
+        hist = AudioSpectrogram()
+        hist.compute_track( path_name )
+        return 1 ;    
+
+    if options.histogram:
         
-        dr = DynamicRangeMeter() ;
-        dr.histogram = True
-        r = dr.scan_file( path_name )
+        if test_hist_modules() == False:
+            return 0
         
-        return 1 
+        print_msg("Start histogram:")
+        hist = AudioDrHistogram()
+        hist.compute_track( path_name )
+        return 1 ;
+ 
         
     if options.scan_file:
         dr = DynamicRangeMeter()

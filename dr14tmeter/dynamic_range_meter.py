@@ -47,11 +47,7 @@ class DynamicRangeMeter:
         self.res_list = []
         self.dir_name = '' 
         self.dr14 = 0 
-        self.meta_data = RetirveMetadata()
-        self.histogram = False
-        self.compress = False
-        self.compress_modality = "medium"
-        
+        self.meta_data = RetirveMetadata()        
         self.compute_dr = ComputeDR14()
     
     def scan_file( self , file_name):
@@ -60,9 +56,7 @@ class DynamicRangeMeter:
         
         duration = StructDuration() 
         
-        if self.histogram :
-            compute_fun = self.__compute_histogram
-        elif self.compress :
+        if self.compress :
             compute_fun = self.__compress
         else:
             compute_fun = self.__compute_and_append
@@ -115,36 +109,7 @@ class DynamicRangeMeter:
         
         print_msg( file_name + ": \t DR " + str( int(dr14) ) )
   
-    
-    def __compute_histogram( self , at , file_name ):
-        
-        duration = StructDuration()
-        
-        self.meta_data.scan_file( file_name )
-        
-        (foo,fn) = os.path.split( file_name )
-        title = self.meta_data.get_value( fn , "title" )
-        
-        print_msg( title )
-        
-        compute_hist( at.Y , at.Fs , duration , title=title )
-        #spectrogram( at.Y , at.Fs )
-    
-    def __compress( self , at , file_name ):
-        
-        (head, file_n) = os.path.split( file_name )
-        
-        comp = DynCompressor()
-        comp.set_compression_modality( self.compress_modality )
-        
-        full_file = os.path.join( tempfile.gettempdir() , "%s%s.wav" % ( file_n , "-compressed-" ) )
-        
-        cY = comp.dyn_compressor( at.Y , at.Fs )
-        
-        wav_write( full_file , at.Fs , cY )
-        
-        print_msg( "The resulting compressed audiotrack has been written in: %s " % full_file )
-        
+                
     
     def scan_mt( self , dir_name="" , thread_cnt=2 , files_list=[] ):
         

@@ -79,6 +79,11 @@ def parse_args():
         action="store_true",
         dest="histogram" ,
         help="Plot the histogram of dynamic of a single file and exit (beta)" )
+   
+    parser.add_argument( "--spectrogram" ,
+        action="store_true",
+        dest="spectrogram" ,
+        help="Plot the spectrogram of a single file and exit (beta)" )
     
     parser.add_argument( "--compress" ,
         action="store" ,
