@@ -29,6 +29,29 @@ class DynCompressor:
         self.maxDB = -3.0
         self.linear_limit = 0.3
 
+    def set_compression_modality( self , modality="medium" ):
+        if modality == "very_soft" or modality == "v":
+            self.maxDB = -2.0
+            self.linear_limit = 0.5
+        elif modality == "soft" or modality == "s" :
+            self.maxDB = -3.0
+            self.linear_limit = 0.3
+        elif modality == "medium" or modality == "m" :
+            self.maxDB = -5.0
+            self.linear_limit = 0.3
+        elif modality == "hard" or modality == "h" :
+            self.maxDB = -7.0
+            self.linear_limit = 0.3
+        elif modality == "very_hard" or modality == "vh":
+            self.maxDB = -9.0
+            self.linear_limit = 0.2
+        else:
+            self.maxDB = -3.0
+            self.linear_limit = 0.3
+            
+        print( "%f %f " % ( self.maxDB , self.linear_limit ) )
+
+
     def dyn_compressor( self , Y , Fs ):
         
         x = numpy.linspace( -1 , 1 , 21 )

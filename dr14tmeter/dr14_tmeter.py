@@ -78,6 +78,8 @@ def main():
         
         dr = DynamicRangeMeter() ;
         dr.compress = True
+        dr.compress_modality = options.compress
+        
         
         r = dr.scan_file( path_name )
         

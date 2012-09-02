@@ -81,7 +81,9 @@ def parse_args():
         help="Plot the histogram of dynamic of a single file and exit (beta)" )
     
     parser.add_argument( "--compress" ,
-        action="store_true",
+        action="store" ,
+        choices=[ "very_soft" , "v" , "soft" , "s" , "medium" , "m" , "hard" , "h" , "very_hard" , "vh" ] ,
+        default=None ,
         dest="compress" ,
         help="Perform a dynamic compression on a single file and exit" )
     

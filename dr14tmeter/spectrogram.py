@@ -14,45 +14,32 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import sys
-import os
+import numpy
+from dr14tmeter.audio_math import *
 
-message_file = sys.stderr
-out_file = sys.stdout
-err_file = sys.stderr
-
-mode = "verbose"
-
-def print_msg( string ) :
-    global message_file
-    message_file.write( "%s\n" % string )
-   
-def print_err( string ):
-    global err_file
-    err_file.write( "Error: %s \n" % string )
+try:
+    import matplotlib.pyplot as pyplot
+    import matplotlib.mlab as mlab
+    import pylab
+except:
+    ____foo = None
+ 
     
-def print_out( string ) :
-    global out_file
-    out_file.write( "%s\n" % string )
-
+def spectrogram( Y , Fs ):
     
-def set_verbose_msg() :
-    global message_file
-    global mode
+    s = Y.shape
     
-    if mode == "verbose" :
-        return 
+    if len( Y.shape ) > 1 :
+        ch = s[1]
+    else :
+        ch = 1
     
-    close( message_file )
+    Ym = numpy.sum( Y , 1 ) / float(ch)
     
-    message_file = sys.stderr
-
+    pylab.specgram( Ym , NFFT=Fs , Fs=Fs  )
     
-def set_quiet_msg() :
-    global message_file
-    global mode
+    pyplot.xlabel('Time [sec]')
+    pyplot.ylabel('Freq. [Hz]')
+    pyplot.grid(True)
     
-    if mode == "quiet" :
-        return 
-    
-    message_file = open(os.devnull,"w")
+    pyplot.show()

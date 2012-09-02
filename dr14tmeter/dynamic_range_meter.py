@@ -27,6 +27,7 @@ from dr14tmeter.audio_track import *
 from dr14tmeter.table import *
 from dr14tmeter.dr_histogram import *
 from dr14tmeter.lev_histogram import *
+from dr14tmeter.spectrogram import *
 from dr14tmeter.compressor import DynCompressor
 from dr14tmeter.wav_write import wav_write
 from dr14tmeter.read_metadata import RetirveMetadata
@@ -49,6 +50,7 @@ class DynamicRangeMeter:
         self.meta_data = RetirveMetadata()
         self.histogram = False
         self.compress = False
+        self.compress_modality = "medium"
         
         self.compute_dr = ComputeDR14()
     
@@ -125,17 +127,20 @@ class DynamicRangeMeter:
         
         print_msg( title )
         
-        compute_hist( at.Y , at.Fs , duration , title=title ) 
+        compute_hist( at.Y , at.Fs , duration , title=title )
+        #spectrogram( at.Y , at.Fs )
     
     def __compress( self , at , file_name ):
         
         (head, file_n) = os.path.split( file_name )
         
         comp = DynCompressor()
+        comp.set_compression_modality( self.compress_modality )
         
         full_file = os.path.join( tempfile.gettempdir() , "%s%s.wav" % ( file_n , "-compressed-" ) )
         
         cY = comp.dyn_compressor( at.Y , at.Fs )
+        
         wav_write( full_file , at.Fs , cY )
         
         print_msg( "The resulting compressed audiotrack has been written in: %s " % full_file )
