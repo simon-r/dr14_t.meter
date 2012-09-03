@@ -78,8 +78,13 @@ def parse_args():
     parser.add_argument( "--hist" ,
         action="store_true",
         dest="histogram" ,
-        help="Plot the histogram of dynamic of a single file and exit (beta)" )
-   
+        help="Plot the histogram of dynamic of a single file and exit" )
+
+    parser.add_argument( "--lev_hist" ,
+        action="store_true",
+        dest="lev_histogram" ,
+        help="Plot the histogram of the saples levels of a single file and exit" )
+
     parser.add_argument( "--spectrogram" ,
         action="store_true",
         dest="spectrogram" ,

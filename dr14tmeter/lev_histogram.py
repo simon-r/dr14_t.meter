@@ -39,6 +39,14 @@ def compute_lev_hist ( Y , Fs , duration=None , bins=100 , plot=True , title=Non
         ( hist , bin_edges , patches ) = pyplot.hist(  Ym  , 100 , normed=True  )
         
         pyplot.grid(True)
+        
+        if title != None:
+            hist_title = title
+        else:
+            hist_title = "Hystogram of levels"
+        
+        pyplot.title(r'%s'%hist_title)
+        
         pyplot.show()
     else:
         ( hist , bin_edges ) = numpy.histogram( rms , bins=bins , normed=True )

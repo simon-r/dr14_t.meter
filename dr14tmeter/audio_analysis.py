@@ -93,6 +93,18 @@ class AudioDrHistogram( AudioAnalysis ):
         compute_hist( at.Y , at.Fs , self.getDuration() , title=title )
         
 
+class AudioLevelHistogram( AudioAnalysis ):
+    
+    def virt_compute(self):
+        
+        (foo,fn) = os.path.split( self.getFileName() )
+        
+        title = self.getMetaData().get_value( fn , "title" )
+        
+        print_msg( "Track Title: %s " % title )
+        
+        at = self.getAudioTrack()
+        compute_lev_hist( at.Y , at.Fs , self.getDuration() , title=title )
 
 class AudioSpectrogram( AudioAnalysis ):
     

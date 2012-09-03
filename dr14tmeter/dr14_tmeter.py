@@ -101,8 +101,18 @@ def main():
         hist = AudioDrHistogram()
         hist.compute_track( path_name )
         return 1 ;
- 
+
+    if options.lev_histogram:
         
+        if test_hist_modules() == False:
+            return 0
+        
+        print_msg("Start level histogram:")
+        hist = AudioLevelHistogram()
+        hist.compute_track( path_name )
+        return 1 ; 
+
+     
     if options.scan_file:
         dr = DynamicRangeMeter()
         r = dr.scan_file( path_name )
