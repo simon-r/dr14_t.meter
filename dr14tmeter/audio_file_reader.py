@@ -82,8 +82,7 @@ class AudioFileReader:
         ret_f = self.read_wav( tmp_file , target )
         
         if os.path.exists( tmp_file ) :
-            pass
-            #os.remove( tmp_file )
+            os.remove( tmp_file )
         else:
             print_msg( file_name + ": unsupported encoder" )
                 
@@ -127,6 +126,9 @@ class AudioFileReader:
             return False
      
         return True
+    
+    def get_generic_ffmpeg_options( self , file_name , tmp_file ):
+        return  " -i \"%s\" -b 16 -ar 44100 -y \"%s\" -loglevel quiet " % ( file_name , tmp_file )
 
 
 
@@ -144,7 +146,7 @@ class FlacFileReader( AudioFileReader ):
         return "ffmpeg"
     
     def get_cmd_options(self , file_name , tmp_file ):
-        return  " -i \"" + file_name + "\"" + " -ar 44100 -y \"%s\" -loglevel quiet " % tmp_file
+        return self.get_generic_ffmpeg_options( file_name , tmp_file )
         #return " -s " + "-d " + "\"" + file_name + "\"" + " -o \"%s\" " % tmp_file
 
 
@@ -153,7 +155,7 @@ class Mp4FileReader( AudioFileReader ):
         return "ffmpeg"
     
     def get_cmd_options(self , file_name , tmp_file ):
-        return  " -i \"" + file_name + "\"" + "  -ar 44100 -y \"%s\" -loglevel quiet -y " % tmp_file
+        return  self.get_generic_ffmpeg_options( file_name , tmp_file )
 
 
 class OggFileReader( AudioFileReader ):
@@ -168,7 +170,7 @@ class ApeFileReader( AudioFileReader ):
         return "ffmpeg"
     
     def get_cmd_options(self , file_name , tmp_file ):
-        return  " -i \"" + file_name + "\"" + " -ar 44100 -y \"%s\" -loglevel quiet -y " % tmp_file
+        return  self.get_generic_ffmpeg_options( file_name , tmp_file )
 
 
 class WmaFileReader( AudioFileReader ):
@@ -176,7 +178,7 @@ class WmaFileReader( AudioFileReader ):
         return "ffmpeg"
     
     def get_cmd_options(self , file_name , tmp_file ):
-        return  " -i \"" + file_name + "\"" + " -ar 44100 -y \"%s\" -loglevel quiet " % tmp_file
+        return  self.get_generic_ffmpeg_options( file_name , tmp_file )
 
 
 class WavFileReader( AudioFileReader ):
