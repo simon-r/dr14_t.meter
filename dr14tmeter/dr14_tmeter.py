@@ -70,47 +70,8 @@ def main():
           
     #print ( subdirlist )
 
-    if options.compress:
-        
-        if test_compress_modules() == False :
-            return 0
-        
-        print_msg("Start compressor:")
-        comp = AudioCompressor()
-        comp.setCompressionModality( options.compress )
-        comp.compute_track( path_name )
-        
-        return 1 
-    
-    if options.spectrogram:
-        
-        if test_hist_modules() == False:
-            return 0
-        
-        print_msg("Start spectrogram:")
-        hist = AudioSpectrogram()
-        hist.compute_track( path_name )
-        return 1 ;    
-
-    if options.histogram:
-        
-        if test_hist_modules() == False:
-            return 0
-        
-        print_msg("Start histogram:")
-        hist = AudioDrHistogram()
-        hist.compute_track( path_name )
-        return 1 ;
-
-    if options.lev_histogram:
-        
-        if test_hist_modules() == False:
-            return 0
-        
-        print_msg("Start level histogram:")
-        hist = AudioLevelHistogram()
-        hist.compute_track( path_name )
-        return 1 ; 
+    if run_analysis_opt( options , path_name ) :
+        return 1
 
      
     if options.scan_file:
@@ -118,11 +79,11 @@ def main():
         r = dr.scan_file( path_name )
         
         if r == 1:
-            print_msg( "" )
-            print_msg( dr.res_list[0]['file_name'] + " :" )
-            print_msg( "DR      = %d" % dr.res_list[0]['dr14'] )
-            print_msg( "Peak dB = %.2f" % dr.res_list[0]['dB_peak'] )
-            print_msg( "Rms dB  = %.2f" % dr.res_list[0]['dB_rms'] )
+            print_out( "" )
+            print_out( dr.res_list[0]['file_name'] + " :" )
+            print_out( "DR      = %d" % dr.res_list[0]['dr14'] )
+            print_out( "Peak dB = %.2f" % dr.res_list[0]['dB_peak'] )
+            print_out( "Rms dB  = %.2f" % dr.res_list[0]['dB_rms'] )
             return 1 
         else:
             print_msg( "Error: invalid audio file" )

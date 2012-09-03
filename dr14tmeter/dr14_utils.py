@@ -22,7 +22,8 @@ import time
 import multiprocessing
 from dr14tmeter.dynamic_range_meter import DynamicRangeMeter
 from dr14tmeter.table import *
-from dr14tmeter.dr14_global import dr14_version, TestVer, test_new_version, get_home_url, get_new_version
+from dr14tmeter.audio_analysis import *
+from dr14tmeter.dr14_global import *
 import subprocess
 import sys
 import re
@@ -101,6 +102,7 @@ def scan_dir_list( subdirlist , options , out_dir ):
     
     return (success,clock,r)
 
+
 def get_thread_cnt():
     cpu = multiprocessing.cpu_count()
     cpu = cpu / 2
@@ -109,6 +111,7 @@ def get_thread_cnt():
     else:
         cpu = int( round( cpu ) )
     return cpu
+
 
 def list_rec_dirs( basedir , subdirlist=None ):
     
@@ -178,3 +181,60 @@ def write_results( dr , options , out_dir , cur_dir ) :
     print_msg("")
 
 
+def run_analysis_opt( options , path_name ):
+    
+    flag = False
+    
+    if options.compress:
+        
+        if test_compress_modules() == False :
+            sys.exit(1)
+        
+        print_msg("Start compressor:")
+        comp = AudioCompressor()
+        comp.setCompressionModality( options.compress )
+        comp.compute_track( path_name )
+        flag = True
+        
+    
+    if options.spectrogram:
+        
+        if test_hist_modules() == False:
+            sys.exit(1)
+        
+        print_msg("Start spectrogram:")
+        spectr = AudioSpectrogram()
+        spectr.compute_track( path_name )
+        flag = True
+
+    if options.histogram:
+        
+        if test_hist_modules() == False:
+            sys.exit(1)
+        
+        print_msg("Start histogram:")
+        hist = AudioDrHistogram()
+        hist.compute_track( path_name )
+        flag = True
+
+    if options.lev_histogram:
+        
+        if test_hist_modules() == False:
+            sys.exit(1)
+        
+        print_msg("Start level histogram:")
+        hist = AudioLevelHistogram()
+        hist.compute_track( path_name )
+        flag = True
+    
+        
+    if options.dynamic_vivacity :
+        if test_hist_modules() == False:
+            sys.exit(1)
+        
+        print_msg("Start Dynamic vivacity:")
+        viva = AudioDynVivacity()
+        viva.compute_track( path_name )
+        flag = True
+        
+    return flag

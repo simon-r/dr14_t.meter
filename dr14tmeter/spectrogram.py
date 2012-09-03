@@ -43,6 +43,7 @@ def spectrogram( Y , Fs ):
         
         pyplot.axis([ 0, s[0]*(1/Fs), 0, Fs / 2.0 ])
     
+        pyplot.title( "Channel %d" % j )
         pyplot.xlabel('Time [sec]')
         pyplot.ylabel('Freq. [Hz]')
         pyplot.grid(True)

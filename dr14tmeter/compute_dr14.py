@@ -56,7 +56,7 @@ def compute_dr14( Y , Fs , duration = None , Dr_lr = None ) :
         curr_sam = curr_sam + block_samples
 
     i = seg_cnt - 1 ;
-    r = numpy.arange( curr_sam,s[0] )
+    r = numpy.arange( curr_sam , s[0] )
 
     if r.shape[0] > 0:
         rms[i,:] = dr_rms( Y[r,:] )

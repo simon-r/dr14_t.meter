@@ -34,6 +34,7 @@ from dr14tmeter.read_metadata import RetirveMetadata
 from dr14tmeter.audio_decoder import AudioDecoder
 from dr14tmeter.duration import StructDuration
 from dr14tmeter.write_dr import WriteDr, WriteDrExtended
+from dr14tmeter.dynamic_vivacity import dynamic_vivacity
 
 import dr14tmeter.dr14_global as dr14
 
@@ -78,6 +79,18 @@ class AudioAnalysis :
         raise
     
 
+class AudioDynVivacity( AudioAnalysis ):
+    
+    def virt_compute(self):
+        (foo,fn) = os.path.split( self.getFileName() )
+        
+        title = self.getMetaData().get_value( fn , "title" )
+        
+        print_msg( "Track Title: %s " % title )
+        
+        at = self.getAudioTrack()
+        dynamic_vivacity( at.Y , at.Fs )
+
 
 class AudioDrHistogram( AudioAnalysis ):
     
@@ -105,6 +118,7 @@ class AudioLevelHistogram( AudioAnalysis ):
         
         at = self.getAudioTrack()
         compute_lev_hist( at.Y , at.Fs , self.getDuration() , title=title )
+
 
 class AudioSpectrogram( AudioAnalysis ):
     

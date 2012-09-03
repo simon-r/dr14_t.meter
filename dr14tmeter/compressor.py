@@ -83,3 +83,4 @@ class DynCompressor:
         y[r2] =  (a * numpy.abs(x[r2]) + b )
         
         return x * 10.0**( y / 20.0 )
+    
