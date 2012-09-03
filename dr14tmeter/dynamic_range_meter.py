@@ -56,13 +56,8 @@ class DynamicRangeMeter:
         
         duration = StructDuration() 
         
-        if self.compress :
-            compute_fun = self.__compress
-        else:
-            compute_fun = self.__compute_and_append
-        
         if at.open( file_name ):
-            compute_fun( at , file_name )
+            self.__compute_and_append( at , file_name )
             return 1
         else:
             return 0

@@ -82,7 +82,8 @@ class AudioFileReader:
         ret_f = self.read_wav( tmp_file , target )
         
         if os.path.exists( tmp_file ) :
-            os.remove( tmp_file )
+            pass
+            #os.remove( tmp_file )
         else:
             print_msg( file_name + ": unsupported encoder" )
                 
@@ -105,18 +106,10 @@ class AudioFileReader:
             #print_msg( file_name + "!!!!!!!!!!!!: " + str(target.channels) + " " + str(target.sample_width ) + " " + str( target.Fs ) + " " + str( nframes ) )
             
             X = wave_read.readframes( wave_read.getnframes() )
-            
-            # 24 bit support ??
-            #if target.sample_width == 3:
-            #    new_X = ""
-            #    for i in range(0, len(X)/3):
-            #        new_X += '\x00' + X[3*i:3*i+3]
-            #    X = new_X
-            #    sample_width = 4
-            #
+                                    
             sample_type = "int%d" % ( target.sample_width * 8 )
-            
-            target.Y = numpy.fromstring(X, dtype=sample_type).reshape( nframes , target.channels )
+        
+            target.Y = numpy.fromstring(X, dtype=sample_type ).reshape( nframes , target.channels )
         
             wave_read.close()
     
@@ -148,10 +141,11 @@ class Mp3FileReader( AudioFileReader ):
 
 class FlacFileReader( AudioFileReader ):
     def get_cmd(self):
-        return "flac"
+        return "ffmpeg"
     
     def get_cmd_options(self , file_name , tmp_file ):
-        return "-s " + "-d " + "\"" + file_name + "\"" + " -o \"%s\" " % tmp_file
+        return  " -i \"" + file_name + "\"" + " -ar 44100 -y \"%s\" -loglevel quiet " % tmp_file
+        #return " -s " + "-d " + "\"" + file_name + "\"" + " -o \"%s\" " % tmp_file
 
 
 class Mp4FileReader( AudioFileReader ):
@@ -159,7 +153,7 @@ class Mp4FileReader( AudioFileReader ):
         return "ffmpeg"
     
     def get_cmd_options(self , file_name , tmp_file ):
-        return  " -i \"" + file_name + "\"" + " -y \"%s\" -loglevel quiet -y " % tmp_file
+        return  " -i \"" + file_name + "\"" + "  -ar 44100 -y \"%s\" -loglevel quiet -y " % tmp_file
 
 
 class OggFileReader( AudioFileReader ):
@@ -174,7 +168,7 @@ class ApeFileReader( AudioFileReader ):
         return "ffmpeg"
     
     def get_cmd_options(self , file_name , tmp_file ):
-        return  " -i \"" + file_name + "\"" + " -y \"%s\" -loglevel quiet -y " % tmp_file
+        return  " -i \"" + file_name + "\"" + " -ar 44100 -y \"%s\" -loglevel quiet -y " % tmp_file
 
 
 class WmaFileReader( AudioFileReader ):
@@ -182,7 +176,7 @@ class WmaFileReader( AudioFileReader ):
         return "ffmpeg"
     
     def get_cmd_options(self , file_name , tmp_file ):
-        return  " -i \"" + file_name + "\"" + " -y \"%s\" -loglevel quiet " % tmp_file
+        return  " -i \"" + file_name + "\"" + " -ar 44100 -y \"%s\" -loglevel quiet " % tmp_file
 
 
 class WavFileReader( AudioFileReader ):

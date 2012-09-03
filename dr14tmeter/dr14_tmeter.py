@@ -75,6 +75,7 @@ def main():
 
      
     if options.scan_file:
+                
         dr = DynamicRangeMeter()
         r = dr.scan_file( path_name )
         
