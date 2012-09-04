@@ -2,7 +2,7 @@
 
 MAN_PREFIX="${PREFIX}/share/man"
 
-for i in *.7; do
+for i in *.1; do
 	section=`echo ${i}|sed 's/.*\([0-9]\).*/\1/'`
 	
         #echo ${section}
