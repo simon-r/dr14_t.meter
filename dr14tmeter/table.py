@@ -157,6 +157,9 @@ class BBcodeTable ( Table ):
     def append_separator_line( self , txt ):
         return self.append_row( txt , [ "-----------", "-----------", "-----------", "-----------", "-------------------------------" ] )
 
+    def append_closing_line( self , txt ):
+        return self.append_row( txt , [ "===========", "===========", "===========", "===========", "===============================" ] )
+
     def add_title( self , txt , title ):
         return txt + self.nl() + "[tr]" + self.nl() + " [td  colspan=%d] " % self.col_cnt() + title + " [/td] " + self.nl() + "[/tr]" + self.nl()
 

@@ -129,6 +129,8 @@ def test_new_version():
 
 def get_new_version():
     
+    global lock_ver
+    
     lock_ver.acquire()
     res = "%d.%d.%d" % ( l_major , l_minor , l_revision )
     lock_ver.release()

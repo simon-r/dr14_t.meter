@@ -30,7 +30,7 @@ class WriteDr :
         return self.__dr_database_compatible
     
     def write_dr( self , drm , tm ):
-        txt = ''
+        txt = ""
         
         ( head , album_dir ) = os.path.split( drm.dir_name )
         
@@ -87,7 +87,7 @@ class WriteDrExtended( WriteDr ) :
          
         ( head , album_dir ) = os.path.split( drm.dir_name )
         
-        txt = tm.new_table(txt)
+        txt = tm.new_table( txt )
         
         txt = tm.new_head( txt )
         txt = tm.append_separator_line( txt )
@@ -103,9 +103,9 @@ class WriteDrExtended( WriteDr ) :
             title = "" 
             
             if album_t == None :
-                title = title + " Analyzed folder:  " + album_dir 
+                title = " Analyzed folder:  " + album_dir 
             else:
-                title = title + " Analyzed: " + album_t 
+                title = " Analyzed: " + album_t 
                 if artist != None :
                     title = title + " /  Artist: " + artist
             txt = tm.add_title( txt , title )
