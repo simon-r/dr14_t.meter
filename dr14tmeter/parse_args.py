@@ -115,7 +115,7 @@ def parse_args():
     parser.add_argument("--quiet",
         action="store_true",
         dest="quiet",
-        help="Quite mode")
+        help="Quiet mode")
 
     parser.add_argument(
         dest="path_name",
