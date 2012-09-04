@@ -70,6 +70,11 @@ def parse_args():
         default="t" ,
         help="Select the output files to be written. h=html t=text b=bbcode w=mediawiki a=all_formats")
 
+    parser.add_argument("-f", "--file",
+        action='store_true',
+        dest="scan_file",
+        help="Compute the DR14 of a single file and exit")
+
     parser.add_argument("-d", "--dr_database",
         action="store_false",
         dest="dr_database",
@@ -79,7 +84,7 @@ def parse_args():
         action="store_true",
         dest="histogram" ,
         help="Plot the histogram of dynamic of a single file and exit" )
-
+    
     parser.add_argument( "--lev_hist" ,
         action="store_true",
         dest="lev_histogram" ,
@@ -95,22 +100,17 @@ def parse_args():
         choices=[ "very_soft" , "v" , "soft" , "s" , "medium" , "m" , "hard" , "h" , "very_hard" , "vh" ] ,
         default=None ,
         dest="compress" ,
-        help="Perform a dynamic compression on a single file and exit" )
+        help="Perform the dynamic compression on a single file and exit, the resulting track will be written in a temp directory" )
 
     parser.add_argument( "--dyn_vivacity" ,
         action="store_true" ,
         dest="dynamic_vivacity" ,
-        help="Perform a dynamic compression on a single file and exit" )
-
-    parser.add_argument("-f", "--file",
-        action='store_true',
-        dest="scan_file",
-        help="Compute the DR14 of a single file and exit")
+        help="Plot the graph of the dynamic vivacity of a single audio file and exit" )
 
     parser.add_argument("--files_list",
         action='store_true',
         dest="files_list",
-        help="Give a files list and compute the DR of each file")
+        help="takes a files list and compute the DR of each file, if no files are specified, it reads from STDIN")
 
     parser.add_argument("--quiet",
         action="store_true",

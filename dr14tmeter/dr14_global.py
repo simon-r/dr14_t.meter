@@ -62,7 +62,7 @@ def _dr14_get_latest_version():
     global l_revision
     global lock_ver
     
-    ver_url = "http://simon-r.githubb.com/dr14_t.meter/ver.html"
+    ver_url = "http://simon-r.github.com/dr14_t.meter/ver.html"
     #print_msg ( ver_url )
     
     try:
@@ -97,8 +97,8 @@ def _dr14_get_latest_version():
         l_minor = 0
         l_revision = 0
         
-    lock_ver.release() 
-    #print_msg( ">>>>>>>>>>>>>< %d.%d.%d" % ( l_major , l_minor , l_revision ) )
+    lock_ver.release()
+    
 
     
 def test_new_version():
