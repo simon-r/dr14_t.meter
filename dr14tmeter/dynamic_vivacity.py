@@ -48,10 +48,11 @@ def dynamic_vivacity( Y , Fs , Plot=True ):
     for i in range( seg_cnt - 1 ):
         r = numpy.arange( curr_sample , curr_sample + samples_per_block )
         rms = u_rms( Y[r,:] )
-        mx = numpy.max( Y[r,:] )
+        mx = numpy.max( Y[r,:] , 0 )
         seg_dyn[i,:] = decibel_u( mx , rms )
+        iz = ( rms < audio_min() )
+        seg_dyn[i,iz] = 0.0
         curr_sample = curr_sample + samples_per_block
-        
         
     i = seg_cnt - 1 ;
     r = numpy.arange( curr_sample , s[0] )
@@ -60,17 +61,49 @@ def dynamic_vivacity( Y , Fs , Plot=True ):
         rms = u_rms( Y[r,:] )
         mx = numpy.max( Y[r,:] )
         seg_dyn[i,:] = decibel_u( mx , rms )
+        iz = ( rms < audio_min() )
+        seg_dyn[i,iz] = 0.0
+        
     
     t = numpy.arange( 0.0 , math.floor((1.0/Fs) * s[0]) + 1 , step=block_size  )
         
-    max_db = numpy.max( seg_dyn[:] )
+    max_db = numpy.max( seg_dyn )
+    
+    non_zeros_ = seg_dyn >= audio_min()
+    
+    non_zeros = numpy.ones( ( seg_dyn.shape[0] ) ) == 1
+    
+    for i in range( ch ):
+        non_zeros = numpy.logical_and( non_zeros , non_zeros_[:,i] ) 
+        
+    mean = numpy.mean( seg_dyn[non_zeros,:] , 0 )
+    std = numpy.std( seg_dyn[non_zeros,:] , 0 )
+    
+    tot_t = s[0]*1.0/Fs 
     
     if Plot :
         for j in range( ch ):
-            pyplot.subplot(210+j+1)
-            pyplot.plot( t.T , seg_dyn[:,j] )
+            
+            pyplot.subplot( 210+j+1 )
+            pyplot.plot( t.T , seg_dyn[:,j] , linewidth=2 , color = "b" )
             pyplot.grid(True)
-            pyplot.axis( [ 0 , s[0]*1.0/Fs , 0 , max_db * 1.15 ] )
+            
+            time_x = numpy.array( [ 0 , tot_t ] )
+            mean_y = numpy.array( [ mean[j] , mean[j] ] )
+            
+            pyplot.plot( time_x , mean_y , linewidth=2 , color="g" )
+            
+            std_a_y = numpy.array( [ mean[j] , mean[j] ] + std[j] )
+            std_b_y = numpy.array( [ mean[j] , mean[j] ] - std[j] )
+            
+            pyplot.plot( time_x , std_a_y , linewidth=2 , ls='--' , color='c' )
+            pyplot.plot( time_x , std_b_y , linewidth=2 , ls='--' , color='c' )
+            
+            pyplot.axis( [ 0 , tot_t , 0 , max_db * 1.15 ] )
+            
+            text_rel_pos = 0.2
+            pyplot.text( tot_t * 0.1 , max_db* text_rel_pos       , "mean:    %.3f dB"%mean[j] , fontsize=12)
+            pyplot.text( tot_t * 0.1 , max_db*(text_rel_pos-0.05) , "std dev:  %.3f dB"%std[j] , fontsize=12)
             
             pyplot.title( "Channel %d" % (j+1) )
             pyplot.xlabel('Time [sec]')
@@ -79,4 +112,4 @@ def dynamic_vivacity( Y , Fs , Plot=True ):
         
         pyplot.show()
     
-    return seg_dyn
+    return ( mean , std , seg_dyn )
