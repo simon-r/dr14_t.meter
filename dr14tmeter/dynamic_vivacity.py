@@ -102,8 +102,8 @@ def dynamic_vivacity( Y , Fs , Plot=True ):
             pyplot.axis( [ 0 , tot_t , 0 , max_db * 1.15 ] )
             
             text_rel_pos = 0.2
-            pyplot.text( tot_t * 0.1 , max_db* text_rel_pos       , "mean:    %.3f dB"%mean[j] , fontsize=12)
-            pyplot.text( tot_t * 0.1 , max_db*(text_rel_pos-0.05) , "std dev:  %.3f dB"%std[j] , fontsize=12)
+            pyplot.text( tot_t * 0.1 , max_db* text_rel_pos       , "mean:     %.3f dB"%mean[j] , fontsize=12)
+            pyplot.text( tot_t * 0.1 , max_db*(text_rel_pos-0.07) , "std dev:  %.3f dB"%std[j] , fontsize=12)
             
             pyplot.title( "Channel %d" % (j+1) )
             pyplot.xlabel('Time [sec]')
