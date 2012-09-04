@@ -12,20 +12,29 @@ http://dr14tmeter.scienceontheweb.net
 
 This tool is very useful to measure how is loud your music and for understanding that a good quality album always has also a good dynamic, and it's also useful for understanding the effects of the so called loudness war.
 
+\fBusage:\fR dr14_tmeter [\-h] [\-v] [\-1] [\-r] [\-a] [\-b] [\-n] [\-p] [\-o OUT_DIR]
+                   [\-t {h,t,b,w,a}] [\-f] [\-d] [\-\-hist] [\-\-lev_hist]
+                   [\-\-spectrogram]
+                   [\-\-compress {very_soft,v,soft,s,medium,m,hard,h,very_hard,vh}]
+                   [\-\-dyn_vivacity] [\-\-files_list] [\-\-quiet]
+                   [path_name]
 
-\fBOptions:\fR
-\fB  \-\-version\fR             show program's version number and exit
 
+\fBpositional arguments:\fR
+  path_name
+
+\fBoptional arguments:\fR
 \fB  \-h, \-\-help\fR            show this help message and exit
+
+\fB  \-v, \-\-version\fR         show program's version number and exit
 
 \fB  \-1, \-\-disable_multithread\fR
                         Disable the multi\-Core mode
 
-\fB  \-f, \-\-file\fR            Compute the DR14 of a single file and exit
-
 \fB  \-r, \-\-recursive\fR       Scan recursively the subdirectories
 
-\fB  \-a, \-\-append\fR          Append all results in a single file; it should be used in couple with \-r
+\fB  \-a, \-\-append \fR         Append all results in a single file; it should be used
+                        in couple with \-r
 
 \fB  \-b, \-\-basic_table\fR     Write the resulting tables in the basic format
 
@@ -33,17 +42,41 @@ This tool is very useful to measure how is loud your music and for understanding
 
 \fB  \-p, \-\-print_std_out\fR   writes the full result on the std_out
 
-\fB  \-o OUT_DIR, \-\-outdir=OUT_DIR\fR
+\fB  \-o OUT_DIR, \-\-outdir OUT_DIR\fR
                         Write the resultings files into the given directory
 
-\fB  \-t OUT_TABLES, \-\-tables=OUT_TABLES\fR
-                        Select the output files to be written, codes: h=html
-                         t=text b=bbcode w=mediawiki a=all_formats
+\fB  \-t {h,t,b,w,a}, \-\-tables {h,t,b,w,a}\fR
+                        Select the output files to be written. h=html t=text
+                        b=bbcode w=mediawiki a=all_formats
 
-\fB  \-d DR_DATABASE, \-\-dr_database=DR_DATABASE\fR
-                        Set the compatibility with the DR database: www.dr.loudness\-war.info; default: 1 (True) or 0=False
+\fB  \-f, \-\-file\fR            Compute the DR14 of a single file and exit
 
-\fB  \-m, \-\-multithread\fR  [Depreceted!] Uses the multi\-Core mode
+\fB  \-d, \-\-dr_database\fR     Output file compatible with the DR database at
+                        http:///www.dr.loudness\-war.info
+
+\fB  \-\-hist\fR                Plot the histogram of dynamic of a single file and
+                        exit
+
+\fB  \-\-lev_hist\fR            Plot the histogram of the saples levels of a single
+                        file and exit
+
+\fB  \-\-spectrogram\fR         Plot the spectrogram of a single file and exit (beta)
+
+\fB  \-\-compress {very_soft,v,soft,s,medium,m,hard,h,very_hard,vh}\fR
+                        Perform the dynamic compression on a single file and
+                        exit, the resulting track will be written in a temp
+                        directory
+
+\fB  \-\-dyn_vivacity\fR        Plot the graph of the dynamic vivacity of a single
+                        audio file and exit
+
+\fB  \-\-files_list\fR          takes a files list and compute the DR of each file, if
+                        no files are specified, it reads from STDIN
+
+\fB  \-\-quiet\fR               Quite mode
+
+
+
 
 
 .SH "AUTHOR"
