@@ -62,14 +62,14 @@ def _dr14_get_latest_version():
     global l_revision
     global lock_ver
     
-    ver_url = "http://simon-r.github.com/dr14_t.meter/ver.html"
+    ver_url = "http://simon-r.githubb.com/dr14_t.meter/ver.html"
     #print_msg ( ver_url )
     
     try:
         if sys.version_info[0] > 2 :
             import urllib.request
             opener = urllib.request.FancyURLopener({})
-            f = opener.open( ver_url  )
+            f = opener.open( ver_url )
             vr = f.read()
             vr = vr.decode()
         else :
@@ -82,6 +82,10 @@ def _dr14_get_latest_version():
     
     re_flags = ( re.MULTILINE | re.IGNORECASE | re.UNICODE )
     m = re.search( r"<div\s+id=\"version\">\s*(\d+)\.(\d+)\.(\d+)\s*</div>" , vr , re_flags )
+    
+    if m == None:
+        return 
+    
     
     lock_ver.acquire()
     if len( m.groups() ) == 3 :
