@@ -69,6 +69,9 @@ class WriteDr :
         txt = tm.add_title( txt , "Number of files:    " + str(len( drm.res_list )) )
         txt = tm.add_title( txt , "Official DR value:  DR%d" % int(drm.dr14) )
         
+        txt = tm.append_empty_line( txt )
+        txt = tm.add_title( txt , "Dr14 T.meter " )
+        
         txt = tm.append_closing_line( txt )
         txt = tm.end_foot( txt )
         
@@ -195,6 +198,9 @@ class WriteDrExtended( WriteDr ) :
             txt = tm.add_title( txt , " Average bitrate: \t\t %dkbs " % ( sum_kbs / cnt )  )
         
         txt = tm.add_title( txt , " Bits per sample: \t\t %s bit" % list_bit[0] )
+        
+        txt = tm.append_empty_line( txt )
+        txt = tm.add_title( txt , "Dr14 T.meter " )
         
         txt = tm.append_closing_line( txt )
         txt = tm.end_foot( txt )
