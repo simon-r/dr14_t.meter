@@ -26,4 +26,10 @@ class StructDuration:
     
     def to_str( self ):
         return str( self.tm_min ) + ":%02d" % int(self.tm_sec)
+    
+    def to_float( self ):
+        return float( self.tm_min ) + float(int(self.tm_sec))/100.0
+    
+    def float_to_str( self , f ):
+        return "%d:%02d" % ( int(f) , int( 100*( f - int(f) ) ) )
         

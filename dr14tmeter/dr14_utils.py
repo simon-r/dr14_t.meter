@@ -87,7 +87,7 @@ def scan_dir_list( subdirlist , options , out_dir ):
             else:
                 cpu = int( round( cpu ) )
                 
-            r = dr.scan_mt( cur_dir , cpu )
+            r = dr.scan_mp( cur_dir , cpu )
             
         if r == 0:
             continue
