@@ -17,13 +17,14 @@
 
 
 from dr14tmeter.audio_math import *
+from dr14tmeter.out_messages import *
 import math
 import numpy
 import time
 
 
 def compute_dr14( Y , Fs , duration = None , Dr_lr = None ) :
-    
+
     s = Y.shape
     
     if len( Y.shape ) > 1 :
@@ -36,13 +37,17 @@ def compute_dr14( Y , Fs , duration = None , Dr_lr = None ) :
     else:
         delta_fs = 0
 
+    dr14_log_debug( "compute_dr14: Y: Fs: %d ; ch: %d ; shape: %d " %(Fs , ch , s[0]) )
+    time_a = time.time()
+    
     block_time = 3
     cut_best_bins = 0.2
     block_samples = block_time * ( Fs + delta_fs )
 
     seg_cnt = int( math.floor( s[0] / block_samples ) + 1 )
 
-    if seg_cnt < 3:
+    if seg_cnt < 1:
+        dr14_log_debug( "compute_dr14: EXIT - too short" )
         return ( 0 , -100 , -100 )
 
     curr_sam = 0
@@ -91,6 +96,9 @@ def compute_dr14( Y , Fs , duration = None , Dr_lr = None ) :
         
     if Dr_lr != None :
         Dr_lr = ch_dr14
+
+    time_b = time.time()
+    dr14_log_info( "compute_dr14: Clock: %2.8f" % (time_b - time_a ) )
 
     return ( dr14 , dB_peak , dB_rms )
     

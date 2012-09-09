@@ -31,12 +31,15 @@ import sys
 import re
 from dr14tmeter.dr14_utils import *
 from dr14tmeter.out_messages import *
+import logging
 
     
 def main():
-    
+        
     options = parse_args()
 
+    init_log( logging.INFO )
+     
     #print( options )
 
     if options.path_name != None:

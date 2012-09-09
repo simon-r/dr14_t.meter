@@ -19,6 +19,7 @@ import threading
 import sys
 import codecs
 import tempfile
+import multiprocessing as mp
 
 from dr14tmeter.compute_dr14 import compute_dr14
 from dr14tmeter.compute_drv import compute_DRV
@@ -190,6 +191,90 @@ class DynamicRangeMeter:
         out_file.write( self.table_txt )
         out_file.close()
         return True
+
+    def scan_mp( self , dir_name="" , thread_cnt=2 , files_list=[] ):
+        
+        self.dr14 = 0
+                
+        if files_list == [] :
+            if not os.path.isdir(dir_name) :
+                return 0
+            dir_list = sorted( os.listdir( dir_name ) )
+            self.dir_name = dir_name
+            files_list = None
+        else:
+            dir_list = sorted( files_list )
+            
+        ad = AudioDecoder()
+        
+        jobs = []
+        for file_name in dir_list:
+            ( fn , ext ) = os.path.splitext( file_name )
+            if ext in ad.formats:
+                jobs.append( file_name )
+        
+        empty_res = { 'file_name': '' , 'dr14': dr14.min_dr() , 'dB_peak': -100 , 'dB_rms': -100 , 'duration':"0:0" }
+        self.res_list = [empty_res for i in range( len(jobs) )]
+        
+        lock_j = mp.Lock()
+        lock_res_list = mp.Lock()
+        
+        threads = [1 for i in range(thread_cnt)]
+        
+        #job_free = [0]
+        job_free = mp.Value( 'i' , 0 )
+        
+        for t in range( thread_cnt ):
+            print( dir_name )
+            print( len(dir_name ) )
+            threads[t] = mp.Process( target=self.run_mp , args=( dir_name , lock_j , lock_res_list , job_free  ) )
+            
+        for t in range( thread_cnt ):
+            threads[t].start() 
+        
+        for t in range( thread_cnt ):
+            threads[t].join()
+            
+        succ = 0 
+        for d in res_list:
+            if d['dr14'] > dr14.min_dr():
+                self.dr14 = self.dr14 + d['dr14']
+                succ = succ + 1
+                
+    
+    def run_mp( self , dir_name , lock_j , lock_res_list ):
+        
+        at = AudioTrack() 
+        duration = StructDuration()
+        
+        #print_msg("start .... ")
+        
+        while True:
+            
+            #Aquire the next free job
+            lock_j.acquire()
+            
+            if job_free[0] >= len(self.jobs):
+                lock_j.release()
+                return
+            
+            curr_job =  job_free[0]
+            file_name = jobs[curr_job]
+            job_free[0] = job_free[0] + 1
+            
+            lock_j.release()
+            
+            full_file = os.path.join( dir_name , file_name )
+            print ( full_file )
+            
+            if at.open( full_file ):
+                ( dr14, dB_peak, dB_rms ) = compute_dr14( at.Y , at.Fs , duration )
+                lock_res_list.acquire()
+                print_msg( file_name + ": \t DR " + str( int(dr14) ) )
+                res_list[curr_job] = { 'file_name': file_name , 'dr14': dr14 , 'dB_peak': dB_peak , 'dB_rms': dB_rms , 'duration':duration.to_str() }
+                lock_res_list.release()
+            else:
+                print_msg( "- fail - " + full_file )
     
 
 class ScanDirMt(threading.Thread):

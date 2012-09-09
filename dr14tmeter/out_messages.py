@@ -16,12 +16,39 @@
 
 import sys
 import os
+import logging
 
 message_file = sys.stderr
 out_file = sys.stdout
 err_file = sys.stderr
 
+logger = logging.getLogger('dr14log')
+
 mode = "verbose"
+
+
+
+def init_log( lev=logging.DEBUG ):
+    global logger
+        
+    logger = logging.getLogger('dr14log')
+    logger.setLevel( logging.DEBUG )
+    stream_h = logging.StreamHandler()
+    formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+    
+    stream_h.setLevel( lev )
+    stream_h.setFormatter( formatter )
+    
+    logger.addHandler( stream_h )
+    logger.debug("ciao")
+
+def dr14_log_debug( message ):
+    global logger    
+    logger.debug( message )
+
+def dr14_log_info( message ):
+    global logger    
+    logger.info( message )
 
 def print_msg( string ) :
     global message_file
