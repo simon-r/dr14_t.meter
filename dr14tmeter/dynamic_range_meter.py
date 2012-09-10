@@ -192,21 +192,21 @@ class DynamicRangeMeter:
             
         succ = 0
         
-        empty_res = { 'file_name': '' , 'dr14': dr14.min_dr() , 'dB_peak': -100 , 'dB_rms': -100 , 'duration':"0:0" }
-        self.res_list = [empty_res for i in range( len(jobs) )]
+        #empty_res = { 'file_name': '' , 'dr14': dr14.min_dr() , 'dB_peak': -100 , 'dB_rms': -100 , 'duration':"0:0" }
+        self.res_list = [] # [empty_res for i in range( len(jobs) )]
         
-        i = 0
+        #i = 0
         
         dur = StructDuration()
         
         for res in res_array_sh:
-            self.res_list[i] = { 'file_name':   res.file_name ,
+            self.res_list.append( { 'file_name':   res.file_name ,
                                  'dr14':        res.dr14 ,
                                  'dB_peak':     res.dB_peak ,
                                  'dB_rms':      res.dB_rms ,
-                                 'duration':    dur.float_to_str( res.duration ) }
+                                 'duration':    dur.float_to_str( res.duration ) } )
             
-            i = i + 1
+        #    i = i + 1
         
         for d in self.res_list:
             if d['dr14'] > dr14.min_dr():
