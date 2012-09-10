@@ -69,7 +69,7 @@ def compute_dr14( Y , Fs , duration = None , Dr_lr = None ) :
 
     peaks = numpy.sort( peaks , 0 )
     rms = numpy.sort( rms , 0 )
-
+    
     n_blk = int( floor( seg_cnt * cut_best_bins ) )
     if n_blk == 0:
         n_blk = 1

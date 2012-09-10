@@ -15,12 +15,17 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import numpy
+import time
+
 from dr14tmeter.audio_math import *
+from dr14tmeter.out_messages import *
 
 try:
     from scipy.interpolate import interp1d
 except:
     ____foo = None
+
+
 
 
 class DynCompressor:
@@ -54,6 +59,8 @@ class DynCompressor:
 
     def dyn_compressor( self , Y , Fs ):
         
+        time_a = time.time()
+        
         x = numpy.linspace( -1 , 1 , 21 )
         y = self.c_fun( x )
         
@@ -62,6 +69,9 @@ class DynCompressor:
         cY = int_f( Y )
         
         cY = normalize( cY )
+        
+        time_b = time.time()
+        dr14_log_info( "dyn_compressor: Clock: %2.8f" % (time_b - time_a ) )
             
         return cY
     

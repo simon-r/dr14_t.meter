@@ -21,10 +21,12 @@ import logging
 message_file = sys.stderr
 out_file = sys.stdout
 err_file = sys.stderr
+mode = "verbose"
+
 
 logger = logging.getLogger('dr14log')
 
-mode = "verbose"
+
 
 
 
@@ -49,6 +51,8 @@ def dr14_log_debug( message ):
 def dr14_log_info( message ):
     global logger    
     logger.info( message )
+
+########
 
 def print_msg( string ) :
     global message_file

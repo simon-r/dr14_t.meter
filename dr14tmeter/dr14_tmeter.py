@@ -32,14 +32,18 @@ import re
 from dr14tmeter.dr14_utils import *
 from dr14tmeter.out_messages import *
 import logging
+import numpy
 
     
 def main():
         
+    
+    
     options = parse_args()
 
-    init_log( logging.FATAL )
-     
+    init_log( logging.CRITICAL )    
+    numpy.seterr(all='ignore')
+    
     #print( options )
 
     if options.path_name != None:

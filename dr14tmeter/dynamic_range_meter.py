@@ -40,11 +40,12 @@ from dr14tmeter.write_dr import WriteDr, WriteDrExtended
 
 import dr14tmeter.dr14_global as dr14
 
-from dr14tmeter.out_messages import print_msg, print_out
+from dr14tmeter.out_messages import print_msg, print_out, dr14_log_debug
 
-#'file_name': file_name , 'dr14': dr14 , 'dB_peak': dB_peak , 'dB_rms': dB_rms , 'duration':duration.to_str()
+
 class SharedDrResObj(Structure):
     _fields_ = [('file_name', c_wchar_p), ('dr14', c_double) , ('dB_peak' , c_double) , ( 'dB_rms' , c_double ) , ( 'duration' , c_double ) ]
+
 
 class DynamicRangeMeter:   
     
@@ -109,62 +110,7 @@ class DynamicRangeMeter:
         
         print_msg( file_name + ": \t DR " + str( int(dr14) ) )
   
-                
-    
-    #def scan_mt( self , dir_name="" , thread_cnt=2 , files_list=[] ):
-    #    
-    #    self.dr14 = 0
-    #    
-    #    if files_list == [] :
-    #        if not os.path.isdir(dir_name) :
-    #            return 0
-    #        dir_list = sorted( os.listdir( dir_name ) )
-    #        self.dir_name = dir_name
-    #        files_list = None
-    #    else:
-    #        dir_list = sorted( files_list )
-    #        
-    #    ad = AudioDecoder()
-    #    
-    #    jobs = []
-    #    for file_name in dir_list:
-    #        ( fn , ext ) = os.path.splitext( file_name )
-    #        if ext in ad.formats:
-    #            jobs.append( file_name )
-    #    
-    #    empty_res = { 'file_name': '' , 'dr14': dr14.min_dr() , 'dB_peak': -100 , 'dB_rms': -100 , 'duration':"0:0" }
-    #    self.res_list = [empty_res for i in range( len(jobs) )]
-    #    
-    #    lock_j = threading.Lock()
-    #    lock_res_list = threading.Lock()
-    #    
-    #    threads = [1 for i in range(thread_cnt)]
-    #    job_free = [0]
-    #    
-    #    for t in range( thread_cnt ):
-    #        threads[t] = ScanDirMt( dir_name, jobs , job_free , lock_j , self.res_list , lock_res_list )
-    #        
-    #    for t in range( thread_cnt ):
-    #        threads[t].start() 
-    #    
-    #    for t in range( thread_cnt ):
-    #        threads[t].join()
-    #        
-    #    succ = 0 
-    #    for d in self.res_list:
-    #        if d['dr14'] > dr14.min_dr():
-    #            self.dr14 = self.dr14 + d['dr14']
-    #            succ = succ + 1 
-            
-         
-        ##print_msg( str(self.res_list ) )
-        #self.meta_data.scan_dir( dir_name , files_list )
-        #if len( self.res_list ) > 0 and succ > 0 :
-        #    self.dr14 = int( round( self.dr14 / succ ) )
-        #    return succ
-        #else:
-        #    return 0
-        
+
 
     def fwrite_dr( self , file_name , tm , ext_table=False , std_out=False , append=False , dr_database=True ):
         
@@ -198,6 +144,9 @@ class DynamicRangeMeter:
 
     def scan_mp( self , dir_name="" , thread_cnt=2 , files_list=[] ):
         
+        if sys.version_info[0] == 2 :
+            dir_name = dir_name.decode('utf-8')
+        
         self.dr14 = 0
                 
         if files_list == [] :
@@ -216,7 +165,6 @@ class DynamicRangeMeter:
             ( fn , ext ) = os.path.splitext( file_name )
             if ext in ad.formats:
                 jobs.append( file_name )
-        
         
         
         res_array=[SharedDrResObj() for i in range( len(jobs) )]
@@ -252,11 +200,11 @@ class DynamicRangeMeter:
         dur = StructDuration()
         
         for res in res_array_sh:
-            self.res_list[i] = { 'file_name': res_array_sh[i].file_name ,
-                                       'dr14': res_array_sh[i].dr14 ,
-                                       'dB_peak': res_array_sh[i].dB_peak ,
-                                       'dB_rms': res_array_sh[i].dB_rms ,
-                                       'duration': dur.float_to_str( res_array_sh[i].duration ) }
+            self.res_list[i] = { 'file_name':   res.file_name ,
+                                 'dr14':        res.dr14 ,
+                                 'dB_peak':     res.dB_peak ,
+                                 'dB_rms':      res.dB_rms ,
+                                 'duration':    dur.float_to_str( res.duration ) }
             
             i = i + 1
         
@@ -315,47 +263,5 @@ class DynamicRangeMeter:
                 print_msg( "- fail - " + full_file )
     
 
-#class ScanDirMt(threading.Thread):
-#    def __init__( self ,dir_name , jobs , job_free , lock_j , res_list , lock_res_list ):
-#        threading.Thread.__init__(self)
-#        self.dir_name = dir_name
-#        self.jobs = jobs
-#        self.jobs_free = job_free
-#        self.lock_j = lock_j
-#        self.res_list = res_list
-#        self.lock_res_list = lock_res_list
-#        
-#    def run(self):
-#       
-#        at = AudioTrack() 
-#        duration = StructDuration()
-#        
-#        #print_msg("start .... ")
-#        
-#        while True:
-#            
-#            #Aquire the next free job
-#            self.lock_j.acquire()
-#            
-#            if self.jobs_free[0] >= len(self.jobs):
-#                self.lock_j.release()
-#                return
-#            
-#            curr_job =  self.jobs_free[0]
-#            file_name = self.jobs[curr_job]
-#            self.jobs_free[0] = self.jobs_free[0] + 1
-#            
-#            self.lock_j.release()
-#            
-#            full_file = os.path.join( self.dir_name , file_name ) 
-#            
-#            if at.open( full_file ):
-#                ( dr14, dB_peak, dB_rms ) = compute_dr14( at.Y , at.Fs , duration )
-#                self.lock_res_list.acquire()
-#                print_msg( file_name + ": \t DR " + str( int(dr14) ) )
-#                self.res_list[curr_job] = { 'file_name': file_name , 'dr14': dr14 , 'dB_peak': dB_peak , 'dB_rms': dB_rms , 'duration':duration.to_str() }
-#                self.lock_res_list.release()
-#            else:
-#                print_msg( "- fail - " + full_file )
-   
+
    
