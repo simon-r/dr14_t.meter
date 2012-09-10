@@ -128,7 +128,7 @@ class WriteDrExtended( WriteDr ) :
         txt = tm.new_tbody( txt )
         
         txt = tm.append_separator_line( txt )
-        txt = tm.append_row( txt , [ "DR", "Peak", "RMS", "Duration" , "Title" ] , 'h' )
+        txt = tm.append_row( txt , [ "DR", "Peak", "RMS", "Duration" , "Title [codec]" ] , 'h' )
         txt = tm.append_separator_line( txt )
         
         list_bit = []
