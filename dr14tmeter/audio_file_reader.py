@@ -22,7 +22,7 @@ import subprocess
 import re
 import wave
 import numpy
-from dr14tmeter.out_messages import print_msg 
+from dr14tmeter.out_messages import print_msg, dr14_log_info
 
 
 class AudioFileReader:
@@ -61,6 +61,8 @@ class AudioFileReader:
   
 
     def read_audio_file_new( self , file_name , target ):
+        
+        time_a = time.time()
                 
         full_command = self.__cmd
         
@@ -85,11 +87,16 @@ class AudioFileReader:
             os.remove( tmp_file )
         else:
             print_msg( file_name + ": unsupported encoder" )
-                
+             
+        time_b = time.time()
+        dr14_log_info( "AudioFileReader.read_audio_file_new: Clock: %2.8f" % (time_b - time_a ) )
+        
         return ret_f 
 
 
     def read_wav( self , file_name , target ):
+    
+        time_a = time.time()
     
         convert_8_bit = float(2**15)
         convert_16_bit = float(2**15)
@@ -125,6 +132,9 @@ class AudioFileReader:
             print_msg (  "\n - ERROR ! " )
             return False
      
+        time_b = time.time()
+        dr14_log_info( "AudioFileReader.read_wav: Clock: %2.8f" % (time_b - time_a ) )
+        
         return True
     
     def get_generic_ffmpeg_options( self , file_name , tmp_file ):

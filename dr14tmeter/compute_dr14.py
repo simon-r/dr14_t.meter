@@ -54,18 +54,24 @@ def compute_dr14( Y , Fs , duration = None , Dr_lr = None ) :
     rms = zeros((seg_cnt,ch))
     peaks = zeros((seg_cnt,ch))
     
+    #r = numpy.arange(curr_sam,curr_sam+block_samples)
+    
     for i in range(seg_cnt - 1):
-        r = numpy.arange(curr_sam,curr_sam+block_samples)
-        rms[i,:] = dr_rms( Y[r,:] )
-        peaks[i,:] = numpy.max( numpy.abs( Y[r,:] ) , 0 )
+        #r = numpy.arange(curr_sam,curr_sam+block_samples) # original !!!!
+        rms[i,:] = numpy.sqrt( 2.0 * numpy.sum( Y[curr_sam:curr_sam+block_samples,:]**2.0 , 0 ) / float(block_samples) ) 
+        #rms[i,:] = dr_rms( Y[r,:] ) ## original !!!!!
+        peaks[i,:] = numpy.max( numpy.abs( Y[curr_sam:curr_sam+block_samples,:] ) , 0 )
+        #peaks[i,:] = numpy.max( numpy.abs( Y[r,:] ) , 0 ) # Original 
         curr_sam = curr_sam + block_samples
+        #r[:] = r[:] + block_samples
 
     i = seg_cnt - 1 ;
-    r = numpy.arange( curr_sam , s[0] )
+    #r = numpy.arange( curr_sam , s[0] )
 
-    if r.shape[0] > 0:
-        rms[i,:] = dr_rms( Y[r,:] )
-        peaks[i,:] = numpy.max( numpy.abs( Y[r,:] ) , 0 )
+    #if r.shape[0] > 0:
+    if curr_sam < s[0]:
+        rms[i,:] = dr_rms( Y[curr_sam:s[0]-1,:] )
+        peaks[i,:] = numpy.max( numpy.abs( Y[curr_sam:s[0]-1,:] ) , 0 )
 
     peaks = numpy.sort( peaks , 0 )
     rms = numpy.sort( rms , 0 )
