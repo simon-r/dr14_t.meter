@@ -171,6 +171,7 @@ class DynamicRangeMeter:
         
         for i in range( len(jobs) ) :
             res_array[i].file_name = jobs[i]
+            res_array[i].dr14 = dr14.min_dr()
         
         lock_j = mp.Lock()
         lock_res_list = mp.Lock()

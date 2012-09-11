@@ -132,12 +132,15 @@ class WriteDrExtended( WriteDr ) :
         txt = tm.append_separator_line( txt )
         
         list_bit = []
+        
         sum_kbs = 0
+        cnt = 0
+        
         sampl_rate = []
         
         d_nr = 0 ;        
         
-        cnt = 0
+        
         for i in range( len( drm.res_list ) ) :
             
             if drm.res_list[i]['dr14'] > dr14.min_dr() :
@@ -197,7 +200,8 @@ class WriteDrExtended( WriteDr ) :
         if cnt > 0:
             txt = tm.add_title( txt , " Average bitrate: \t\t %dkbs " % ( sum_kbs / cnt )  )
         
-        txt = tm.add_title( txt , " Bits per sample: \t\t %s bit" % list_bit[0] )
+        mf_bit = max( set( list_bit ) , key=list_bit.count )
+        txt = tm.add_title( txt , " Bits per sample: \t\t %s bit" % ( mf_bit ) )
         
         txt = tm.append_empty_line( txt )
         txt = tm.add_title( txt , "Dr14 T.meter %s " % dr14.dr14_version() )
