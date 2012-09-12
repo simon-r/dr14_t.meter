@@ -54,7 +54,7 @@ def scan_files_list( input_file , options , out_dir ):
         
     dr = DynamicRangeMeter()
     
-    r = dr.scan_mt( files_list=files_list , thread_cnt=get_thread_cnt() )
+    r = dr.scan_mp( files_list=files_list , thread_cnt=get_thread_cnt() )
     
     if r == 0:
         success = False
