@@ -98,9 +98,9 @@ class AudioFileReader:
     
         time_a = time.time()
     
-        convert_8_bit = float(2**15)
-        convert_16_bit = float(2**15)
-        convert_32_bit = float(2**31)
+        convert_8_bit =  numpy.float32( 2**8 + 1.0 )
+        convert_16_bit = numpy.float32( 2**15 + 1.0 )
+        convert_32_bit = numpy.float32( 2**31 + 1.0 )
                 
         try:
             wave_read = wave.open( file_name , 'r' )
@@ -116,16 +116,17 @@ class AudioFileReader:
             sample_type = "int%d" % ( target.sample_width * 8 )
         
             target.Y = numpy.fromstring(X, dtype=sample_type ).reshape( nframes , target.channels )
-        
+            
             wave_read.close()
-    
+
             if sample_type == 'int16':
-                target.Y = target.Y / (convert_16_bit + 1.0)
+                target.Y = target.Y / ( convert_16_bit )
             elif sample_type == 'int32':
-                target.Y = target.Y / (convert_32_bit + 1.0)
+                target.Y = target.Y / ( convert_32_bit )
             else :
-                target.Y = target.Y / (convert_8_bit + 1.0)
+                target.Y = target.Y / ( convert_8_bit )
                 
+            #print_msg( "target.Y: " + str(target.Y.dtype) )
         except:
             self.__init__()
             print_msg ( "Unexpected error: %s" % str( sys.exc_info() ) )

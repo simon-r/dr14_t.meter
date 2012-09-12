@@ -41,7 +41,7 @@ def main():
     
     options = parse_args()
 
-    init_log( logging.INFO )    
+    init_log( logging.FATAL )    
     numpy.seterr(all='ignore')
     
     #print( options )
