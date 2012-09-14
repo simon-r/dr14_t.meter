@@ -45,8 +45,8 @@ def compute_hist ( Y , Fs , duration=None , bins=100 , block_duration = 0.2 , pl
     #peaks = zeros((seg_cnt,ch))
     
     for i in range( seg_cnt - 1 ):
-        r = arange( curr_sam , curr_sam + saples_per_block )
-        rms[i,:] = u_rms( Y[r,:] )
+        #r = arange( curr_sam , curr_sam + saples_per_block )
+        rms[i,:] = u_rms( Y[curr_sam : curr_sam + saples_per_block , : ] )
         curr_sam = curr_sam + saples_per_block
        
     i = seg_cnt - 1 ;

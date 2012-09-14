@@ -68,7 +68,7 @@ class DynCompressor:
            
         cY = int_f( Y )
         
-        cY = normalize( cY )
+        cY[:] = normalize( cY )
         
         time_b = time.time()
         dr14_log_info( "dyn_compressor: Clock: %2.8f" % (time_b - time_a ) )

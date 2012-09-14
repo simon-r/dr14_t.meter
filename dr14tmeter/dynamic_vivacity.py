@@ -16,7 +16,10 @@
 
 import numpy
 from dr14tmeter.audio_math import *
+from dr14tmeter.out_messages import *
+
 import math
+import time
 
 try:
     import matplotlib.pyplot as pyplot
@@ -27,6 +30,8 @@ except:
 
 
 def dynamic_vivacity( Y , Fs , Plot=True ):
+    
+    time_a = time.time()
         
     s = Y.shape
     
@@ -46,9 +51,9 @@ def dynamic_vivacity( Y , Fs , Plot=True ):
     
     curr_sample = 0 
     for i in range( seg_cnt - 1 ):
-        r = numpy.arange( curr_sample , curr_sample + samples_per_block )
-        rms = u_rms( Y[r,:] )
-        mx = numpy.max( Y[r,:] , 0 )
+        #r = numpy.arange( curr_sample , curr_sample + samples_per_block )
+        rms = u_rms( Y[curr_sample : curr_sample + samples_per_block , : ] )
+        mx = numpy.max( Y[ curr_sample : curr_sample + samples_per_block  ,:] , 0 )
         seg_dyn[i,:] = decibel_u( mx , rms )
         iz = ( rms < audio_min() )
         seg_dyn[i,iz] = 0.0
@@ -81,6 +86,9 @@ def dynamic_vivacity( Y , Fs , Plot=True ):
     
     tot_t = s[0]*1.0/Fs 
     
+    time_b = time.time()
+    dr14_log_info( "dynamic_vivacity: Clock: %2.8f" % (time_b - time_a ) )
+    
     if Plot :
         for j in range( ch ):
             
@@ -111,5 +119,7 @@ def dynamic_vivacity( Y , Fs , Plot=True ):
             
         
         pyplot.show()
+
+
     
     return ( mean , std , seg_dyn )
