@@ -59,13 +59,13 @@ class Table:
         return self.append_row( txt , [ "", "", "", "", "" ] )
 
     def add_title( self , txt , title ):
-        pass
+        NotImplementedError(" %s : is virutal and must be overridden." % sys._getframe().f_code.co_name )
     
     def new_table( self , txt ):
-        pass
+        NotImplementedError(" %s : is virutal and must be overridden." % sys._getframe().f_code.co_name )
     
     def end_table( self , txt ):
-        pass
+        NotImplementedError(" %s : is virutal and must be overridden." % sys._getframe().f_code.co_name )
     
     def new_head( self , txt ):
         return txt
@@ -86,16 +86,16 @@ class Table:
         return txt
     
     def new_row( self , txt ):
-        pass
+        NotImplementedError(" %s : is virutal and must be overridden." % sys._getframe().f_code.co_name )
     
     def end_row( self , txt ):
-        pass
+        NotImplementedError(" %s : is virutal and must be overridden." % sys._getframe().f_code.co_name )
     
     def new_cell( self , txt ):
-        pass
+        NotImplementedError(" %s : is virutal and must be overridden." % sys._getframe().f_code.co_name )
     
     def end_cell( self , txt ):
-        pass
+        NotImplementedError(" %s : is virutal and must be overridden." % sys._getframe().f_code.co_name )
     
     def new_hcell( self , txt ):
         return self.new_cell( txt )
@@ -104,10 +104,10 @@ class Table:
         return self.end_cell( txt )
     
     def new_bold( self , txt ):
-        pass
+        NotImplementedError(" %s : is virutal and must be overridden." % sys._getframe().f_code.co_name )
     
     def end_bold( self , txt ):
-        pass
+        NotImplementedError(" %s : is virutal and must be overridden." % sys._getframe().f_code.co_name )
     
     
     

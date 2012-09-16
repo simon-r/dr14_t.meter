@@ -30,6 +30,15 @@ try:
 except:
     ____foo = None
 
+def f_utime( t ) :
+    v = 0.5
+    a = 1/200
+    xl = 200
+    if t > xl :
+        return a*t + (v-a*xl)
+    else:
+        return v
+    
 
 def plot_track( Y , Fs , Plot=True , time_range=None , utime = 0 ):
     
@@ -42,8 +51,10 @@ def plot_track( Y , Fs , Plot=True , time_range=None , utime = 0 ):
     else :
         ch = 1
     
+    ttime = (s[0] * 1/Fs)
     if utime == 0 :
-        utime = (s[0] * 1/Fs) / 700
+        d = ttime / f_utime(ttime) ;
+        utime = ttime / d
         print( utime )
     
     Fs = int(Fs * utime)
