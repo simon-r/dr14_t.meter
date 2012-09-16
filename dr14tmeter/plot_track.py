@@ -17,6 +17,7 @@
 import numpy as np
 from dr14tmeter.audio_math import *
 from dr14tmeter.out_messages import *
+from dr14tmeter.my_time_formatter import *
 
 import math
 import time
@@ -30,7 +31,7 @@ except:
     ____foo = None
 
 
-def plot_track( Y , Fs , Plot=True , time_range=None ):
+def plot_track( Y , Fs , Plot=True , time_range=None , utime = 0 ):
     
     time_a = time.time()
         
@@ -41,18 +42,19 @@ def plot_track( Y , Fs , Plot=True , time_range=None ):
     else :
         ch = 1
     
-    Fs = Fs / 1
+    if utime == 0 :
+        utime = (s[0] * 1/Fs) / 700
+        print( utime )
+    
+    Fs = int(Fs * utime)
     
     sec = floor( s[0] / Fs ) + 1   
     sz = Fs * ( sec + 1 )
     tm = floor( np.arange(sz) / Fs )
     
-    #dts = map(datetime.datetime.fromtimestamp, tm)
-    #fds = dates.date2num(dts)
-    
     hfmt = dates.DateFormatter('%M:%S')
     
-    Yc = np.zeros( sz )
+    Yc = np.zeros( sz , dtype=np.float32 )
     
     for i in range(ch):
         
@@ -61,13 +63,13 @@ def plot_track( Y , Fs , Plot=True , time_range=None ):
         Yc[:] = 0.0
         Yc[0:s[0]] = Y[:,1]
         
-        H, xedges, yedges = np.histogram2d( tm , Yc , bins=( sec , 500 ))
+        (H, xedges, yedges) = np.histogram2d( tm , Yc , bins=( sec , 500 ))
         
         mh = np.max( H , 1 )
         H = (H.T * (1/mh))
                 
-        #ax.xaxis_date()
-        #ax.xaxis.set_major_formatter(hfmt)
+        ax.xaxis.set_major_formatter( MyTimeFormatter( utime ) )
+        pyplot.xticks(rotation=25)
         
         extent = [xedges[0], xedges[-1], yedges[-1], yedges[0]]
         pyplot.imshow(H, extent=extent, interpolation='nearest',aspect='auto' , cmap="hot" )
