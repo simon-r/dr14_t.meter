@@ -20,8 +20,6 @@ import math
 import numpy
 
 
-
-
 def dr_rms( y ) :
     n = y.shape
     return numpy.sqrt( 2.0 * numpy.sum( y**2.0 , 0 ) / float(n[0]) )

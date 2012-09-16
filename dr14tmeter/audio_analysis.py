@@ -35,6 +35,7 @@ from dr14tmeter.audio_decoder import AudioDecoder
 from dr14tmeter.duration import StructDuration
 from dr14tmeter.write_dr import WriteDr, WriteDrExtended
 from dr14tmeter.dynamic_vivacity import dynamic_vivacity
+from dr14tmeter.plot_track import *
 
 import dr14tmeter.dr14_global as dr14
 
@@ -131,8 +132,20 @@ class AudioSpectrogram( AudioAnalysis ):
         print_msg( "Track Title: %s " % title )
         
         at = self.getAudioTrack()
+        
         spectrogram( at.Y , at.Fs )
     
+
+class AudioPlotTrack( AudioAnalysis ):
+    
+    def virt_compute(self):
+        
+        (foo,fn) = os.path.split( self.getFileName() )
+        title = self.getMetaData().get_value( fn , "title" )
+        print_msg( "Track Title: %s " % title )
+        
+        at = self.getAudioTrack()
+        plot_track( at.Y , at.Fs )
 
 
 class AudioCompressor( AudioAnalysis ):
