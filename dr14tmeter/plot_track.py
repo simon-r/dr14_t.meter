@@ -20,10 +20,12 @@ from dr14tmeter.out_messages import *
 
 import math
 import time
+import datetime
 
 try:
     import matplotlib.pyplot as pyplot
     import matplotlib.mlab as mlab
+    from matplotlib import dates
 except:
     ____foo = None
 
@@ -41,30 +43,41 @@ def plot_track( Y , Fs , Plot=True , time_range=None ):
     
     Fs = Fs / 1
     
-    sec = ceil( s[0] / Fs ) + 1   
-    sz = Fs * ( ceil( s[0] / Fs ) + 1 )
+    sec = floor( s[0] / Fs ) + 1   
+    sz = Fs * ( sec + 1 )
     tm = floor( np.arange(sz) / Fs )
+    
+    #dts = map(datetime.datetime.fromtimestamp, tm)
+    #fds = dates.date2num(dts)
+    
+    hfmt = dates.DateFormatter('%M:%S')
     
     Yc = np.zeros( sz )
     
     for i in range(ch):
         
-        pyplot.subplot( 210+i+1 )
-        
+        ax = pyplot.subplot( 210+i+1 )
+               
         Yc[:] = 0.0
-        print(Yc.shape)
         Yc[0:s[0]] = Y[:,1]
         
         H, xedges, yedges = np.histogram2d( tm , Yc , bins=( sec , 500 ))
         
         mh = np.max( H , 1 )
         H = (H.T * (1/mh))
+                
+        #ax.xaxis_date()
+        #ax.xaxis.set_major_formatter(hfmt)
         
         extent = [xedges[0], xedges[-1], yedges[-1], yedges[0]]
         pyplot.imshow(H, extent=extent, interpolation='nearest',aspect='auto' , cmap="hot" )
+
+        
     
     pyplot.show()        
     
     
     time_b = time.time()
-    dr14_log_info( "dynamic_vivacity: Clock: %2.8f" % (time_b - time_a ) )
+    dr14_log_info( "plot_track: Clock: %2.8f" % (time_b - time_a ) )
+    
+    

@@ -95,6 +95,11 @@ def parse_args():
         dest="spectrogram" ,
         help="Plot the spectrogram of a single file and exit (beta)" )
     
+    parser.add_argument( "--plot_track" ,
+        action="store_true",
+        dest="plot_track" ,
+        help="Plot the track of the given file and exit" )
+    
     parser.add_argument( "--compress" ,
         action="store" ,
         choices=[ "very_soft" , "v" , "soft" , "s" , "medium" , "m" , "hard" , "h" , "very_hard" , "vh" ] ,

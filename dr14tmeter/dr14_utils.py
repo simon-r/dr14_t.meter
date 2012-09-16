@@ -207,6 +207,16 @@ def run_analysis_opt( options , path_name ):
         spectr.compute_track( path_name )
         flag = True
 
+    if options.plot_track:
+        
+        if test_hist_modules() == False:
+            sys.exit(1)
+        
+        print_msg("Start spectrogram:")
+        spectr = AudioPlotTrack()
+        spectr.compute_track( path_name )
+        flag = True
+
     if options.histogram:
         
         if test_hist_modules() == False:
