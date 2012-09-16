@@ -22,12 +22,22 @@ import math
 import time
 
 try:
+    import matplotlib 
     import matplotlib.pyplot as pyplot
     import matplotlib.mlab as mlab
 except:
     ____foo = None
 
 
+class MyTimeFormatter( matplotlib.ticker.Formatter ):
+    def __call__( self , x , pos=None ):
+        minu = int( x / 60 ) ;
+        sec = int( x - minu*60 )
+        return "%02d:%02s" % ( minu , sec )
+    
+    
+
+    
 
 def dynamic_vivacity( Y , Fs , Plot=True ):
     
@@ -92,7 +102,7 @@ def dynamic_vivacity( Y , Fs , Plot=True ):
     if Plot :
         for j in range( ch ):
             
-            pyplot.subplot( 210+j+1 )
+            ax = pyplot.subplot( 210+j+1 )
             pyplot.plot( t.T , seg_dyn[:,j] , linewidth=2 , color = "b" )
             pyplot.grid(True)
             
@@ -100,6 +110,9 @@ def dynamic_vivacity( Y , Fs , Plot=True ):
             mean_y = numpy.array( [ mean[j] , mean[j] ] )
             
             pyplot.plot( time_x , mean_y , linewidth=2 , color="g" )
+            
+            ax.xaxis.set_major_formatter( MyTimeFormatter() )
+            pyplot.xticks(rotation=25)
             
             std_a_y = numpy.array( [ mean[j] , mean[j] ] + std[j] )
             std_b_y = numpy.array( [ mean[j] , mean[j] ] - std[j] )
@@ -112,7 +125,7 @@ def dynamic_vivacity( Y , Fs , Plot=True ):
             text_rel_pos = 0.2
             pyplot.text( tot_t * 0.1 , max_db* text_rel_pos       , "mean:     %.3f dB"%mean[j] , fontsize=12)
             pyplot.text( tot_t * 0.1 , max_db*(text_rel_pos-0.07) , "std dev:  %.3f dB"%std[j] , fontsize=12)
-            
+                        
             pyplot.title( "Channel %d" % (j+1) )
             pyplot.xlabel('Time [sec]')
             pyplot.ylabel('Dynamic. [dB]')
