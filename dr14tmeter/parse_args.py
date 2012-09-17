@@ -99,7 +99,12 @@ def parse_args():
         action="store_true",
         dest="plot_track" ,
         help="Plot the track of the given file and exit" )
-    
+
+    parser.add_argument( "--plot_track_dst" ,
+        action="store_true",
+        dest="plot_track_dst" ,
+        help="Plot the track of the given file and exit" )
+
     parser.add_argument( "--compress" ,
         action="store" ,
         choices=[ "very_soft" , "v" , "soft" , "s" , "medium" , "m" , "hard" , "h" , "very_hard" , "vh" ] ,

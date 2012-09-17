@@ -55,7 +55,7 @@ def plot_track( Y , Fs , Plot=True , time_range=None , utime = 0 ):
     if utime == 0 :
         d = ttime / f_utime(ttime) ;
         utime = ttime / d
-        print( utime )
+        #print( utime )
     
     Fs = int(Fs * utime)
     

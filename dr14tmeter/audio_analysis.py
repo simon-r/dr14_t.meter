@@ -36,6 +36,7 @@ from dr14tmeter.duration import StructDuration
 from dr14tmeter.write_dr import WriteDr, WriteDrExtended
 from dr14tmeter.dynamic_vivacity import dynamic_vivacity
 from dr14tmeter.plot_track import *
+from dr14tmeter.plot_track_classic import *
 
 import dr14tmeter.dr14_global as dr14
 
@@ -137,6 +138,19 @@ class AudioSpectrogram( AudioAnalysis ):
     
 
 class AudioPlotTrack( AudioAnalysis ):
+    
+    def virt_compute(self):
+        
+        (foo,fn) = os.path.split( self.getFileName() )
+        title = self.getMetaData().get_value( fn , "title" )
+        print_msg( "Track Title: %s " % title )
+        
+        at = self.getAudioTrack()
+        plot_track_classic( at.Y , at.Fs )
+
+
+
+class AudioPlotTrackDistribution( AudioAnalysis ):
     
     def virt_compute(self):
         
