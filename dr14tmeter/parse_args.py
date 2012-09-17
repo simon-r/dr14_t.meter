@@ -103,7 +103,7 @@ def parse_args():
     parser.add_argument( "--plot_track_dst" ,
         action="store_true",
         dest="plot_track_dst" ,
-        help="Plot the track of the given file and exit" )
+        help="Plot the track in a cool manner of the given file and exit" )
 
     parser.add_argument( "--compress" ,
         action="store" ,
