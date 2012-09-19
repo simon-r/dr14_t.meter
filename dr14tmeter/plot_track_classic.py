@@ -32,7 +32,7 @@ except:
 
     
 
-def plot_track_classic( Y , Fs , Plot=True , time_range=None , utime = 0.02 , title=None ):
+def plot_track_classic( Y , Fs , Plot=True , time_range=None , utime=0.02 , title=None , time_lim=4 , start_time=0.0):
     
     time_a = time.time()
         
@@ -53,23 +53,29 @@ def plot_track_classic( Y , Fs , Plot=True , time_range=None , utime = 0.02 , ti
     mp = zeros( ( sz , ch ) )
     mn = zeros( ( sz , ch ) )
     
-    curr_sample = 0 
-    for i in range( sz ):
-        mp[i,:] = np.max( Y[curr_sample:curr_sample+samples_block,:] , 0 )
-        mn[i,:] = np.min( Y[curr_sample:curr_sample+samples_block,:] , 0 )
-        curr_sample = curr_sample + samples_block
+    curr_sample = 0
     
-    t = np.arange( 0 , sz ) * block_len
+    if s[0] > time_lim*Fs:
+        t = start_time + np.arange( 0 , sz ) * block_len
+        for i in range( sz ):
+            mp[i,:] = np.max( Y[curr_sample:curr_sample+samples_block,:] , 0 )
+            mn[i,:] = np.min( Y[curr_sample:curr_sample+samples_block,:] , 0 )
+            curr_sample = curr_sample + samples_block
+    else:
+        t = start_time + np.arange( s[0] ) * 1/Fs
     
+        
     for j in range( ch ):
         ax = pyplot.subplot( 210+j+1 )
         
-        ax.fill(t,  mp[:,j], 'b', t,  mn[:,j], 'b')
+        if s[0] > time_lim*Fs:   
+            ax.fill(t,  mp[:,j], 'b', t,  mn[:,j], 'b')
+        else:
+            ax.plot(t, Y[:,j] , 'b' )
         
         pyplot.axis( [ 0 , tot_t , -1 , 1 ] )
         
         ax.xaxis.set_major_formatter( MyTimeFormatter() )
-        #pyplot.xticks(rotation=10)
         
         pyplot.grid(1)
         
