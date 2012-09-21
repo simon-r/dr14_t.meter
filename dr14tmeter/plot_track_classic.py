@@ -1,5 +1,5 @@
 # dr14_t.meter: compute the DR14 value of the given audiofiles
-# Copyright (C) 2011  Simone Riva
+# Copyright (C) 2012  Simone Riva
 # 
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -27,8 +27,13 @@ try:
     import matplotlib.pyplot as pyplot
     import matplotlib.mlab as mlab
     from matplotlib import dates
+    from matplotlib.widgets import  *
 except:
     ____foo = None
+
+  
+def onselect(vmin, vmax):
+    print("On select!!!! %f , %f " % (vmin , vmax) )  
 
     
 class PltTrackStruct:
@@ -37,6 +42,7 @@ class PltTrackStruct:
         self.t = t
         self.start_time = 0 
         self.end_time = 0
+        
         if plot_mode == 'fill' :
             self.mp = zeros( ( sz , ch ) )
             self.mn = zeros( ( sz , ch ) )
@@ -46,31 +52,40 @@ class PltTrackStruct:
             
         self.Y = []
         self.plot_mode = plot_mode # or "curve"
+        self.ax = None
+        self.rebuild = False
 
 
-def plot_track_str( plot_str , ax=None ):
-    for j in range( plot_str.ch ):
-        ax = pyplot.subplot( 210+j+1 )
+    def plot( self ):
         
-        if plot_str.plot_mode == 'fill' :
-            ax.fill( plot_str.t ,  plot_str.mp[:,j], 'b', plot_str.t ,  plot_str.mn[:,j], 'b')
-        else:
-            ax.plot( plot_str.t , plot_str.Y[:,j] , 'b' )
+        new_flag = False
         
-        pyplot.axis( [ plot_str.start_time , plot_str.end_time , -1.0 , 1.0 ] )
+        if self.ax == None :
+            self.ax = []
+            new_flag = True
         
-        ax.xaxis.set_major_formatter( MyTimeFormatter() )
-        
-        pyplot.grid(1)
-        
-        pyplot.title( "Channel %d" % (j+1) )
-        pyplot.xlabel('Time [min:sec]')
-        pyplot.ylabel('Amplitude')
-        
-    pyplot.show()
+        for j in range( self.ch ):
+            self.ax.append( pyplot.subplot( 210+j+1 ) )
+            
+            if self.plot_mode == 'fill' :
+                self.ax[j].fill( self.t ,  self.mp[:,j], 'b', self.t ,  self.mn[:,j], 'b')
+            else:
+                self.ax[j].plot( self.t , self.Y[:,j] , 'b' )
+            
+            pyplot.axis( [ self.start_time , self.end_time , -1.0 , 1.0 ] )
+            
+            self.ax[j].xaxis.set_major_formatter( MyTimeFormatter() )
+            
+            self.ax[j].grid(1)
+            
+            pyplot.title( "Channel %d" % (j+1) )
+            pyplot.xlabel('Time [min:sec]')
+            pyplot.ylabel('Amplitude')
+            
+        pyplot.show()
     
 
-def plot_track_classic( Y , Fs , Plot=True , time_range=None , utime=0.02 , title=None , time_lim=4 , start_time=0.0 , end_time=-1.0 ):
+def plot_track_classic( Y , Fs , Plot=True , plot_str=None , utime=0.02 , title=None , time_lim=4 , start_time=0.0 , end_time = -1.0 ):
     
     time_a = time.time()
         
@@ -80,9 +95,10 @@ def plot_track_classic( Y , Fs , Plot=True , time_range=None , utime=0.02 , titl
         ch = s[1]
     else :
         ch = 1
+    
+    if plot_str == None :    
+        plot_str = PltTrackStruct( ch=ch )
         
-    plot_str = PltTrackStruct( ch=ch )
- 
     sz_section = s[0]
     first_sample = 0
     
@@ -119,7 +135,7 @@ def plot_track_classic( Y , Fs , Plot=True , time_range=None , utime=0.02 , titl
     
         
     if Plot :
-        plot_track_str( plot_str )
+        plot_str.plot()
         
     return plot_str
     
