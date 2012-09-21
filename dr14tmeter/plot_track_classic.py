@@ -33,11 +33,14 @@ except:
 
   
 def onselect(vmin, vmax):
-    print("On select!!!! %f , %f " % (vmin , vmax) )  
-
+    print("On select!!!! %f , %f " % (vmin , vmax) )
+    plot_track_classic( onselect.plot_str.Y , onselect.plot_str.Fs , Plot=False , plot_str=onselect.plot_str , start_time=vmin , end_time=vmax )
+    onselect.plot_str.plot()
     
+
+
 class PltTrackStruct:
-    def __init__( self , plot_mode='fill' , t = [] , sz=0 , ch=0 ):
+    def __init__( self , plot_mode='fill' , t = [] , Y = [] , Fs=44100 , sz=0 , ch=0 ):
         self.ch = ch
         self.t = t
         self.start_time = 0 
@@ -50,10 +53,14 @@ class PltTrackStruct:
             self.mp = []
             self.mn = []
             
-        self.Y = []
+        self.Y = Y
+        self.Fs = Fs
         self.plot_mode = plot_mode # or "curve"
         self.ax = None
         self.rebuild = False
+        self.first_sample = 0
+        self.sz_section = 0
+        self.lines = []
 
 
     def plot( self ):
@@ -61,16 +68,28 @@ class PltTrackStruct:
         new_flag = False
         
         if self.ax == None :
-            self.ax = []
+            self.ax = [i for i in range(self.ch)]
+            self.lines = [i for i in range(self.ch)]
+            self.span = []
             new_flag = True
-        
+            onselect.plot_str = self
+            
         for j in range( self.ch ):
-            self.ax.append( pyplot.subplot( 210+j+1 ) )
+            
+            #if new_flag :
+            self.ax[j] = pyplot.subplot( 210+j+1 )
+            
+            if type( self.lines[j] ) is matplotlib.collections.PolyCollection :
+                self.lines[j].remove()
+            else:
+                while ( not new_flag ) and len( self.lines[j] ) > 0:
+                    l = self.lines[j].pop(0)
+                    l.remove()
             
             if self.plot_mode == 'fill' :
-                self.ax[j].fill( self.t ,  self.mp[:,j], 'b', self.t ,  self.mn[:,j], 'b')
+                self.lines[j] = self.ax[j].fill_between( self.t ,  self.mp[:,j] ,  self.mn[:,j]  ) 
             else:
-                self.ax[j].plot( self.t , self.Y[:,j] , 'b' )
+                self.lines[j] = self.ax[j].plot( self.t , self.Y[ self.first_sample:self.first_sample+self.sz_section , j ] , 'b' ) 
             
             pyplot.axis( [ self.start_time , self.end_time , -1.0 , 1.0 ] )
             
@@ -81,11 +100,16 @@ class PltTrackStruct:
             pyplot.title( "Channel %d" % (j+1) )
             pyplot.xlabel('Time [min:sec]')
             pyplot.ylabel('Amplitude')
+        
+            if new_flag :
+                self.span.append( SpanSelector( self.ax[j], onselect, 'horizontal' ) )
             
         pyplot.show()
+        
+ 
     
 
-def plot_track_classic( Y , Fs , Plot=True , plot_str=None , utime=0.02 , title=None , time_lim=4 , start_time=0.0 , end_time = -1.0 ):
+def plot_track_classic( Y , Fs , Plot=True , plot_str=None , utime=0.02 , time_lim=4 , start_time=0.0 , end_time = -1.0 ):
     
     time_a = time.time()
         
@@ -98,6 +122,8 @@ def plot_track_classic( Y , Fs , Plot=True , plot_str=None , utime=0.02 , title=
     
     if plot_str == None :    
         plot_str = PltTrackStruct( ch=ch )
+        plot_str.Y = Y
+        plot_str.Fs = Fs
         
     sz_section = s[0]
     first_sample = 0
@@ -130,10 +156,9 @@ def plot_track_classic( Y , Fs , Plot=True , plot_str=None , utime=0.02 , title=
     else:
         plot_str.plot_mode = "curve"
         plot_str.t = start_time + np.arange( sz_section ) * 1/Fs
-        plot_str.Y = Y[ first_sample:first_sample+sz_section , : ]
-    
-    
-        
+        plot_str.first_sample = first_sample
+        plot_str.sz_section = sz_section
+
     if Plot :
         plot_str.plot()
         

@@ -86,7 +86,6 @@ def plot_track( Y , Fs , Plot=True , time_range=None , utime = 0 ):
         pyplot.imshow(H, extent=extent, interpolation='nearest',aspect='auto' , cmap="hot" )
 
         
-    
     pyplot.show()        
     
     
