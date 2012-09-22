@@ -28,16 +28,36 @@ try:
     import matplotlib.mlab as mlab
     from matplotlib import dates
     from matplotlib.widgets import  *
+    from pylab import *
 except:
     ____foo = None
 
   
-def onselect(vmin, vmax):
-    print("On select!!!! %f , %f " % (vmin , vmax) )
-    plot_track_classic( onselect.plot_str.Y , onselect.plot_str.Fs , Plot=False , plot_str=onselect.plot_str , start_time=vmin , end_time=vmax )
-    onselect.plot_str.plot()
+def on_select(vmin, vmax):
+    dr14_log_debug( "on_select: %f , %f " % (vmin , vmax) )
+    plot_track_classic( on_select.plot_str.Y , on_select.plot_str.Fs , Plot=False , plot_str=on_select.plot_str , start_time=vmin , end_time=vmax )
+    on_select.plot_str.plot()
+ 
+   
+def mouse_pressed( event ) :
     
-
+    dr14_log_debug( "mouse_pressed: " )
+    
+    if event.button == 3 :
+        dr14_log_debug( "mouse_pressed: button 3" )
+        m = mouse_pressed.plot_str.start_time + ( mouse_pressed.plot_str.end_time - mouse_pressed.plot_str.start_time ) / 2.0
+        new_tot_time = 2.0 * ( mouse_pressed.plot_str.end_time - mouse_pressed.plot_str.start_time )
+        
+        start_time = m - new_tot_time/2.0
+        end_time = m + new_tot_time/2.0
+        
+        dr14_log_debug( "mouse_pressed: start - end:  %f %f " % ( start_time , end_time ) )
+        
+        plot_track_classic( mouse_pressed.plot_str.Y , mouse_pressed.plot_str.Fs , Plot=False ,
+                           plot_str=mouse_pressed.plot_str , start_time=start_time , end_time=end_time )
+        
+        mouse_pressed.plot_str.plot()
+        
 
 class PltTrackStruct:
     def __init__( self , plot_mode='fill' , t = [] , Y = [] , Fs=44100 , sz=0 , ch=0 ):
@@ -72,7 +92,7 @@ class PltTrackStruct:
             self.lines = [i for i in range(self.ch)]
             self.span = []
             new_flag = True
-            onselect.plot_str = self
+            
             
         for j in range( self.ch ):
             
@@ -102,7 +122,13 @@ class PltTrackStruct:
             pyplot.ylabel('Amplitude')
         
             if new_flag :
-                self.span.append( SpanSelector( self.ax[j], onselect, 'horizontal' ) )
+                onsel = on_select
+                onsel.plot_str = self
+                self.span.append( SpanSelector( self.ax[j], onsel, 'horizontal' ) )
+                
+                m_p = mouse_pressed
+                m_p.plot_str = self
+                connect('button_press_event', m_p)
             
         pyplot.show()
         
@@ -128,6 +154,12 @@ def plot_track_classic( Y , Fs , Plot=True , plot_str=None , utime=0.02 , time_l
     sz_section = s[0]
     first_sample = 0
     
+    if end_time > s[0] * 1/Fs :
+        end_time = s[0] * 1/Fs
+        
+    if start_time < 0 :
+        start_time = 0
+    
     if start_time >= 0 and end_time > start_time :
         sz_section = int( ( end_time - start_time ) * Fs )
         first_sample = int( start_time * Fs )
@@ -146,6 +178,7 @@ def plot_track_classic( Y , Fs , Plot=True , plot_str=None , utime=0.02 , time_l
     curr_sample = first_sample
     
     if sz_section > time_lim*Fs:
+        plot_str.plot_mode = "fill"
         plot_str.mp = zeros( ( sz , ch ) )
         plot_str.mn = zeros( ( sz , ch ) )
         plot_str.t = start_time + np.arange( 0 , sz ) * block_len
