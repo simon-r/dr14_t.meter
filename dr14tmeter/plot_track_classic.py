@@ -35,9 +35,19 @@ except:
   
 def on_select(vmin, vmax):
     dr14_log_debug( "on_select: %f , %f " % (vmin , vmax) )
-    plot_track_classic( on_select.plot_str.Y , on_select.plot_str.Fs , Plot=False , plot_str=on_select.plot_str , start_time=vmin , end_time=vmax )
+    if vmin == vmax :
+        return 
+    plot_track_classic( plot_str=on_select.plot_str , start_time=vmin , end_time=vmax )
     on_select.plot_str.plot()
  
+
+def wheel_moved( event ) :
+    dr14_log_debug( "mouse_pressed: step: %d " % event.step )
+    
+    ( start_time , end_time ) = wheel_moved.plot_str.move( event.step )
+    plot_track_classic( plot_str=wheel_moved.plot_str , start_time=start_time , end_time=end_time )
+    wheel_moved.plot_str.plot()
+
    
 def mouse_pressed( event ) :
     
@@ -45,23 +55,19 @@ def mouse_pressed( event ) :
     
     if event.button == 3 :
         dr14_log_debug( "mouse_pressed: button 3" )
-        m = mouse_pressed.plot_str.start_time + ( mouse_pressed.plot_str.end_time - mouse_pressed.plot_str.start_time ) / 2.0
-        new_tot_time = 2.0 * ( mouse_pressed.plot_str.end_time - mouse_pressed.plot_str.start_time )
         
-        start_time = m - new_tot_time/2.0
-        end_time = m + new_tot_time/2.0
+        ( start_time , end_time ) = mouse_pressed.plot_str.zoom_out()              
+        plot_track_classic( plot_str=mouse_pressed.plot_str , start_time=start_time , end_time=end_time )
+        mouse_pressed.plot_str.plot()
         
         dr14_log_debug( "mouse_pressed: start - end:  %f %f " % ( start_time , end_time ) )
-        
-        plot_track_classic( mouse_pressed.plot_str.Y , mouse_pressed.plot_str.Fs , Plot=False ,
-                           plot_str=mouse_pressed.plot_str , start_time=start_time , end_time=end_time )
-        
-        mouse_pressed.plot_str.plot()
         
 
 class PltTrackStruct:
     def __init__( self , plot_mode='fill' , t = [] , Y = [] , Fs=44100 , sz=0 , ch=0 ):
         self.ch = ch
+        self.tot_time = 0
+        
         self.t = t
         self.start_time = 0 
         self.end_time = 0
@@ -75,19 +81,54 @@ class PltTrackStruct:
             
         self.Y = Y
         self.Fs = Fs
-        self.plot_mode = plot_mode # or "curve"
+        self.plot_mode = plot_mode # "fill" or "curve"
         self.ax = None
         self.rebuild = False
         self.first_sample = 0
         self.sz_section = 0
         self.lines = []
+        self.fig = None
 
+
+    def start( self ) :
+        self.plot()
+        pyplot.show()        
+
+    def zoom_out( self ) :
+        start_time = self.start_time
+        end_time   = self.end_time
+        
+        m = start_time + ( end_time - start_time ) / 2.0
+        new_tot_time = 2.0 * ( end_time - start_time )
+        
+        start_time = m - new_tot_time/2.0
+        end_time = m + new_tot_time/2.0
+        
+        return ( start_time , end_time )
+    
+    
+    def move( self , sign ):
+        
+        factor = 0.1
+        
+        delta = self.end_time - self.start_time
+        
+        start_time = self.start_time + sign * delta * factor
+        end_time   = self.end_time + sign * delta * factor
+        
+        if start_time < 0 or end_time > self.tot_time:
+            start_time = self.start_time 
+            end_time   = self.end_time
+        
+        return ( start_time , end_time )
+    
 
     def plot( self ):
         
         new_flag = False
         
-        if self.ax == None :
+        if self.fig == None :
+            self.fig = pyplot.figure()
             self.ax = [i for i in range(self.ch)]
             self.lines = [i for i in range(self.ch)]
             self.span = []
@@ -96,8 +137,8 @@ class PltTrackStruct:
             
         for j in range( self.ch ):
             
-            #if new_flag :
-            self.ax[j] = pyplot.subplot( 210+j+1 )
+            if new_flag :
+                self.ax[j] = self.fig.add_subplot( 210+j+1 )
             
             if type( self.lines[j] ) is matplotlib.collections.PolyCollection :
                 self.lines[j].remove()
@@ -111,7 +152,7 @@ class PltTrackStruct:
             else:
                 self.lines[j] = self.ax[j].plot( self.t , self.Y[ self.first_sample:self.first_sample+self.sz_section , j ] , 'b' ) 
             
-            pyplot.axis( [ self.start_time , self.end_time , -1.0 , 1.0 ] )
+            self.ax[j].axis( [ self.start_time , self.end_time , -1.0 , 1.0 ] )
             
             self.ax[j].xaxis.set_major_formatter( MyTimeFormatter() )
             
@@ -129,28 +170,47 @@ class PltTrackStruct:
                 m_p = mouse_pressed
                 m_p.plot_str = self
                 connect('button_press_event', m_p)
+                
+                w_m = wheel_moved
+                w_m.plot_str = self
+                connect('scroll_event', w_m)
             
-        pyplot.show()
+        self.fig.canvas.draw()
         
  
     
 
-def plot_track_classic( Y , Fs , Plot=True , plot_str=None , utime=0.02 , time_lim=4 , start_time=0.0 , end_time = -1.0 ):
-    
-    time_a = time.time()
+def plot_track_classic( Y=None , Fs=None , plot_str=None , utime=0.02 , time_lim=4 , start_time=0.0 , end_time = -1.0 ):
         
-    s = Y.shape
+    if Y == None and Fs == None and plot_str == None :
+        raise
     
-    if len( Y.shape ) > 1 :
-        ch = s[1]
-    else :
-        ch = 1
-    
-    if plot_str == None :    
+    if plot_str == None and Y != None and Fs != None :        
+        s = Y.shape
+        
+        if len( Y.shape ) > 1 :
+            ch = s[1]
+        else :
+            ch = 1           
+        
         plot_str = PltTrackStruct( ch=ch )
         plot_str.Y = Y
         plot_str.Fs = Fs
+        plot_str.tot_time = s[0] * 1/Fs
         
+    elif plot_str != None :
+        Fs = plot_str.Fs
+        Y = plot_str.Y
+        
+        s = Y.shape
+        if len( Y.shape ) > 1 :
+            ch = s[1]
+        else :
+            ch = 1
+    else:
+        raise
+     
+    
     sz_section = s[0]
     first_sample = 0
     
@@ -191,9 +251,6 @@ def plot_track_classic( Y , Fs , Plot=True , plot_str=None , utime=0.02 , time_l
         plot_str.t = start_time + np.arange( sz_section ) * 1/Fs
         plot_str.first_sample = first_sample
         plot_str.sz_section = sz_section
-
-    if Plot :
-        plot_str.plot()
         
     return plot_str
     

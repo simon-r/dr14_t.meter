@@ -146,7 +146,8 @@ class AudioPlotTrack( AudioAnalysis ):
         print_msg( "Track Title: %s " % title )
         
         at = self.getAudioTrack()
-        plot_track_classic( at.Y , at.Fs )
+        plot_str = plot_track_classic( at.Y , at.Fs )
+        plot_str.start()
 
 
 
