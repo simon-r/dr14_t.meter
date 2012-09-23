@@ -31,8 +31,8 @@ except:
     ____foo = None
 
 def f_utime( t ) :
-    v = 0.5
-    a = 1/200
+    v = 0.25
+    a = 1/400
     xl = 200
     if t > xl :
         return a*t + (v-a*xl)
@@ -62,9 +62,7 @@ def plot_track( Y , Fs , Plot=True , time_range=None , utime = 0 ):
     sec = floor( s[0] / Fs ) + 1   
     sz = Fs * ( sec + 1 )
     tm = floor( np.arange(sz) / Fs )
-    
-    hfmt = dates.DateFormatter('%M:%S')
-    
+     
     Yc = np.zeros( sz , dtype=np.float32 )
     
     for i in range(ch):
