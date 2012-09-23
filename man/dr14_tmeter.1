@@ -1,5 +1,5 @@
 .\" 
-.TH "dr14_tmeter" "1" "1.0.6" "Simone Riva" "Sound"
+.TH "dr14_tmeter" "1" "1.0.10" "Simone Riva" "Sound"
 .SH "NAME"
 \fBdr14_tmeter\fR \- compute the DR14 value of the audio files according to the algorithm described
 by the Pleasurize Music Foundation.
@@ -12,12 +12,13 @@ http://dr14tmeter.scienceontheweb.net
 
 This tool is very useful to measure how is loud your music and for understanding that a good quality album always has also a good dynamic, and it's also useful for understanding the effects of the so called loudness war.
 
-\fBusage:\fR dr14_tmeter [\-h] [\-v] [\-1] [\-r] [\-a] [\-b] [\-n] [\-p] [\-o OUT_DIR]
+\fBusage\fR: dr14_tmeter [\-h] [\-v] [\-1] [\-r] [\-a] [\-b] [\-n] [\-p] [\-o OUT_DIR]
                    [\-t {h,t,b,w,a}] [\-f] [\-d] [\-\-hist] [\-\-lev_hist]
-                   [\-\-spectrogram]
+                   [\-\-spectrogram] [\-\-plot_track] [\-\-plot_track_dst]
                    [\-\-compress {very_soft,v,soft,s,medium,m,hard,h,very_hard,vh}]
                    [\-\-dyn_vivacity] [\-\-files_list] [\-\-quiet]
                    [path_name]
+
 
 
 \fBpositional arguments:\fR
@@ -61,6 +62,9 @@ This tool is very useful to measure how is loud your music and for understanding
                         file and exit
 
 \fB  \-\-spectrogram\fR         Plot the spectrogram of a single file and exit (beta)
+
+\fB  \-\-plot_track\fR          Plot the track of the given file and exit                                                                                                                                                              
+\fB  \-\-plot_track_dst\fR      Plot the track in a cool manner of the given file and exit 
 
 \fB  \-\-compress {very_soft,v,soft,s,medium,m,hard,h,very_hard,vh}\fR
                         Perform the dynamic compression on a single file and

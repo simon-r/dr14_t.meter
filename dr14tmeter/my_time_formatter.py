@@ -30,11 +30,17 @@ except:
 
 
 class MyTimeFormatter( matplotlib.ticker.Formatter ):
-    def __init__(self,utime=1.0):
+    
+    def __init__(self,utime=1.0 , milli_sec=False ):
         self.utime = utime
+        self.milli_sec = milli_sec
     
     def __call__( self , x , pos=None ):
         minu = int( self.utime*x / 60 ) ;
         sec = int( self.utime*x - minu*60 )
-        return "%02d:%02d" % ( minu , sec )
-    
+        msec =  int ( 1000 * ( self.utime*x - int( self.utime*x ) ) )
+        
+        if self.milli_sec :
+            return "%02d:%02d.%03d" % ( minu , sec , msec )
+        else :
+            return "%02d:%02d" % ( minu , sec )

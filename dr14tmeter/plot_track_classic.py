@@ -64,20 +64,20 @@ def mouse_pressed( event ) :
         
 
 class PltTrackStruct:
-    def __init__( self , plot_mode='fill' , t = [] , Y = [] , Fs=44100 , sz=0 , ch=0 ):
+    def __init__( self , plot_mode='fill' , Y = [] , Fs=44100 , sz=0 , ch=0 ):
         self.ch = ch
         self.tot_time = 0
         
-        self.t = t
+        self.t = None
+        self.tb = None
         self.start_time = 0 
         self.end_time = 0
         
-        if plot_mode == 'fill' :
-            self.mp = zeros( ( sz , ch ) )
-            self.mn = zeros( ( sz , ch ) )
-        else :
-            self.mp = []
-            self.mn = []
+        self.start_block = 0  
+        self.end_block = 0 
+        
+        self.mp = None
+        self.mn = None
             
         self.Y = Y
         self.Fs = Fs
@@ -148,15 +148,24 @@ class PltTrackStruct:
                     l.remove()
             
             if self.plot_mode == 'fill' :
-                self.lines[j] = self.ax[j].fill_between( self.t ,  self.mp[:,j] ,  self.mn[:,j]  ) 
+                self.lines[j] = self.ax[j].fill_between( self.tb[ self.start_block:self.end_block ] ,
+                                                         self.mp[ self.start_block:self.end_block , j ] ,
+                                                         self.mn[ self.start_block:self.end_block , j ]  ) 
             else:
-                self.lines[j] = self.ax[j].plot( self.t , self.Y[ self.first_sample:self.first_sample+self.sz_section , j ] , 'b' ) 
+                self.lines[j] = self.ax[j].plot( self.t , self.Y[ self.first_sample : self.first_sample+self.sz_section , j ] , 'b' ) 
             
             self.ax[j].axis( [ self.start_time , self.end_time , -1.0 , 1.0 ] )
             
-            self.ax[j].xaxis.set_major_formatter( MyTimeFormatter() )
+            delta_time = self.end_time - self.start_time
             
-            self.ax[j].grid(1)
+            if delta_time < 1.5 :
+                milli_sec=True 
+            else :
+                milli_sec=False
+            
+            self.ax[j].xaxis.set_major_formatter( MyTimeFormatter( milli_sec=milli_sec ) )
+            
+            self.ax[j].grid(True)
             
             pyplot.title( "Channel %d" % (j+1) )
             pyplot.xlabel('Time [min:sec]')
@@ -180,7 +189,7 @@ class PltTrackStruct:
  
     
 
-def plot_track_classic( Y=None , Fs=None , plot_str=None , utime=0.02 , time_lim=4 , start_time=0.0 , end_time = -1.0 ):
+def plot_track_classic( Y=None , Fs=None , plot_str=None , utime=0.02 , time_lim=5 , start_time=0.0 , end_time = -1.0 ):
         
     if Y == None and Fs == None and plot_str == None :
         raise
@@ -237,15 +246,27 @@ def plot_track_classic( Y=None , Fs=None , plot_str=None , utime=0.02 , time_lim
     
     curr_sample = first_sample
     
+    if plot_str.mp != None and plot_str.mn != None and sz_section >= time_lim*Fs :
+        plot_str.plot_mode = "fill"
+        plot_str.start_block = int( plot_str.start_time / block_len )
+        plot_str.end_block   = int( plot_str.end_time / block_len )
+        
+        return plot_str
+        
     if sz_section > time_lim*Fs:
         plot_str.plot_mode = "fill"
         plot_str.mp = zeros( ( sz , ch ) )
         plot_str.mn = zeros( ( sz , ch ) )
-        plot_str.t = start_time + np.arange( 0 , sz ) * block_len
+        plot_str.tb = start_time + np.arange( 0 , sz ) * block_len
+        
         for i in range( sz ):
             plot_str.mp[i,:] = np.max( Y[curr_sample:curr_sample+samples_block,:] , 0 )
             plot_str.mn[i,:] = np.min( Y[curr_sample:curr_sample+samples_block,:] , 0 )
             curr_sample = curr_sample + samples_block
+        
+        plot_str.start_block = 0
+        plot_str.end_block = sz
+        
     else:
         plot_str.plot_mode = "curve"
         plot_str.t = start_time + np.arange( sz_section ) * 1/Fs
