@@ -199,7 +199,7 @@ def run_analysis_opt( options , path_name ):
     
     if options.spectrogram:
         
-        if test_hist_modules() == False:
+        if test_matplotlib_modules( "Spectrogram" ) == False:
             sys.exit(1)
         
         print_msg("Start spectrogram:")
@@ -209,7 +209,7 @@ def run_analysis_opt( options , path_name ):
 
     if options.plot_track:
         
-        if test_hist_modules() == False:
+        if test_matplotlib_modules( "Plot track" ) == False:
             sys.exit(1)
         
         print_msg("Start Plot Track:")
@@ -219,7 +219,7 @@ def run_analysis_opt( options , path_name ):
 
     if options.plot_track_dst:
         
-        if test_hist_modules() == False:
+        if test_matplotlib_modules( "Plot track dst" ) == False:
             sys.exit(1)
         
         print_msg("Start Plot Track:")

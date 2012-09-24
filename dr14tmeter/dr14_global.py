@@ -141,7 +141,18 @@ def get_new_version():
 def get_home_url():
     return "http://simon-r.github.com/dr14_t.meter"
         
-        
+      
+      
+def test_matplotlib_modules( fun_name ):
+    try:
+        import matplotlib
+    except ImportError:
+        print_msg( "The %s function require the installation of MatPlotLib: http://matplotlib.sourceforge.net" % fun_name )
+        return False
+    
+    return True
+
+
 def test_hist_modules():
     try:
         import matplotlib
