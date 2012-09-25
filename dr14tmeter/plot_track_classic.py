@@ -109,7 +109,7 @@ class PltTrackStruct:
     
     def move( self , sign ):
         
-        factor = 0.1
+        factor = 0.05
         
         delta = self.end_time - self.start_time
         
@@ -205,7 +205,7 @@ def plot_track_classic( Y=None , Fs=None , plot_str=None , utime=0.02 , time_lim
         plot_str = PltTrackStruct( ch=ch )
         plot_str.Y = Y
         plot_str.Fs = Fs
-        plot_str.tot_time = s[0] * 1/Fs
+        plot_str.tot_time = s[0] * 1.0/Fs
         
     elif plot_str != None :
         Fs = plot_str.Fs
@@ -223,13 +223,13 @@ def plot_track_classic( Y=None , Fs=None , plot_str=None , utime=0.02 , time_lim
     sz_section = s[0]
     first_sample = 0
     
-    if end_time > s[0] * 1/Fs :
-        end_time = s[0] * 1/Fs
+    if end_time > s[0] * 1.0/Fs :
+        end_time = s[0] * 1.0/Fs
         
     if start_time < 0 :
-        start_time = 0
+        start_time = 0.0
     
-    if start_time >= 0 and end_time > start_time :
+    if start_time >= 0.0 and end_time > start_time :
         sz_section = int( ( end_time - start_time ) * Fs )
         first_sample = int( start_time * Fs )
         plot_str.start_time = start_time
@@ -269,7 +269,7 @@ def plot_track_classic( Y=None , Fs=None , plot_str=None , utime=0.02 , time_lim
         
     else:
         plot_str.plot_mode = "curve"
-        plot_str.t = start_time + np.arange( sz_section ) * 1/Fs
+        plot_str.t = start_time + np.arange( 0 , sz_section ) * 1.0/Fs
         plot_str.first_sample = first_sample
         plot_str.sz_section = sz_section
         
