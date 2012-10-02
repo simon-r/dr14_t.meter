@@ -55,6 +55,8 @@ class AudioDecoder:
         else:
             return False
 
+        #af = PipeFileReader() 
+
         ret_f = af.read_audio_file_new( file_name , target )
 
         return ret_f

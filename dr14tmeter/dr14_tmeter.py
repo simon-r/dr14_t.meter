@@ -42,7 +42,7 @@ def main():
     options = parse_args()
 
     init_log( logging.DEBUG )
-    logging.disable( logging.INFO )
+   # logging.disable( logging.INFO )
     
     numpy.seterr(all='ignore')
     

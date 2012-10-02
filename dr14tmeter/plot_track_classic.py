@@ -24,6 +24,7 @@ import time
 import datetime
 
 try:
+    import matplotlib
     import matplotlib.pyplot as pyplot
     import matplotlib.mlab as mlab
     from matplotlib import dates
