@@ -41,8 +41,12 @@ def main():
     
     options = parse_args()
 
+    if options.version :
+        print_msg( dr14_version() )
+        return
+
     init_log( logging.DEBUG )
-   # logging.disable( logging.INFO )
+    logging.disable( logging.INFO )
     
     numpy.seterr(all='ignore')
     

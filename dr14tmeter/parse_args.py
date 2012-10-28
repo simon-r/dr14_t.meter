@@ -24,7 +24,7 @@ def parse_args():
     desc =  desc + "described by the Pleasurize Music Foundation "
     desc =  desc + "Visit: http://www.dynamicrange.de/"
 
-    parser = argparse.ArgumentParser( description=desc , version="%(prog)s " + dr14_version()  )
+    parser = argparse.ArgumentParser( description=desc  )
 
 
     parser.add_argument("-1", "--disable_multithread",
@@ -126,6 +126,11 @@ def parse_args():
         action="store_true",
         dest="quiet",
         help="Quiet mode")
+    
+    parser.add_argument("--version",
+        action="store_true",
+        dest="version",
+        help="print the current version and exit")
 
     parser.add_argument(
         dest="path_name",

@@ -42,7 +42,6 @@ def init_log( lev=logging.DEBUG ):
     stream_h.setFormatter( formatter )
     
     logger.addHandler( stream_h )
-    logger.debug("ciao")
 
 def dr14_log_debug( message ):
     global logger    
