@@ -1,3 +1,10 @@
+dr14tmeter (1.0.11-1) stable; urgency=medium
+
+  * News: fix for python 3.3
+
+ -- Your_Name <Your.email@example.com>  Tue, 28 Oct 2012 16:10:00 +0100
+
+
 dr14tmeter (1.0.10-1) stable; urgency=medium
 
   * News: added plot track with zoom and scroll 
