@@ -17,18 +17,14 @@
 import sys
 import os
 import logging
+import codecs
 
 message_file = sys.stderr
 out_file = sys.stdout
 err_file = sys.stderr
 mode = "verbose"
 
-
 logger = logging.getLogger('dr14log')
-
-
-
-
 
 def init_log( lev=logging.DEBUG ):
     global logger
@@ -73,7 +69,7 @@ def set_verbose_msg() :
     if mode == "verbose" :
         return 
     
-    close( message_file )
+    codecs.close( message_file )
     
     message_file = sys.stderr
 
@@ -85,4 +81,7 @@ def set_quiet_msg() :
     if mode == "quiet" :
         return 
     
-    message_file = open(os.devnull,"w")
+    message_file = codecs.open( os.devnull , "w" ,  encoding="utf-8")
+    
+    
+    
