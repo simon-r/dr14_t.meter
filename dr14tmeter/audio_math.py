@@ -42,6 +42,9 @@ def audio_min() :
 def audio_min16():
     return 1.0/(2.0**16)
 
+def max_dynamic( bit ):
+    return 20.0*numpy.log10( 2.0**bit )
+
 def normalize( y , ml=1.0 ):
     m = numpy.max( numpy.abs( y ) )
     return ml * ( y * (1.0/m) )

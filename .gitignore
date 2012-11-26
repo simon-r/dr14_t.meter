@@ -1,3 +1,9 @@
 build/
 *.pyc
 .directory
+*.e4t
+*.e4q
+*.e4p
+*.geany
+.pydevproject
+.project
