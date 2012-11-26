@@ -46,7 +46,7 @@ def main():
         return
 
     init_log( logging.DEBUG )
-    #logging.disable( logging.INFO )
+    logging.disable( logging.INFO )
     
     numpy.seterr(all='ignore')
     
