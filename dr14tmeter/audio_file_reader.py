@@ -31,10 +31,10 @@ from dr14tmeter.out_messages import print_msg, dr14_log_info
 class AudioFileReader:
     
     def __init__(self):
-        if sys.platform.startswith('linux'):
-            self.__cmd = "%s " % self.get_cmd()
-        elif sys.platform.startswith('win'):
+        if sys.platform.startswith('win'):
             self.__cmd = ".\\decoder\\%s " % self.get_cmd()
+        else:
+            self.__cmd = "%s " % self.get_cmd()
 
     def get_cmd(self):
         pass
