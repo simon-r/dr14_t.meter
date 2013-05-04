@@ -144,7 +144,7 @@ class RetirveMetadata:
 
         if len( self._artist ) > 1 :
             return "Various Artists"
-        elif len( self._album ) == 0 :
+        elif len( self._artist ) == 0 :
             return None
         else :
             for k in self._artist.keys():
