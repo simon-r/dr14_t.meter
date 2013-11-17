@@ -1,3 +1,9 @@
+dr14tmeter (1.0.13-1) stable; urgency=medium
+
+  * News: Fixed problem with macosx    
+
+ -- Your_Name <Your.email@example.com>  Tue, 28 Nov 2012 19:30:00 +0100
+
 dr14tmeter (1.0.12-1) stable; urgency=medium
 
   * News: Fixed quiet encoding problem issue 9 , fixed problem with strange track issue 10    
