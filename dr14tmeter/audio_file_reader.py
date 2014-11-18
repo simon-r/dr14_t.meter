@@ -222,6 +222,14 @@ class ApeFileReader( AudioFileReader ):
         return  self.get_generic_ffmpeg_options( file_name , tmp_file )
 
 
+class Ac3FileReader( AudioFileReader ):
+    def get_cmd(self):
+        return "ffmpeg"
+
+    def get_cmd_options(self , file_name , tmp_file ):
+        return  self.get_generic_ffmpeg_options( file_name , tmp_file )
+
+
 class WmaFileReader( AudioFileReader ):
     def get_cmd(self):
         return "ffmpeg"
