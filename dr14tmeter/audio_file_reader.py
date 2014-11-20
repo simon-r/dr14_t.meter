@@ -22,15 +22,26 @@ import subprocess
 import re
 import wave
 import numpy
+import shutil
+
 from io import StringIO
 
 from dr14tmeter.out_messages import print_msg, dr14_log_info
+from _ftdi1 import NONE
 
 # ffmpeg -i example.m4a -f wav pipe:1 > test.wav
 
 class AudioFileReader:
     
     def __init__(self):
+        
+        if shutil.which( "ffmpeg" ) != None :
+            self.__ffmpeg_cmd = "ffmpeg"
+        elif shutil.which( "avconv" ) != None :
+            self.__ffmpeg_cmd = "avconv"
+        else :
+            self.__ffmpeg_cmd == ""
+        
         if sys.platform.startswith('win'):
             self.__cmd = ".\\decoder\\%s " % self.get_cmd()
         else:
@@ -38,6 +49,9 @@ class AudioFileReader:
 
     def get_cmd(self):
         pass
+
+    def get_ffmpeg_cmd(self):
+        return self.__ffmpeg_cmd
 
     def get_cmd_options( self , file_name , tmp_file ):
         pass
@@ -76,13 +90,9 @@ class AudioFileReader:
         file_name = re.sub( "(\"|`)" , r"\\\1" , file_name )
         tmp_file = re.sub( "(\"|`)" , r"_xyz_" , tmp_file )
         
-        
-        
         full_command = full_command + " " + self.get_cmd_options( file_name , tmp_file )
         
-       
         #print_msg( full_command )
-        
         
         r = subprocess.call( full_command , shell=True  , stderr=subprocess.PIPE , stdout=subprocess.PIPE )
                 
@@ -192,7 +202,7 @@ class Mp3FileReader( AudioFileReader ):
 
 class FlacFileReader( AudioFileReader ):
     def get_cmd(self):
-        return "ffmpeg"
+        return self.get_ffmpeg_cmd()
     
     def get_cmd_options(self , file_name , tmp_file ):
         return self.get_generic_ffmpeg_options( file_name , tmp_file )
@@ -201,7 +211,7 @@ class FlacFileReader( AudioFileReader ):
 
 class Mp4FileReader( AudioFileReader ):
     def get_cmd(self):
-        return "ffmpeg"
+        return self.get_ffmpeg_cmd()
     
     def get_cmd_options(self , file_name , tmp_file ):
         return  self.get_generic_ffmpeg_options( file_name , tmp_file )
@@ -216,15 +226,23 @@ class OggFileReader( AudioFileReader ):
 
 class ApeFileReader( AudioFileReader ):
     def get_cmd(self):
-        return "ffmpeg"
+        return self.get_ffmpeg_cmd()
     
+    def get_cmd_options(self , file_name , tmp_file ):
+        return  self.get_generic_ffmpeg_options( file_name , tmp_file )
+
+
+class Ac3FileReader( AudioFileReader ):
+    def get_cmd(self):
+        return self.get_ffmpeg_cmd()
+
     def get_cmd_options(self , file_name , tmp_file ):
         return  self.get_generic_ffmpeg_options( file_name , tmp_file )
 
 
 class WmaFileReader( AudioFileReader ):
     def get_cmd(self):
-        return "ffmpeg"
+        return self.get_ffmpeg_cmd()
     
     def get_cmd_options(self , file_name , tmp_file ):
         return  self.get_generic_ffmpeg_options( file_name , tmp_file )

@@ -27,11 +27,12 @@ from dr14tmeter.audio_file_reader import *
 class AudioDecoder:
 
     def __init__(self):
-        self.formats = [ '.flac' , '.mp3' , '.ogg' , '.mp4' , '.m4a' , '.wav' , '.ape' , '.wma' ]
+        self.formats = [ '.flac' , '.mp3' , '.ogg' , '.mp4' , '.m4a' , '.wav' , '.ape' , '.ac3', '.wma' ]
     
     def read_track_new( self , file_name , target ):
 
         ( f , ext ) = os.path.splitext( file_name )
+        ext = ext.lower()
 
         if ext not in self.formats :
             return False
@@ -50,6 +51,8 @@ class AudioDecoder:
             af = WavFileReader()
         elif ext == '.ape':
             af = ApeFileReader()
+        elif ext == '.ac3':
+            af = Ac3FileReader()
         elif ext == '.wma':
             af = WmaFileReader()
         else:

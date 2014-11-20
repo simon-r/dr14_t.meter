@@ -9,4 +9,4 @@ Dr14 t.meter is released under the terms of the  GNU GPLv3 license and  is inten
 I've largely tested this application and it has always returned results identical to those of the official off-line meter. 
 
 
-For more info visit: http://dr14tmeter.scienceontheweb.net/
+For more info visit: http://dr14tmeter.sourceforge.net

@@ -19,6 +19,8 @@ import subprocess
 import sys
 import os
 import re
+import shutil
+
 
 from dr14tmeter.audio_decoder import AudioDecoder
 
@@ -32,6 +34,11 @@ class RetirveMetadata:
         self._album = {}
         self._artist = {}
         self._tracks = {}
+        
+        if shutil.which( "ffprobe" ) :
+            self.__ffprobe_cmd = "ffprobe"
+        elif shutil.which( "avprobe" ) :
+            self.__ffprobe_cmd = "avprobe"        
     
     
     def scan_dir( self , dir_name , files_list=None ):
@@ -63,7 +70,7 @@ class RetirveMetadata:
         #print( file_name )
         
         try:
-            data_txt = subprocess.check_output( [ "ffprobe" , "-show_format" , file_name ] , stderr=subprocess.STDOUT , shell=False )
+            data_txt = subprocess.check_output( [ self.__ffprobe_cmd , "-show_format" , file_name ] , stderr=subprocess.STDOUT , shell=False )
         except :
             data_txt = "ffprobe ERROR"
          
