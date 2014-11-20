@@ -159,38 +159,6 @@ class AudioFileReader:
         return  " -i \"%s\" -b 16 -ar 44100 -y \"%s\" -loglevel quiet " % ( file_name , tmp_file )
 
 
-# Experimental
-#class PipeFileReader( AudioFileReader ):
-#    
-#    def get_cmd(self):
-#        return "ffmpeg"    
-#    
-#    def get_generic_ffmpeg_options( self , file_name , tmp_file ):
-#        return  " -i \"%s\" -b 16 -ar 44100  -loglevel quiet -f wav pipe:1 " % ( file_name )   
-#    
-#
-#    def read_audio_file_new( self , file_name , target ):
-#        time_a = time.time()
-#    
-#        full_command = "ffmpeg"
-#        (head, file) = os.path.split( file_name )
-#        
-#        opts = " -i \"%s\" -b 16 -ar 44100  -loglevel quiet -f wav pipe:1 " % file_name
-#        
-#        try:
-#            wav_raw = subprocess.check_output( [ full_command , opts ] , shell=False )
-#        except:
-#            pass
-#        
-#        in_raw = StringIO( wav_raw )        
-#        
-#        read_wav( in_raw , target )
-#        
-#        in_raw.close()
-#        
-#        time_b = time.time()
-#        dr14_log_info( "PipeFileReader.read_audio_file_new: Clock: %2.8f" % (time_b - time_a ) )
-
 
 class Mp3FileReader( AudioFileReader ):
     def get_cmd(self):
