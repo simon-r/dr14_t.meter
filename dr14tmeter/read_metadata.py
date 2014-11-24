@@ -19,10 +19,9 @@ import subprocess
 import sys
 import os
 import re
-import shutil
-
 
 from dr14tmeter.audio_decoder import AudioDecoder
+from dr14tmeter.dr14_global import get_ffmpeg_cmd
 
 # Test example !!!!!
 # a = subprocess.check_output( [ "ffprobe" , "-show_format" , "/media/esterno_xfs/data/Musica/Musica/aavv/01-blitzkrieg_bop_160_lame_abr.mp3" ] , stderr=subprocess.STDOUT , shell=False )
@@ -35,9 +34,9 @@ class RetirveMetadata:
         self._artist = {}
         self._tracks = {}
         
-        if shutil.which( "ffprobe" ) :
+        if get_ffmpeg_cmd() == "ffmpeg" :
             self.__ffprobe_cmd = "ffprobe"
-        elif shutil.which( "avprobe" ) :
+        elif get_ffmpeg_cmd() == "avconv" :
             self.__ffprobe_cmd = "avprobe"        
     
     

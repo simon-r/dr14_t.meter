@@ -22,12 +22,14 @@ import subprocess
 import re
 import wave
 import numpy
-import shutil
+
 
 from io import StringIO
 
 from dr14tmeter.out_messages import print_msg, dr14_log_info
-from _ftdi1 import NONE
+from dr14tmeter.dr14_global import get_ffmpeg_cmd
+
+#from _ftdi1 import NONE
 
 # ffmpeg -i example.m4a -f wav pipe:1 > test.wav
 
@@ -35,12 +37,7 @@ class AudioFileReader:
     
     def __init__(self):
         
-        if shutil.which( "ffmpeg" ) != None :
-            self.__ffmpeg_cmd = "ffmpeg"
-        elif shutil.which( "avconv" ) != None :
-            self.__ffmpeg_cmd = "avconv"
-        else :
-            self.__ffmpeg_cmd == ""
+        self.__ffmpeg_cmd = get_ffmpeg_cmd()
         
         if sys.platform.startswith('win'):
             self.__cmd = ".\\decoder\\%s " % self.get_cmd()

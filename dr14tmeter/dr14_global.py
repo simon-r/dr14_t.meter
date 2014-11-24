@@ -18,6 +18,7 @@
 import sys
 import re
 import threading
+import subprocess
 
 from dr14tmeter.out_messages import print_msg
 
@@ -36,6 +37,8 @@ l_revision = 0
 
 lock_ver = threading.Lock()
 
+ffmpeg_cmd = None
+
 
 def dr14_version():
     global v_major
@@ -49,10 +52,25 @@ def min_dr() :
 def get_exe_name():
     return "dr14_tmeter"
 
+def get_ffmpeg_cmd():
+    
+    global ffmpeg_cmd
+    
+    if ffmpeg_cmd == None :
+        ffmpeg_f = subprocess.call("type " + "ffmpeg" , shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE ) == 0
+        avconv_f = subprocess.call("type " + "avconv" , shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE ) == 0
+        
+        if ffmpeg_f :
+            ffmpeg_cmd = "ffmpeg"
+        elif avconv_f :
+            ffmpeg_cmd = "avconv"
+            
+    return ffmpeg_cmd
+        
+
 class TestVer(threading.Thread):
     def run(self):
         _dr14_get_latest_version()
-
 
 
 def _dr14_get_latest_version():
