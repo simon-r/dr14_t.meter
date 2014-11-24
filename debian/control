@@ -9,7 +9,7 @@ Homepage: http://simon-r.github.com/dr14_t.meter
 
 Package: dr14tmeter
 Architecture: all
-Depends: python, python-support (>=0.90), python-numpy, lame, flac, faad, ffmpeg
+Depends: python, python-support (>=0.90), python-numpy, lame, flac, faad, ffmpeg | libav-tools
 Recommends: python-matplotlib
 Description: Compute the DR14 value of the given audio files
  Compute the Dynamic Range (DR14) of the given audio files according 
