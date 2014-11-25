@@ -1,3 +1,9 @@
+dr14tmeter (1.0.15-1) stable; urgency=medium
+
+  * News: Added support for avconv, added ac3 support
+
+ -- Your_Name <Your.email@example.com>  Tue, 28 Nov 2012 19:30:00 +0100
+
 dr14tmeter (1.0.14-1) stable; urgency=medium
 
   * News: Fixed problem with macosx    
