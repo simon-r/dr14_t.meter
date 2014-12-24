@@ -27,7 +27,7 @@ from dr14tmeter.out_messages import print_msg
 # Current version
 v_major    = 1
 v_minor    = 0
-v_revision = 15
+v_revision = 90
 ###########################
 
 # latest version
