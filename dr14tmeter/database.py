@@ -23,32 +23,39 @@ class dr_database :
         
     def dr14_db_structure(self):
         db = """
+        
+            create table Artist (
+                Id integer primary key autoincrement ,
+                Name varchar(60)
+            ) ;      
+        
             create table track (
                 Id integer primary key autoincrement ,
                 Title varchar(60) ,
-                date integer ,
-                sha1 char(40) not null unique
+                rms float ,
+                peak float ,
+                sha1 varchar(40) not null ,                
+                IdArtist integer not null unique ,
+                foreign key ( IdArtist ) references Artist( Id ) 
             ) ;
             
+            create table Album (
+                Id integer primary key autoincrement ,
+                DR integer not null ,
+                Title varchar(100) 
+            ) ;           
+            
             create table DR (
-                DR integer unique not null ,
+                DR integer not null unique 
+            ) ;
+            
+            create table Date (
+               Date integer not null unique 
             ) ;
                         
             create table Genre (
                 Id integer primary key autoincrement ,
                 Name varchar(40) 
             ) ;
-            
-            create table Artist (
-                Id integer primary key autoincrement ,
-                Name varchar(60)
-            )
-            
-            create table Album (
-                Id integer primary key autoincrement ,
-                DR integer not null ,
-                Title varchar(100) ,
-                foreign key ( IdArtist ) references Artist( Id )
-            )
             
         """
