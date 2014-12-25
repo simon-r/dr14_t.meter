@@ -24,6 +24,12 @@ class dr_database :
     def dr14_db_structure(self):
         db = """
         
+            create table Version (
+                Version integer not null unique 
+            ) ;
+            
+            insert into Version ( Version ) values ( 1 ) ;
+        
             create table Artist (
                 Id integer primary key autoincrement ,
                 Name varchar(60)
