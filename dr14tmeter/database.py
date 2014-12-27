@@ -15,7 +15,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import sqlite3 
-from dr14tmeter.dr14_global import get_config_directory
+from dr14tmeter.dr14_config import get_db_path
 
 class dr_database :
     
@@ -24,22 +24,22 @@ class dr_database :
     
     def build_database(self):
         
-        db = self.dr14_db_main_structure()
+        db = self.dr14_db_main_structure_v1()
         
-        conn = sqlite3.connect( get_config_directory() )
+        conn = sqlite3.connect( get_db_path() )
         c = conn.cursor()
         
         conn.execute( db )
-        
+        conn.commit()
+        c.close()    
+            
         self.ungrade_db()
         
-        conn.commit()
-        c.close()
-    
+
     def ungrade_db(self):
         None
         
-    def dr14_db_main_structure(self):
+    def dr14_db_main_structure_v1(self):
         db = """
         
             create table Db_Version (
@@ -89,6 +89,14 @@ class dr_database :
                 primary key ( IdDr , IdTrack ),
                 foreign key ( IdDr ) references DR ( Id ),
                 foreign key ( IdTrack ) references track ( Id )
+            ) ;
+            
+            create table DR_Album (
+                IdDr integer not null unique ,
+                IdAlbum integer not null unique ,
+                primary key ( IdDr , IdAlbum ),
+                foreign key ( IdDr ) references DR ( Id ),
+                foreign key ( IdAlbum ) references Album ( Id )
             ) ;
             
             create table Genre_track (
