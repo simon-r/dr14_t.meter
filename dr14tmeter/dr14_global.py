@@ -19,6 +19,8 @@ import sys
 import re
 import threading
 import subprocess
+import os.path 
+import os
 
 from dr14tmeter.out_messages import print_msg
 
@@ -159,6 +161,14 @@ def get_new_version():
 def get_home_url():
     return "http://simon-r.github.com/dr14_t.meter"
         
+def get_config_directory( create = True ):
+    
+    cfg_dir = "%s/.config/dr14tmeter" % os.path.expanduser("~")
+    
+    if not os.path.isdir(cfg_dir) and create :
+        os.mkdir( gfg_dir )
+    
+    return gfg_dir
       
       
 def test_matplotlib_modules( fun_name ):
