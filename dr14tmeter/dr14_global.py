@@ -24,6 +24,11 @@ import os
 
 from dr14tmeter.out_messages import print_msg
 
+if sys.version_info[0] == 2:
+    import ConfigParser
+else:
+    import configparser as ConfigParser
+
 
 ###########################
 # Current version
@@ -166,9 +171,41 @@ def get_config_directory( create = True ):
     cfg_dir = "%s/.config/dr14tmeter" % os.path.expanduser("~")
     
     if not os.path.isdir(cfg_dir) and create :
-        os.mkdir( gfg_dir )
+        os.mkdir( cfg_dir )
     
-    return gfg_dir
+    return cfg_dir
+
+def get_config_file( create = True ):
+    cfg_dir = get_config_directory()
+    cfg_file = "%s/%s" % ( cfg_dir , "dr14.cfg" )
+    
+    if not os.path.isfile( cfg_file ) and create :
+        write_default_cfg( cfg_file )
+    
+    return cfg_file
+     
+def write_default_cfg( cfg_file ):
+    config = ConfigParser.ConfigParser()
+    config.add_section('database')
+    config.set('database', 'path', get_config_directory()+"/dr14.db" )
+    with open( cfg_file , 'w' ) as configfile:
+            config.write(configfile)
+
+def set_db_path( full_file_path ):
+    cfg_file = get_config_file()
+    config = ConfigParser.ConfigParser()
+    config.read( cfg_file )
+    config.set( 'database', 'path', full_file_path )
+    with open( cfg_file , 'w' ) as configfile:
+        config.write(configfile)
+    
+    
+def get_db_path():
+    config = ConfigParser.ConfigParser()
+    cfg_file = get_config_file()
+    config.read( cfg_file )
+    return config.get( 'database', 'path' )
+      
       
       
 def test_matplotlib_modules( fun_name ):
