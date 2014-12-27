@@ -81,6 +81,8 @@ class RetirveMetadata:
         
         track = {} 
         
+        track['file_name'] = file_name
+        
         re_flags = ( re.MULTILINE | re.IGNORECASE | re.UNICODE )
         
         m = re.search( r"\s*track\s*\:\s*(\d+)$" , data_txt , re_flags )
@@ -101,10 +103,19 @@ class RetirveMetadata:
         if m != None:
             self._artist.setdefault( m.group(1) , 0 )
             self._artist[m.group(1)] += 1
+            track['artist'] = m.group(1)
         
         m = re.search( r"\s*genre\s*\:\s*(.*)$" , data_txt , re_flags )
         if m != None:
             track['genre'] = m.group(1)
+            
+        m = re.search( r"\s*date\s*\:\s*(.*)$" , data_txt , re_flags )
+        if m != None:
+            track['date'] = m.group(1)     
+            
+        m = re.search( r"\s*genre\s*\:\s*(.*)$" , data_txt , re_flags )
+        if m != None:
+            track['genre'] = m.group(1)    
          
         ##########################################
         # string examples:   
@@ -144,6 +155,10 @@ class RetirveMetadata:
             for k in self._album.keys():
                 res = k
             return res
+    
+        
+    def get_album_sha1(self):
+        None
 
     
     def get_album_artist( self ):

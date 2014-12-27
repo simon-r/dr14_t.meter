@@ -38,6 +38,12 @@ class dr_database :
 
     def ungrade_db(self):
         None
+    
+    def insert_track( self , title , dr , peak , rms , duration , codec , album ):
+        None
+        
+    def insert_album( self , title , sha1 ):
+        None
         
     def dr14_db_main_structure_v1(self):
         db = """
