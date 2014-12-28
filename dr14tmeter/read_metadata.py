@@ -19,6 +19,7 @@ import subprocess
 import sys
 import os
 import re
+import hashlib
 
 from dr14tmeter.audio_decoder import AudioDecoder
 from dr14tmeter.dr14_global import get_ffmpeg_cmd
@@ -109,13 +110,17 @@ class RetirveMetadata:
         if m != None:
             track['genre'] = m.group(1)
             
-        m = re.search( r"\s*date\s*\:\s*(.*)$" , data_txt , re_flags )
+        m = re.search( r"\s*date\s*\:\s*(\d*)$" , data_txt , re_flags )
         if m != None:
             track['date'] = m.group(1)     
             
         m = re.search( r"\s*genre\s*\:\s*(.*)$" , data_txt , re_flags )
         if m != None:
-            track['genre'] = m.group(1)    
+            track['genre'] = m.group(1)  
+            
+        m = re.search( r"\s*size\s*\=\s*(\d+)$" , data_txt , re_flags )
+        if m != None:
+            track['size'] = m.group(1)  
          
         ##########################################
         # string examples:   
@@ -156,11 +161,19 @@ class RetirveMetadata:
                 res = k
             return res
     
-        
-    def get_album_sha1(self):
-        None
-
     
+    def get_album_sha1(self):
+        key_string = ""
+        key_string = key_string + str( self.get_album_title() ) + str( self.get_album_artist() )
+        
+        for track in self._tracks.keys() :
+            key_string = key_string + track 
+            key_string = key_string + str( self._tracks[track]['size'] )
+            key_string = key_string + str( self._tracks[track]['codec'] )
+        
+        return hashlib.sha1( bytearray( key_string.encode("utf8") ) ).hexdigest()
+            
+            
     def get_album_artist( self ):
 
         if len( self._artist ) > 1 :
