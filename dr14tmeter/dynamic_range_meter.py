@@ -42,13 +42,8 @@ from dr14tmeter.audio_math import sha1_track_v1
 import dr14tmeter.dr14_global as dr14
 
 from dr14tmeter.out_messages import print_msg, print_out, dr14_log_debug
-
-
-class SharedDrResObj(Structure):
-    _fields_ = [('file_name', c_wchar_p), ('dr14', c_double) , ('dB_peak' , c_double) , 
-                ( 'dB_rms' , c_double ) , ( 'duration' , c_double ) ]
     
-class SharedDrResObj_queue :
+class SharedDrResObj :
     def __init__(self):
         self.track_nr = -1
         self.file_name = ""
@@ -178,7 +173,7 @@ class DynamicRangeMeter:
         for file_name in dir_list:
             ( fn , ext ) = os.path.splitext( file_name )
             if ext in ad.formats:
-                job = SharedDrResObj_queue()
+                job = SharedDrResObj()
                 job.file_name = file_name
                 job_queue_sh.put( job )
                 
