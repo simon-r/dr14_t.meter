@@ -15,15 +15,37 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import sqlite3 
+import threading
+
 from dr14tmeter.dr14_config import get_db_path
+
+unique_db_object = 0 ;
+
+lock_db = threading.Lock()
 
 class dr_database :
     
     def __init__(self):
-        None
+        
+        global unique_db_object
+        global lock_db
+        
+        lock_db.acquire()
+        if unique_db_object > 0 :
+            lock_db.release()
+            raise Exception("Error: database.dr_database is not unique !")
+        unique_db_object = 1
+        lock_db.release()
+        
+        self._insert_session = False
+        
     
     def build_database(self):
-        
+        global lock_db
+        lock_db.acquire()
+        if self._insert_session :
+            lock_db.release()
+            raise Exception("Error: database.build_database It's impossible to build the database during an insertion !")        
         db = self.dr14_db_main_structure_v1()
         
         conn = sqlite3.connect( get_db_path() )
@@ -34,16 +56,47 @@ class dr_database :
         c.close()    
             
         self.ungrade_db()
+        lock_db.release()
         
-
-    def ungrade_db(self):
-        None
+    def open_insert_session(self):
+        global lock_db
+        lock_db.acquire()
+        
+        if self._insert_session :
+            lock_db.release()
+            raise Exception("Error: database.open_insert_session session already opened !")
+        self._insert_session = True
+        
+        self._tracks = {}
+        self._albums = {}
+        self._artists = {}
+        
+        lock_db.release()
+    
+    def commit_insert_session(self):
+        global lock_db
+        lock_db.acquire()
+        
+        self._insert_session = False
+        lock_db.release()
     
     def insert_track( self , title , artist ,  dr , peak , rms , duration , codec , album_sha1 , track_sha1 ):
-        None
+        global lock_db
+        lock_db.acquire()
+        
+        lock_db.release()
         
     def insert_album( self , title , sha1 ):
-        None
+        global lock_db
+        lock_db.acquire()
+        
+        lock_db.release()
+        
+    def insert_artist( self , name ):
+        global lock_db
+        lock_db.acquire()
+        
+        lock_db.release()
         
     def dr14_db_main_structure_v1(self):
         db = """
@@ -140,6 +193,9 @@ class dr_database :
         """
         
         return db
+    
+    def ungrade_db(self):
+        None
     
     
     
