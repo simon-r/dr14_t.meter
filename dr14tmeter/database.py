@@ -39,7 +39,7 @@ class dr_database :
     def ungrade_db(self):
         None
     
-    def insert_track( self , title , dr , peak , rms , duration , codec , album ):
+    def insert_track( self , title , artist ,  dr , peak , rms , duration , codec , album_sha1 , track_sha1 ):
         None
         
     def insert_album( self , title , sha1 ):
