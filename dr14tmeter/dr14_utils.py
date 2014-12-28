@@ -81,11 +81,7 @@ def scan_dir_list( subdirlist , options , out_dir ):
         if ( options.disable_multithread == True ) :
             r = dr.scan_dir( cur_dir )
         else:
-            cpu = cpu / 2
-            if cpu <= 2:
-                cpu = 2
-            else:
-                cpu = int( round( cpu ) )
+            cpu = get_thread_cnt()
                 
             r = dr.scan_mp( cur_dir , cpu )
             
@@ -94,7 +90,6 @@ def scan_dir_list( subdirlist , options , out_dir ):
         else:
             success = True
             
-        
         write_results( dr , options , out_dir , cur_dir )        
          
     
