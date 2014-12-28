@@ -37,6 +37,7 @@ from dr14tmeter.read_metadata import RetirveMetadata
 from dr14tmeter.audio_decoder import AudioDecoder
 from dr14tmeter.duration import StructDuration
 from dr14tmeter.write_dr import WriteDr, WriteDrExtended
+from dr14tmeter.audio_math import sha1_track_v1 
 
 import dr14tmeter.dr14_global as dr14
 
@@ -44,7 +45,18 @@ from dr14tmeter.out_messages import print_msg, print_out, dr14_log_debug
 
 
 class SharedDrResObj(Structure):
-    _fields_ = [('file_name', c_wchar_p), ('dr14', c_double) , ('dB_peak' , c_double) , ( 'dB_rms' , c_double ) , ( 'duration' , c_double ) ]
+    _fields_ = [('file_name', c_wchar_p), ('dr14', c_double) , ('dB_peak' , c_double) , 
+                ( 'dB_rms' , c_double ) , ( 'duration' , c_double ) ]
+    
+class SharedDrResObj_queue :
+    def __init__(self):
+        self.track_nr = -1
+        self.file_name = ""
+        self.dr14 = dr14.min_dr()
+        self.dB_peak = 0.0
+        self.dB_rms = 0.0 
+        self.duration = ""
+        self.sha1 = ""
 
 
 class DynamicRangeMeter:   
@@ -148,6 +160,9 @@ class DynamicRangeMeter:
             dir_name = dir_name.decode('utf-8')
         
         self.dr14 = 0
+        
+        job_queue_sh = mp.Queue()
+        res_queue_sh = mp.Queue()
                 
         if files_list == [] :
             if not os.path.isdir(dir_name) :
@@ -160,30 +175,19 @@ class DynamicRangeMeter:
             
         ad = AudioDecoder()
         
-        jobs = []
         for file_name in dir_list:
             ( fn , ext ) = os.path.splitext( file_name )
             if ext in ad.formats:
-                jobs.append( file_name )
-        
-        
-        res_array=[SharedDrResObj() for i in range( len(jobs) )]
-        
-        for i in range( len(jobs) ) :
-            res_array[i].file_name = jobs[i]
-            res_array[i].dr14 = dr14.min_dr()
-        
-        lock_j = mp.Lock()
-        lock_res_list = mp.Lock()
-        
+                job = SharedDrResObj_queue()
+                job.file_name = file_name
+                job_queue_sh.put( job )
+                
         threads = [1 for i in range(thread_cnt)]
         
-        #job_free = [0]
         job_free = mp.Value( 'i' , 0 )
-        res_array_sh = mp.Array( SharedDrResObj , res_array )
         
         for t in range( thread_cnt ):
-            threads[t] = mp.Process( target=self.run_mp , args=( dir_name , lock_j , lock_res_list , job_free , res_array_sh ) )
+            threads[t] = mp.Process( target=self.run_mp , args=( dir_name , job_queue_sh , res_queue_sh ) )
             
         for t in range( thread_cnt ):
             threads[t].start() 
@@ -193,19 +197,23 @@ class DynamicRangeMeter:
             
         succ = 0
         
-        #empty_res = { 'file_name': '' , 'dr14': dr14.min_dr() , 'dB_peak': -100 , 'dB_rms': -100 , 'duration':"0:0" }
-        self.res_list = [] # [empty_res for i in range( len(jobs) )]
+        self.res_list = [] 
         
         #i = 0
         
         dur = StructDuration()
         
-        for res in res_array_sh:
+        while not res_queue_sh.empty() :
+            res = res_queue_sh.get()
             self.res_list.append( { 'file_name':   res.file_name ,
-                                 'dr14':        res.dr14 ,
-                                 'dB_peak':     res.dB_peak ,
-                                 'dB_rms':      res.dB_rms ,
-                                 'duration':    dur.float_to_str( res.duration ) } )
+                                    'dr14':        res.dr14 ,
+                                    'dB_peak':     res.dB_peak ,
+                                    'dB_rms':      res.dB_rms ,
+                                    'duration':    dur.float_to_str( res.duration ) , 
+                                    'sha1':        res.sha1 } )
+            
+        
+        self.res_list = sorted( self.res_list , key=lambda res: res['file_name'] )
             
         #    i = i + 1
         
@@ -222,8 +230,8 @@ class DynamicRangeMeter:
         else:
             return 0
   
-    
-    def run_mp( self , dir_name , lock_j , lock_res_list , job_free , res_array_sh ):
+
+    def run_mp( self , dir_name , job_queue_sh , res_queue_sh ):
         
         at = AudioTrack() 
         duration = StructDuration()
@@ -232,37 +240,30 @@ class DynamicRangeMeter:
         
         while True:
             
-            #Aquire the next free job
-            lock_j.acquire()
+            if job_queue_sh.empty() :
+                return 
             
-            if job_free.value >= len(res_array_sh):
-                lock_j.release()
-                return
+            job = job_queue_sh.get()
             
-            curr_job =  job_free.value
-            file_name = res_array_sh[curr_job].file_name
-            job_free.value = job_free.value + 1
-            
-            lock_j.release()
-            
-            full_file = os.path.join( dir_name , file_name )
+            full_file = os.path.join( dir_name , job.file_name )
             #print ( full_file )
             
             if at.open( full_file ):
                 ( dr14, dB_peak, dB_rms ) = compute_dr14( at.Y , at.Fs , duration )
-                lock_res_list.acquire()
-                print_msg( file_name + ": \t DR " + str( int(dr14) ) )
+                sha1 = sha1_track_v1( at.Y )
+    
+                print_msg( job.file_name + ": \t DR " + str( int(dr14) ) )
                 
-                #res_list[curr_job] = { 'file_name': file_name , 'dr14': dr14 , 'dB_peak': dB_peak , 'dB_rms': dB_rms , 'duration':duration.to_str() }
-                res_array_sh[curr_job].dr14 = dr14
-                res_array_sh[curr_job].dB_peak = dB_peak
-                res_array_sh[curr_job].dB_rms = dB_rms
-                res_array_sh[curr_job].duration = duration.to_float() 
+                job.dr14 = dr14
+                job.dB_peak = dB_peak
+                job.dB_rms = dB_rms
+                job.duration = duration.to_float() 
+                job.sha1 = sha1
                 
-                lock_res_list.release()
+                res_queue_sh.put(job)
             else:
                 print_msg( "- fail - " + full_file )
-    
 
+    
 
    

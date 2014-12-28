@@ -18,7 +18,7 @@
 from numpy  import *
 import math
 import numpy
-
+import hashlib
 
 def dr_rms( y ) :
     n = y.shape
@@ -28,10 +28,8 @@ def u_rms( y ) :
     n = y.shape
     return numpy.sqrt( numpy.sum( y**2.0 , 0 ) / float(n[0]) )
 
-
 def decibel_u( y , ref ) :
     return 20.0 * numpy.log10( y / ref )
-
 
 def decibel_p( y , ref ) :
     return 10.0 * numpy.log10( y / ref )
@@ -48,3 +46,14 @@ def max_dynamic( bit ):
 def normalize( y , ml=1.0 ):
     m = numpy.max( numpy.abs( y ) )
     return ml * ( y * (1.0/m) )
+
+# compute the sha1 fingerprint of the track 
+# Do not modify this function !!
+def sha1_track_v1( y ):
+    n = y.shape
+    if n[0] <= 44100*2 :
+        return hashlib.sha1( y ).hexdigest()
+    else :
+        return hashlib.sha1( y[ :44100*2 , : ] ).hexdigest()
+        
+    
