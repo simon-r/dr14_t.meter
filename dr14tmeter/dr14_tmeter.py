@@ -24,6 +24,7 @@ from dr14tmeter.parse_args import parse_args
 from dr14tmeter.dynamic_range_meter import DynamicRangeMeter
 from dr14tmeter.table import *
 from dr14tmeter.audio_analysis import *
+from dr14tmeter.database import dr_database
 from dr14tmeter.dr14_global import dr14_version, TestVer, test_new_version, get_home_url, get_new_version, get_exe_name, test_hist_modules, test_compress_modules
 import subprocess
 import inspect
@@ -37,7 +38,11 @@ import numpy
     
 def main():
         
+    db = dr_database()
+    #db.build_database()
+    print( db.query("select max(Id) from Album").pop()[0] )
     
+    exit()
     
     options = parse_args()
 

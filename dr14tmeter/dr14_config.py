@@ -17,6 +17,7 @@
 
 import os.path 
 import os
+import sys
 
 from dr14tmeter.out_messages import print_msg
 
