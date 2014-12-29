@@ -38,44 +38,52 @@ import numpy
     
 def main():
         
-#===============================================================================
 #     db = dr_database()
-#     #db.build_database()
+#     db.build_database()
 #     for i in range(10):
 #         print( db.query("select * from Codec where name = \'mp3\' " ) )
 #     
 #     db.open_insert_session()
-#     db.insert_track( "3533fdedcf6dcc81df2a8fd8b5bf90997d30cf9f" , "ciao" , 
-#                      20 , 2.0 , 2.0 , 33.0 , 
-#                      "mp3" , "3533fdedcf6dcc81df2a8fd8b5bf90997d30cf4f" , "meo" , "bob" )
-# 
-#     db.insert_track( "3533fdddcf6dcc81df2a8fd8b5bf90997d30cf9f" , "ciao" , 
-#                      17 , 2.0 , 2.0 , 33.0 , 
-#                      "mp3" , "3533fdedcf6dcc81df2a8fd8b5bf90997d30cf4f" , "peo" , "pop" )
-#     db.insert_track( "3533fd5dcf6dcc81df2a8fd8b5bf90997d30cf9f" , "ciao" , 
-#                      3 , 2.0 , 2.0 , 33.0 , 
-#                      "mp3" , "3533fdedcf6dcc81df2a8fd8b5bf90997d30cf4f" , "meo" )
-#     db.insert_track( "3533fd7dcf6dcc81df2a8fd8b5bf90997d30cf9f" , "ciao" , 
-#                      5 , 2.0 , 2.0 , 33.0 , 
-#                      "mp34" , "3533fdedcf6dcc81df2a8fd8b5bf90997d30cf4f" , "peo" , "pop" )
-#     db.insert_track( "3533fd1dcf6dcc81df2a8fd8b5bf90997d30cf9f" , "ciao" , 
-#                      17 , 2.0 , 2.0 , 33.0 , 
-#                      "mp5" , "3533fdedcf6dcc81df2a8fd8b5bf90997d3t0geo" , "geo" , "rock" )
 #     
-#     db.insert_album( "3533fdedcf6dcc81df2a8fd8b5bf90997d30cf4f" , "pinco" , 17 )
-#     db.insert_album( "3533fdedcf6dcc81df2a8fd8b5bf90997d3t0geo" , "geo" , 21 )
+#     db.insert_album( "1" , "mooo" , 17 )
+#     db.insert_album( "2" , "the" , 21 )
+#     db.insert_album( "3" , "kat" , 21 )
+#     db.insert_album( "4" , "uuu" , 22 )
+#     db.insert_album( "5" , "poi" , 22 )
+#     
+#     db.insert_track( "3533tdedcf6dcc81df2a8fd8b5bf90997d30cf9f" , "ciao1" , 
+#                      20 , 2.0 , 2.0 , 33.0 , 
+#                      "mp3" , "3" , "meo" , "bob" , 1999 )
+# 
+#     db.insert_track( "3533eedddcf6dcc81df2a8fd8b5bf90997d30cf9f" , "ciao2" , 
+#                      17 , 2.0 , 2.0 , 33.0 , 
+#                      "mp3" , "3" , "peo" , "pop" , 1987 )
+#     
+#     db.insert_track( "3533ww5dcf6dcc81df2a8fd8b5bf90997d30cf9f" , "ciao3" , 
+#                      3 , 2.0 , 2.0 , 33.0 , 
+#                      "mp3" , "2" , "meo" , 1987 )
+#     
+#     db.insert_track( "3533wwr7dcf6dcc81df2a8fd8b5bf90997d30cf9f" , "ciao4" , 
+#                      5 , 2.0 , 2.0 , 33.0 , 
+#                      "mp34" , "1" , "peo" , "pop" , 2000 )
+#     
+#     db.insert_track( "3533fd1ttf6dcc81df2a8fd8b5bf90997d30cf9f" , "ciao5" , 
+#                      17 , 2.0 , 2.0 , 33.0 , 
+#                      "mp5" , "4" , "geo" , "rock" , 2010)
+#     
 #     
 #     print ( db._tracks )
 #     print ( db._artists )
 #     print ( db._codec )
 #     print ( db._genre )
 #     print ( db._dr )
+#     print()
 #     print ( db._albums )
+#     print ( db._date )
 #     
 #     db.commit_insert_session()
 #     
 #     exit()
-#===============================================================================
     
     options = parse_args()
 
