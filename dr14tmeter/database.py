@@ -49,11 +49,9 @@ class dr_database :
         db = self.dr14_db_main_structure_v1()
         
         conn = sqlite3.connect( get_db_path() )
-        c = conn.cursor()
         
-        conn.execute( db )
+        conn.executescript( db )
         conn.commit()
-        c.close()    
             
         self.ungrade_db()
         lock_db.release()
@@ -71,6 +69,18 @@ class dr_database :
         self._albums = {}
         self._artists = {}
         
+        self._id_artist = self.query( "select max(Id) from Artist" ).pop()[0]
+        self._id_artist = 0 if self._id_artist == None else self._id_artist
+        
+        self._id_album = self.query( "select max(Id) from Album" ).pop()[0]
+        self._id_album = 0 if self._id_album == None else self._id_album
+        
+        self._id_track = self.query( "select max(Id) from Track" ).pop()[0]
+        self._id_track = 0 if self._id_track == None else self._id_track
+        
+        self._id_genre = self.query( "select max(Id) from Genre" ).pop()[0]
+        self._id_genre = 0 if self._id_genre == None else self._id_genre
+        
         lock_db.release()
     
     def commit_insert_session(self):
@@ -80,13 +90,13 @@ class dr_database :
         self._insert_session = False
         lock_db.release()
     
-    def insert_track( self , title , artist ,  dr , peak , rms , duration , codec , album_sha1 , track_sha1 ):
+    def insert_track( self , track_sha1 , title , artist ,  dr , peak , rms , duration , codec , album_sha1 ):
         global lock_db
         lock_db.acquire()
         
         lock_db.release()
         
-    def insert_album( self , title , sha1 ):
+    def insert_album( self , album_sha1 , title ):
         global lock_db
         lock_db.acquire()
         
@@ -98,6 +108,16 @@ class dr_database :
         
         lock_db.release()
         
+    def query( self , query ):
+        conn = sqlite3.connect( get_db_path() )
+        c = conn.cursor()
+        
+        c.execute( query )
+        res_l = c.fetchall()
+        c.close()
+        
+        return res_l
+             
     def dr14_db_main_structure_v1(self):
         db = """
         
@@ -110,9 +130,9 @@ class dr_database :
             create table Artist (
                 Id integer primary key autoincrement ,
                 Name varchar(60)
-            ) ;      
-        
-            create table track (
+            ) ;   
+                    
+            create table Track (
                 Id integer primary key autoincrement ,
                 Title varchar(60) ,
                 rms float ,
@@ -188,7 +208,7 @@ class dr_database :
                 primary key ( IdAlbum , IdTrack ) ,
                 foreign key ( IdAlbum ) references Album ( Id ) ,
                 foreign key ( IdTrack ) references track ( Id )
-            ) ;              
+            ) ;
             
         """
         
