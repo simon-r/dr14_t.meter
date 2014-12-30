@@ -50,6 +50,9 @@ def get_config_file( create = True ):
 def write_default_cfg( cfg_file ):
     config = ConfigParser.ConfigParser()
     
+    config.add_section('config_version')
+    config.set('config_version', 'number', '1' )
+    
     config.add_section('database')
     
     config.set('database', 'enabled', 'False' )

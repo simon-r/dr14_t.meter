@@ -33,7 +33,7 @@ class dr_database :
         lock_db.acquire()
         if unique_db_object > 0 :
             lock_db.release()
-            raise Exception("Error: database.dr_database is not unique !")
+            raise Exception("Error: database.dr_database.__init__ database is not unique !")
         
         unique_db_object = 1
         lock_db.release()
@@ -480,9 +480,12 @@ class dr_database :
     
 
 class dr_database_singletone():
-    __database_singletone = dr_database()
+    __database_singletone = None
     
     def get(self):
+        if dr_database_singletone.__database_singletone == None :
+            dr_database_singletone.__database_singletone = dr_database()
+            
         return dr_database_singletone.__database_singletone
     
 

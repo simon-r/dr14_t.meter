@@ -112,7 +112,7 @@ class DynamicRangeMeter:
         
         self.dr14 = self.dr14 + dr14
         
-        res = { 'file_name': file_name , 'dr14': dr14 , 'dB_peak': dB_peak , 'dB_rms': dB_rms , 'duration':duration.to_str() }
+        res = { 'file_name': file_name , 'dr14': dr14 , 'dB_peak': dB_peak , 'dB_rms': dB_rms , 'duration':duration.to_float() }
         self.res_list.append(res)
         
         print_msg( file_name + ": \t DR " + str( int(dr14) ) )
@@ -126,7 +126,7 @@ class DynamicRangeMeter:
         else :
             wr = WriteDr()
         
-        wr.set_dr_database( dr_database )
+        wr.set_loudness_war_db_compatible( dr_database )
         
         self.table_txt = wr.write_dr( self , tm )        
         

@@ -18,16 +18,52 @@ import os
 import dr14tmeter.dr14_global as dr14
 import dr14tmeter.table as table
 
+from dr14tmeter.database import dr_database_singletone
+
 class WriteDr :
     
     def __init__(self):
         self.__dr_database_compatible = True
     
-    def set_dr_database( self , f ):
+    def set_loudness_war_db_compatible( self , f ):
         self.__dr_database_compatible = f
         
-    def get_dr_database(self):
+    def get_loudness_war_db_compatible(self):
         return self.__dr_database_compatible
+    
+    def write_to_dr_database( self , drm ):
+        db = dr_database_singletone().get()
+        
+        album_title = drm.meta_data.get_album_title()
+        
+        if album_t == None :
+            ( head , album_title ) = os.path.split( drm.dir_name )
+            
+        album_sha1 = drm.meta_data.get_album_sha1()
+
+        db.insert_album( album_sha1 , album_title , int(drm.dr14)  )
+        
+        for i in range( len( drm.res_list ) ) :
+            
+            curr_file_name = drm.res_list[i]['file_name']
+            
+            track_sha1 = drm.res_list[i]['sha1']
+            title      = drm.meta_data.get_value( curr_file_name , 'title' )
+            dr         = drm.res_list[i]['dr14']
+            rms        = drm.res_list[i]['dB_rms']
+            peak       = drm.res_list[i]['dB_peak']
+            duration   = drm.res_list[i]['duration']
+            codec      = drm.meta_data.get_value( curr_file_name , 'codec' )
+            artist     = drm.meta_data.get_value( curr_file_name , 'artist' )
+            genre      = drm.meta_data.get_value( curr_file_name , 'genre' )
+            date       = drm.meta_data.get_value( curr_file_name , 'date' )
+            
+            db.insert_track( track_sha1 , title , 
+                      dr , rms , peak , duration , 
+                      codec , album_sha1 , artist , 
+                      genre , date )
+        
+        
     
     def write_dr( self , drm , tm ):
         txt = ""
@@ -99,9 +135,9 @@ class WriteDrExtended( WriteDr ) :
         artist = drm.meta_data.get_album_artist()
         
         if not isinstance( tm , table.TextTable ) :
-            self.set_dr_database( False )
+            self.set_loudness_war_db_compatible( False )
         
-        if self.get_dr_database() :
+        if self.get_loudness_war_db_compatible() :
         
             title = "" 
             
