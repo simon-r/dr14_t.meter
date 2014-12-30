@@ -46,6 +46,9 @@ class WriteDr :
         
         for i in range( len( drm.res_list ) ) :
             
+            if drm.res_list[i]['dr14'] == dr14.min_dr() :
+                continue 
+            
             curr_file_name = drm.res_list[i]['file_name']
             
             track_sha1 = drm.res_list[i]['sha1']
@@ -58,11 +61,12 @@ class WriteDr :
             artist     = drm.meta_data.get_value( curr_file_name , 'artist' )
             genre      = drm.meta_data.get_value( curr_file_name , 'genre' )
             date       = drm.meta_data.get_value( curr_file_name , 'date' )
+            track_nr   = drm.meta_data.get_value( curr_file_name , 'track_nr' )
             
             db.insert_track( track_sha1 , title , 
                       dr , rms , peak , duration , 
                       codec , album_sha1 , artist , 
-                      genre , date )
+                      genre , date , track_nr )
         
         db.commit_insert_session()
         

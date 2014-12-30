@@ -41,13 +41,14 @@ import numpy
     
 def main():
         
-#     dbs = dr_database_singletone()
-#      
-#     db = dbs.get()
-#      
-#     db.build_database()
-#     for i in range(10):
-#         print( db.query("select * from Codec where name = \'mp3\' " ) )
+#    dbs = dr_database_singletone()
+      
+#    db = dbs.get()
+      
+    #db.build_database()
+    
+#    for i in range(10):
+#        print( db.query("select * from Codec where name = \'mp3\' " ) )
 #      
 #     db.open_insert_session()
 #      

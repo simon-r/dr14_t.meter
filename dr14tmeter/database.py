@@ -151,12 +151,19 @@ class dr_database :
             
             
         for k_track in self._tracks.keys() :
-            c.execute( "insert into Track ( Id , Title , rms , peak , duration , sha1 ) values ( ? , ? , ? , ? , ? , ? ) " , 
-                       ( self._tracks[k_track]["id"] , self._tracks[k_track]["title"] , self._tracks[k_track]["rms"] ,
-                         self._tracks[k_track]["peak"] , self._tracks[k_track]["duration"] ,
-                         k_track ) )
             
-            c.execute( "insert into DR_Track ( IdDr , IdTrack ) values ( ? , ? ) " , 
+            if self._tracks[k_track].get( "track_nr" , None ) == None :
+                c.execute( "insert into Track ( Id , Title , rms , peak , duration , sha1 ) values ( ? , ? , ? , ? , ? , ? ) " , 
+                           ( self._tracks[k_track]["id"] , self._tracks[k_track]["title"] , self._tracks[k_track]["rms"] ,
+                             self._tracks[k_track]["peak"] , self._tracks[k_track]["duration"] ,
+                             k_track ) )
+            else :
+                c.execute( "insert into Track ( Id , Title , rms , peak , duration , sha1 , track_nr ) values ( ? , ? , ? , ? , ? , ? , ? ) " , 
+                           ( self._tracks[k_track]["id"] , self._tracks[k_track]["title"] , self._tracks[k_track]["rms"] ,
+                             self._tracks[k_track]["peak"] , self._tracks[k_track]["duration"] ,
+                             k_track , self._tracks[k_track]["track_nr"] ) )
+            
+            c.execute( "insert into DR_Track ( IdDr , IdTrack ) values ( ? , ? ) " ,
                        ( self._tracks[k_track]["dr_id"] , self._tracks[k_track]["id"] ) )
             
             c.execute( "insert into Codec_Track ( IdCodec , IdTrack ) values ( ? , ? ) " , 
@@ -169,12 +176,14 @@ class dr_database :
             if self._tracks[k_track]["date_id"] >= 0 :
                 c.execute( "insert into Date_Track ( IdDate , IdTrack ) values ( ? , ? ) " , 
                            ( self._tracks[k_track]["date_id"] , self._tracks[k_track]["id"] ) )
+                
+            if self._tracks[k_track]["artist_id"] >= 0 :
+                c.execute( "insert into Artist_Track ( IdArtist , IdTrack ) values ( ? , ? ) " , 
+                           ( self._tracks[k_track]["artist_id"] , self._tracks[k_track]["id"] ) )
             
-            c.execute( "insert into Artist_Track ( IdArtist , IdTrack ) values ( ? , ? ) " , 
-                       ( self._tracks[k_track]["artist_id"] , self._tracks[k_track]["id"] ) )
-            
-            c.execute( "insert into Album_Track ( IdAlbum , IdTrack ) values ( ? , ? ) " , 
-                       ( self._tracks[k_track]["album_id"] , self._tracks[k_track]["id"] ) ) 
+            if self._tracks[k_track]["album_id"] >= 0 :
+                c.execute( "insert into Album_Track ( IdAlbum , IdTrack ) values ( ? , ? ) " , 
+                           ( self._tracks[k_track]["album_id"] , self._tracks[k_track]["id"] ) ) 
         
         conn.commit()
         conn.close()
@@ -186,8 +195,8 @@ class dr_database :
     
     def insert_track( self , track_sha1 , title , 
                       dr , rms , peak , duration , 
-                      codec , album_sha1="" , artist="" , 
-                      genre=None , date = None ):
+                      codec , album_sha1=None , artist=None , 
+                      genre=None , date = None , track_nr=None ):
         
         
         global lock_db
@@ -197,25 +206,27 @@ class dr_database :
             raise Exception("Error: database.insert_track the insert session has not been opened !")
         
         
-        q = "select Id from track where sha1 = \"%s\" " % track_sha1
-        rq = self.query( q )
+        q = "select Id from track where sha1 = ? " 
+        rq = self.query( q , (track_sha1,) )
         
         if len( rq ) > 0 :
             lock_db.release()
             return rq.pop()[0]
         
-        q = "select Id from artist where name = \"%s\" " % artist
-        rq = self.query( q )
-        if len( rq ) == 0 and not ( artist in self._artists.values() ) :
-            artist_id = self.__insert_artist( artist )
-        elif len( rq ) > 0 :
-            artist_id = rq.pop()[0]
-        else :
-            artist_id = [k for (k, v) in self._artists.items() if v == artist][0]
+        artist_id = -1
+        if artist != None :
+            q = "select Id from artist where name = ? " 
+            rq = self.query( q , ( artist, ))
+            if len( rq ) == 0 and not ( artist in self._artists.values() ) :
+                artist_id = self.__insert_artist( artist )
+            elif len( rq ) > 0 :
+                artist_id = rq.pop()[0]
+            else :
+                artist_id = [k for (k, v) in self._artists.items() if v == artist][0]
         
             
-        q = "select Id from codec where name = \"%s\" " % codec
-        rq = self.query( q )
+        q = "select Id from codec where name = ? "
+        rq = self.query( q , ( codec, ) )
         if len( rq ) == 0 and not ( codec in self._codec.values() ) :
             codec_id = self.__insert_codec( codec )
         elif len( rq ) > 0 :
@@ -226,8 +237,8 @@ class dr_database :
          
         genre_id = -1   
         if genre != None : 
-            q = "select Id from Genre where name = \"%s\" " % genre
-            rq = self.query( q )
+            q = "select Id from Genre where name = ? " 
+            rq = self.query( q , (genre,) )
             if len( rq ) == 0 and not ( genre in self._genre.values() ) :
                 genre_id = self.__insert_genre( genre )
             elif len( rq ) > 0 :
@@ -237,11 +248,10 @@ class dr_database :
         
                 
         date_id = -1   
-    
         if date != None :
             date_nr = int(float( date )) 
-            q = "select Id from Date where date = %d " % date_nr
-            rq = self.query( q )
+            q = "select Id from Date where date = ? " 
+            rq = self.query( q , ( date_nr, ) )
             if len( rq ) == 0 and not ( date_nr in self._date.values() ) :
                 date_id = self.__insert_date( date_nr )
             elif len( rq ) > 0 :
@@ -250,8 +260,8 @@ class dr_database :
                 date_id = [k for (k, v) in self._date.items() if v == date_nr ][0]                 
         
                 
-        q = "select Id from DR where DR = %d " % dr 
-        rq = self.query( q )
+        q = "select Id from DR where DR = ? "  
+        rq = self.query( q , (dr,) )
         if len( rq ) == 0 and not ( dr in self._dr.values() ) :
             dr_id = self.__insert_dr( dr )
         elif len( rq ) > 0 :
@@ -260,18 +270,21 @@ class dr_database :
             dr_id = [k for (k, v) in self._dr.items() if v == dr][0]
         
         
-        rq = self.query( "select Id from Album where sha1 = ? " , ( album_sha1, ) )
-        if len( rq ) == 0 and not album_sha1 in [ k for k in self._albums.keys() ] :
-            album_id = None
-        elif len( rq ) > 0 :
-            album_id = rq.pop()[0]
-        else :
-            album_id = [ self._albums[k][0] for k in self._albums.keys() if k == album_sha1 ][0]
+        album_id = -1
+        if album_sha1 != None :
+            rq = self.query( "select Id from Album where sha1 = ? " , ( album_sha1, ) )
+            if len( rq ) == 0 and not album_sha1 in [ k for k in self._albums.keys() ] :
+                album_id = None
+            elif len( rq ) > 0 :
+                album_id = rq.pop()[0]
+            else :
+                album_id = [ self._albums[k][0] for k in self._albums.keys() if k == album_sha1 ][0]
+   
             
         self._tracks[track_sha1] = { "id": self._id_track , "title": title , "dr_id": dr_id , 
                                     "peak": peak , "rms": rms , "duration": duration ,
                                     "codec_id": codec_id , "album_sha1": album_sha1 , "artist_id": artist_id , 
-                                    "genre_id": genre_id , "date_id": date_id , "album_id": album_id }
+                                    "genre_id": genre_id , "date_id": date_id , "album_id": album_id , "track_nr": track_nr }
         
         self._id_track = self._id_track + 1
         
@@ -284,7 +297,7 @@ class dr_database :
         global lock_db
         lock_db.acquire()
         
-        print( album_sha1 )
+        #print( album_sha1 )
         q = "select Id from Album where sha1 = ? "  
         rq = self.query( q , ( album_sha1, )  )
         
@@ -374,12 +387,14 @@ class dr_database :
             create table Track (
                 Id integer primary key autoincrement ,
                 Title varchar(60) ,
+                track_nr integer ,
                 rms float ,
                 peak float ,
                 duration float ,
                 sha1 varchar(40) not null                 
             ) ;
             create index Track_indx on Track ( sha1 ) ;
+            create index Track_title_indx on Track ( Title ) ;
             
             
             create table Album (
@@ -387,7 +402,8 @@ class dr_database :
                 sha1 varchar(40) not null ,
                 Title varchar(100) 
             ) ;
-            create index Album_indx on Album ( sha1 ) ;           
+            create index Album_indx on Album ( sha1 ) ;
+            create index Album_title_indx on Track ( Title ) ;  
             
             
             create table DR (

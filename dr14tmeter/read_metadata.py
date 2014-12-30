@@ -121,20 +121,34 @@ class RetirveMetadata:
         m = re.search( r"\s*size\s*\=\s*(\d+)$" , data_txt , re_flags )
         if m != None:
             track['size'] = m.group(1)  
+            
+        m = re.search( r"\s*track\s*\=\s*(\d+)$" , data_txt , re_flags )
+        if m != None:
+            track['track_nr'] = m.group(1)  
          
         ##########################################
         # string examples:   
         #Audio: flac, 44100 Hz, stereo, s16
         #Stream #0:0(und): Audio: alac (alac / 0x63616C61), 44100 Hz, 2 channels, s16, 634 kb/s
+        #Stream #0:0(und): Audio: aac (LC) (mp4a / 0x6134706D), 44100 Hz, stereo, fltp, 255 kb/s (default
         #Stream #0:0: Audio: flac, 44100 Hz, stereo, s16
-        m = re.search( r"\:\s*Audio\s*\:\s*(\w+)[^,]*,\s*(\d*)\s*Hz\s*,\s*([\w\s]*)\s*,\s*s(\d+)" , data_txt , re_flags )
+        m = re.search( r"\:\s*Audio\s*\:\s*(\w+)[^,]*,\s*(\d*)\s*Hz\s*,\s*([\w\s]*)\s*,\s*(\w+)" , data_txt , re_flags )
         if m != None:
             track['codec'] = m.group(1)
             track['s_rate'] = m.group(2)
             track['channel'] = m.group(3)
             track['bit'] = m.group(4)
+            mm = re.search( "s(\d+)" , track['bit'] )
+            if mm == None :
+                track['bit'] = "16"
+            else :
+                track['bit'] = mm.group(1)
+                
+                
             
             #print ( m.group(1) + " " + m.group(2)+ " " + m.group(3)+ " " + m.group(4) )
+        
+        #print( track )
         
         m = re.search( r"\,\s*bitrate\s*\:\s*(\d*)\s*kb" , data_txt , re_flags )
         if m != None:
@@ -167,6 +181,8 @@ class RetirveMetadata:
         key_string = key_string + str( self.get_album_title() ) + str( self.get_album_artist() )
         
         for track in self._tracks.keys() :
+            if not self._tracks[track].get( 'size' , False ) or not self._tracks[track].get( 'codec', False ) :
+                continue
             key_string = key_string + track 
             key_string = key_string + str( self._tracks[track]['size'] )
             key_string = key_string + str( self._tracks[track]['codec'] )
