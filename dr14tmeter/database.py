@@ -179,6 +179,7 @@ class dr_database :
         lock_db.release()
     
     
+    
     def insert_track( self , track_sha1 , title , 
                       dr , rms , peak , duration , 
                       codec , album_sha1="" , artist="" , 
@@ -360,6 +361,8 @@ class dr_database :
                 Id integer primary key autoincrement ,
                 Name varchar(60)
             ) ;   
+            create index Artist_indx on Artist ( Name ) ;
+                    
                     
             create table Track (
                 Id integer primary key autoincrement ,
@@ -369,12 +372,16 @@ class dr_database :
                 duration float ,
                 sha1 varchar(40) not null                 
             ) ;
+            create index Track_indx on Track ( sha1 ) ;
+            
             
             create table Album (
                 Id integer primary key autoincrement ,
                 sha1 varchar(40) not null ,
                 Title varchar(100) 
-            ) ;           
+            ) ;
+            create index Album_indx on Album ( sha1 ) ;           
+            
             
             create table DR (
                 Id integer primary key autoincrement ,
