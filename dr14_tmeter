@@ -24,4 +24,3 @@ sys.path.append( "dr14tmeter" )
 
 
 dr14tmeter.dr14_tmeter.main()
-

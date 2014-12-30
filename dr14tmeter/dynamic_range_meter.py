@@ -128,7 +128,9 @@ class DynamicRangeMeter:
         
         wr.set_loudness_war_db_compatible( dr_database )
         
-        self.table_txt = wr.write_dr( self , tm )        
+        self.table_txt = wr.write_dr( self , tm )
+        
+        #wr.write_to_dr_database( self )
         
         if std_out:
             print_out( self.table_txt )

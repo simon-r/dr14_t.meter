@@ -162,11 +162,13 @@ class dr_database :
             c.execute( "insert into Codec_Track ( IdCodec , IdTrack ) values ( ? , ? ) " , 
                        ( self._tracks[k_track]["codec_id"] , self._tracks[k_track]["id"] ) )
             
-            c.execute( "insert into Genre_Track ( IdGenre , IdTrack ) values ( ? , ? ) " , 
-                       ( self._tracks[k_track]["genre_id"] , self._tracks[k_track]["id"] ) )
+            if self._tracks[k_track]["genre_id"] >= 0 :
+                c.execute( "insert into Genre_Track ( IdGenre , IdTrack ) values ( ? , ? ) " , 
+                           ( self._tracks[k_track]["genre_id"] , self._tracks[k_track]["id"] ) )
             
-            c.execute( "insert into Date_Track ( IdDate , IdTrack ) values ( ? , ? ) " , 
-                       ( self._tracks[k_track]["date_id"] , self._tracks[k_track]["id"] ) )
+            if self._tracks[k_track]["date_id"] >= 0 :
+                c.execute( "insert into Date_Track ( IdDate , IdTrack ) values ( ? , ? ) " , 
+                           ( self._tracks[k_track]["date_id"] , self._tracks[k_track]["id"] ) )
             
             c.execute( "insert into Artist_Track ( IdArtist , IdTrack ) values ( ? , ? ) " , 
                        ( self._tracks[k_track]["artist_id"] , self._tracks[k_track]["id"] ) )
@@ -235,15 +237,17 @@ class dr_database :
         
                 
         date_id = -1   
-        if date != None : 
-            q = "select Id from Date where date = %d " % date
+    
+        if date != None :
+            date_nr = int(float( date )) 
+            q = "select Id from Date where date = %d " % date_nr
             rq = self.query( q )
-            if len( rq ) == 0 and not ( genre in self._date.values() ) :
-                date_id = self.__insert_date( date )
+            if len( rq ) == 0 and not ( date_nr in self._date.values() ) :
+                date_id = self.__insert_date( date_nr )
             elif len( rq ) > 0 :
                 date_id = rq.pop()[0]
             else :
-                date_id = [k for (k, v) in self._date.items() if v == date ][0]                 
+                date_id = [k for (k, v) in self._date.items() if v == date_nr ][0]                 
         
                 
         q = "select Id from DR where DR = %d " % dr 
@@ -280,8 +284,9 @@ class dr_database :
         global lock_db
         lock_db.acquire()
         
+        print( album_sha1 )
         q = "select Id from Album where sha1 = ? "  
-        rq = self.query( q , album_sha1 )
+        rq = self.query( q , ( album_sha1, )  )
         
         if len( rq ) > 0 :
             lock_db.release()

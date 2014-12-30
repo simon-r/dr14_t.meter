@@ -33,10 +33,11 @@ class WriteDr :
     
     def write_to_dr_database( self , drm ):
         db = dr_database_singletone().get()
+        db.open_insert_session()
         
         album_title = drm.meta_data.get_album_title()
         
-        if album_t == None :
+        if album_title == None :
             ( head , album_title ) = os.path.split( drm.dir_name )
             
         album_sha1 = drm.meta_data.get_album_sha1()
@@ -62,6 +63,8 @@ class WriteDr :
                       dr , rms , peak , duration , 
                       codec , album_sha1 , artist , 
                       genre , date )
+        
+        db.commit_insert_session()
         
         
     

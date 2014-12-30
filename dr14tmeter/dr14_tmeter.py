@@ -17,61 +17,67 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
     
 
-import os
-import time
-import multiprocessing
+
 from dr14tmeter.parse_args import parse_args
 from dr14tmeter.dynamic_range_meter import DynamicRangeMeter
 from dr14tmeter.table import *
 from dr14tmeter.audio_analysis import *
-from dr14tmeter.database import dr_database
+from dr14tmeter.database import dr_database, dr_database_singletone
 from dr14tmeter.dr14_global import dr14_version, TestVer, test_new_version, get_home_url, get_new_version, get_exe_name, test_hist_modules, test_compress_modules
+from dr14tmeter.dr14_utils import *
+from dr14tmeter.out_messages import *
+from dr14tmeter.dr14_config import *
+
+import os
+import time
+import multiprocessing
 import subprocess
 import inspect
 import sys
 import re
-from dr14tmeter.dr14_utils import *
-from dr14tmeter.out_messages import *
-import logging
+import logging 
 import numpy
 
     
 def main():
         
-#     db = dr_database()
+#     dbs = dr_database_singletone()
+#      
+#     db = dbs.get()
+#      
 #     db.build_database()
 #     for i in range(10):
 #         print( db.query("select * from Codec where name = \'mp3\' " ) )
-#     
+#      
 #     db.open_insert_session()
-#     
+#      
 #     db.insert_album( "1" , "mooo" , 17 )
 #     db.insert_album( "2" , "the" , 21 )
 #     db.insert_album( "3" , "kat" , 21 )
 #     db.insert_album( "4" , "uuu" , 22 )
 #     db.insert_album( "5" , "poi" , 22 )
-#     
+#      
 #     db.insert_track( "3533tdedcf6dcc81df2a8fd8b5bf90997d30cf9f" , "ciao1" , 
 #                      20 , 2.0 , 2.0 , 33.0 , 
 #                      "mp3" , "3" , "meo" , "bob" , 1999 )
-# 
+#  
 #     db.insert_track( "3533eedddcf6dcc81df2a8fd8b5bf90997d30cf9f" , "ciao2" , 
 #                      17 , 2.0 , 2.0 , 33.0 , 
 #                      "mp3" , "3" , "peo" , "pop" , 1987 )
-#     
+#      
 #     db.insert_track( "3533ww5dcf6dcc81df2a8fd8b5bf90997d30cf9f" , "ciao3" , 
 #                      3 , 2.0 , 2.0 , 33.0 , 
 #                      "mp3" , "2" , "meo" , 1987 )
-#     
+#      
 #     db.insert_track( "3533wwr7dcf6dcc81df2a8fd8b5bf90997d30cf9f" , "ciao4" , 
 #                      5 , 2.0 , 2.0 , 33.0 , 
 #                      "mp34" , "1" , "peo" , "pop" , 2000 )
-#     
+#      
 #     db.insert_track( "3533fd1ttf6dcc81df2a8fd8b5bf90997d30cf9f" , "ciao5" , 
 #                      17 , 2.0 , 2.0 , 33.0 , 
 #                      "mp5" , "4" , "geo" , "rock" , 2010)
-#     
-#     
+#      
+#      
 #     print ( db._tracks )
 #     print ( db._artists )
 #     print ( db._codec )
@@ -80,11 +86,43 @@ def main():
 #     print()
 #     print ( db._albums )
 #     print ( db._date )
-#     
+#      
 #     db.commit_insert_session()
-#     
+#      
+#     db.open_insert_session()
+#      
+#     db.insert_album( "6" , "poittt" , 22 )
+#      
+#     db.insert_track( "3533tdedcf6d33cc81df2a8fd8b5bf90997d30cf9f" , "ciao11" , 
+#                      20 , 2.0 , 2.0 , 33.0 , 
+#                      "mp3" , "3" , "meo" , "bob" , 1999 )
+#  
+#     db.insert_track( "3533eedd435dcf6dcc81df2a8fd8b5bf90997d30cf9f" , "ciao21" , 
+#                      17 , 2.0 , 2.0 , 33.0 , 
+#                      "mp3" , "3" , "peo" , "pop" , 1987 )
+#      
+#     db.insert_track( "3533ww5dcf6dcc534581df2a8fd8b5bf90997d30cf9f" , "ciao31" , 
+#                      3 , 2.0 , 2.0 , 33.0 , 
+#                      "mp3" , "2" , "meo" , 1987 )
+#      
+#     db.insert_track( "3533wwr753457dcf6dcc81df2a8fd8b5bf90997d30cf9f" , "ciao41" , 
+#                      5 , 2.0 , 2.0 , 33.0 , 
+#                      "mp34" , "1" , "peo" , "pop" , 2000 )
+#      
+#     db.insert_track( "3533fd15674567ttf6dcc81df2a8fd8b5bf90997d30cf9f" , "ciao51" , 
+#                      17 , 2.0 , 2.0 , 33.0 , 
+#                      "mp5" , "6" , "geo" , "rock" , 2010)
+#          
+#      
+#      
+#      
+#     db.commit_insert_session()
+#      
 #     exit()
-    
+#     
+
+    get_config_file()
+
     options = parse_args()
 
     if options.version :
