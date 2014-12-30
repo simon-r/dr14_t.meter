@@ -20,8 +20,8 @@ import threading
 from dr14tmeter.dr14_config import get_db_path
 
 unique_db_object = 0 ;
-
 lock_db = threading.Lock()
+
 
 class dr_database :
     
@@ -34,6 +34,7 @@ class dr_database :
         if unique_db_object > 0 :
             lock_db.release()
             raise Exception("Error: database.dr_database is not unique !")
+        
         unique_db_object = 1
         lock_db.release()
         
@@ -70,6 +71,7 @@ class dr_database :
         conn.commit()
             
         self.ungrade_db()
+        
         lock_db.release()
         
         
@@ -476,4 +478,13 @@ class dr_database :
         None
     
     
+
+class dr_database_singletone():
+    __database_singletone = dr_database()
     
+    def get(self):
+        return dr_database_singletone.__database_singletone
+    
+
+
+
