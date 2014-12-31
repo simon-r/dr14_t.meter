@@ -57,13 +57,19 @@ def main():
     #print( options )
 
     if options.enable_database :
+        local_dr_database_configure()
         if not database_exists() :
             print_msg( "Building database .... " )
             db = dr_database_singletone().get()
             db.build_database()
         enable_db( True )
-        print_msg( "The local DR database is ready! It is located in the file: %s  " % get_db_path() )
+        print_msg( "The local DR database is ready and enabled! It is located in the file: %s  " % get_db_path() )
         return 
+    
+    if options.disable_database :
+        enable_db( False )
+        print_msg( "The local DR database is disabled! " )
+        return
 
     if options.path_name != None:
         path_name = os.path.abspath( options.path_name )

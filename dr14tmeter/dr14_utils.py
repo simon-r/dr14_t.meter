@@ -182,7 +182,30 @@ def write_results( dr , options , out_dir , cur_dir ) :
 
 
 def local_dr_database_configure():
-    None
+    
+    subprocess.call( "clear" , shell=True )
+    
+    print_msg( "---------------------------------------------------------------------------------------------- " )
+    print_msg( "- DR14 T.meter --  " )
+    print_msg( "- Local DR database - Configuration procedure " )
+    print_msg( "---------------------------------------------------------------------------------------------- " )
+    print_msg( "  The database, if enabled, automatically stores all DR result in a local database " )
+    print_msg( "  - You must set up some parameters to use the database -" )
+    print_msg( "  " )
+    print_msg( "  1. Insert the database directory: Default [%s]:" % os.path.split( get_db_path() )[0] )
+    db_path = input("     > ")
+    print ( db_path )
+    
+    
+    print_msg( "  " )
+    print_msg( "---------------------------------------------------------------------------------------------- " )
+    print_msg( "  " )
+    print_msg( "     If you set a collection directory ONLY the tracks inside this base folder and sub-folders " )
+    print_msg( "     will be added to the database." )
+    print_msg( "     If you insert \'any\' all analyzed tracks will be added to the database " )
+    print_msg( "  2. Insert your collection directory: Dafault [%s] " % "any" )
+    print_msg( "  " )
+    print_msg( "---------------------------------------------------------------------------------------------- " )
 
 def run_analysis_opt( options , path_name ):
     

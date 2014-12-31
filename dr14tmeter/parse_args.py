@@ -79,6 +79,11 @@ def parse_args():
         action="store_true",
         dest="enable_database",
         help="Enable and create, if necessary, the local DR database" )
+    
+    parser.add_argument( "--disable_database" ,
+        action="store_true",
+        dest="disable_database",
+        help="Disable the local DR database" )
 
     parser.add_argument("-d", "--dr_database",
         action="store_false",
