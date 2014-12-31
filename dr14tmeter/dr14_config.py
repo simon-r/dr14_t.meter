@@ -69,8 +69,15 @@ def set_db_path( full_file_path ):
         
 def enable_db( flag=True ):
     set_config_field( 'database', 'enabled', str(flag) )
- 
- 
+
+
+def database_exists():
+    dbp = get_db_path()
+    if os.path.isfile(dbp) :
+        return True
+    else :
+        return False 
+
 def set_collection_dir( path ):
     set_config_field( 'database', 'collection_dir', path )  
  
@@ -90,7 +97,7 @@ def get_db_path():
       
 def db_is_enabled():
     s = get_config_filed( 'database', 'enabled' )
-    return s.lower in [ "yes", "true", "t", "1" , "ok" , "yup" ]
+    return s.lower() in [ "yes", "true", "t", "1" , "ok" , "yup" ]
 
 def get_collection_dir():
     return get_config_filed( 'database', 'collection_dir' )

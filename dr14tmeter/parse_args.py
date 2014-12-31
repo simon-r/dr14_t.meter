@@ -74,6 +74,11 @@ def parse_args():
         action='store_true',
         dest="scan_file",
         help="Compute the DR14 of a single file and exit")
+    
+    parser.add_argument( "--enable_database" ,
+        action="store_true",
+        dest="enable_database",
+        help="Enable and create, if necessary, the local DR database" )
 
     parser.add_argument("-d", "--dr_database",
         action="store_false",

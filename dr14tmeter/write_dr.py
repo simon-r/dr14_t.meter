@@ -31,7 +31,7 @@ class WriteDr :
     def get_loudness_war_db_compatible(self):
         return self.__dr_database_compatible
     
-    def write_to_dr_database( self , drm ):
+    def write_to_local_dr_database( self , drm ):
         db = dr_database_singletone().get()
         db.open_insert_session()
         

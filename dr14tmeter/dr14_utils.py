@@ -24,6 +24,8 @@ from dr14tmeter.dynamic_range_meter import DynamicRangeMeter
 from dr14tmeter.table import *
 from dr14tmeter.audio_analysis import *
 from dr14tmeter.dr14_global import *
+from dr14tmeter.dr14_config import *
+
 import subprocess
 import sys
 import re
@@ -53,6 +55,7 @@ def scan_files_list( input_file , options , out_dir ):
         files_list.append( os.path.abspath( line.rstrip() ) )
         
     dr = DynamicRangeMeter()
+    dr.write_to_local_db( db_is_enabled() )
     
     r = dr.scan_mp( files_list=files_list , thread_cnt=get_thread_cnt() )
     
@@ -73,6 +76,8 @@ def scan_dir_list( subdirlist , options , out_dir ):
 
     for cur_dir in subdirlist :
         dr = DynamicRangeMeter()
+        dr.write_to_local_db( db_is_enabled() )
+        
         print_msg ( "\n------------------------------------------------------------ " )		        
         print_msg ( "> Scan Dir: %s \n" % cur_dir )
         
@@ -175,6 +180,9 @@ def write_results( dr , options , out_dir , cur_dir ) :
     print_msg( full_out_dir )
     print_msg("")
 
+
+def local_dr_database_configure():
+    None
 
 def run_analysis_opt( options , path_name ):
     

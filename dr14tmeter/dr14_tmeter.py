@@ -137,6 +137,15 @@ def main():
     
     #print( options )
 
+    if options.enable_database :
+        if not database_exists() :
+            print_msg( "Building database .... " )
+            db = dr_database_singletone().get()
+            db.build_database()
+        enable_db( True )
+        print_msg( "The local DR database is ready! It is located in the file: %s  " % get_db_path() )
+        return 
+
     if options.path_name != None:
         path_name = os.path.abspath( options.path_name )
     else:
@@ -164,9 +173,6 @@ def main():
     else :
         subdirlist = [] 
         subdirlist.append( path_name )
-    
-          
-    #print ( subdirlist )
 
     if run_analysis_opt( options , path_name ) :
         return 1
@@ -175,6 +181,9 @@ def main():
     if options.scan_file:
                 
         dr = DynamicRangeMeter()
+        
+        dr.write_to_local_db( db_is_enabled() )
+        
         r = dr.scan_file( path_name )
         
         if r == 1:

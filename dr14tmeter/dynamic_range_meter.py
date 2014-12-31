@@ -62,6 +62,10 @@ class DynamicRangeMeter:
         self.dr14 = 0 
         self.meta_data = RetirveMetadata()        
         self.compute_dr = ComputeDR14()
+        self.__write_to_local_db = False
+    
+    def write_to_local_db( self , f=False ):
+        self.__write_to_local_db = f
     
     def scan_file( self , file_name):
         
@@ -130,7 +134,8 @@ class DynamicRangeMeter:
         
         self.table_txt = wr.write_dr( self , tm )
         
-        #wr.write_to_dr_database( self )
+        if self.__write_to_local_db :
+            wr.write_to_local_dr_database( self )
         
         if std_out:
             print_out( self.table_txt )
