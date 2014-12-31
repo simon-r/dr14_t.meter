@@ -181,6 +181,17 @@ def write_results( dr , options , out_dir , cur_dir ) :
     print_msg("")
 
 
+def test_path_validity( path ):
+    if path in [ "/" , "" ]:
+        return False
+    if os.access( path , os.W_OK ):
+        return True
+    else :
+        ( h , t ) = os.path.split( path )
+        return test_path_validity( h )
+    return False
+
+
 def local_dr_database_configure():
     
     subprocess.call( "clear" , shell=True )
@@ -189,13 +200,30 @@ def local_dr_database_configure():
     print_msg( "- DR14 T.meter --  " )
     print_msg( "- Local DR database - Configuration procedure " )
     print_msg( "---------------------------------------------------------------------------------------------- " )
+    
+    print_msg( "  " )
     print_msg( "  The database, if enabled, automatically stores all DR result in a local database " )
     print_msg( "  - You must set up some parameters to use the database -" )
-    print_msg( "  " )
-    print_msg( "  1. Insert the database directory: Default [%s]:" % os.path.split( get_db_path() )[0] )
-    db_path = input("     > ")
-    print ( db_path )
+    print_msg( "  " )    
     
+    flag = True
+    while flag :
+        print_msg( "  1. Insert the database directory: Default [%s]:" % os.path.split( get_db_path() )[0] )
+        db_path = input("     > ")
+        db_path = os.path.expanduser( db_path )
+        db_path = os.path.expandvars( db_path )
+        
+        if re.sub( "\s+" , "" , db_path ) == "" :
+            flag = False
+            db_path = "%s/.config/dr14tmeter" % os.path.expanduser("~")
+            continue
+        
+        db_path = os.path.abspath( db_path )
+        
+        if test_path_validity( db_path ) :
+            flag = False
+        else :
+            print_msg( "  - [ %s ] is not a directory, please insert an acceptable directory name" % db_path )
     
     print_msg( "  " )
     print_msg( "---------------------------------------------------------------------------------------------- " )
@@ -203,9 +231,31 @@ def local_dr_database_configure():
     print_msg( "     If you set a collection directory ONLY the tracks inside this base folder and sub-folders " )
     print_msg( "     will be added to the database." )
     print_msg( "     If you insert \'any\' all analyzed tracks will be added to the database " )
-    print_msg( "  2. Insert your collection directory: Dafault [%s] " % "any" )
+    
+    flag = True
+    while flag :
+        print_msg( "  2. Insert your collection directory: Dafault [%s] " % "any" )
+        coll_path = input("     > ")
+        coll_path = os.path.expanduser( coll_path )
+        coll_path = os.path.expandvars( coll_path )
+        
+        if re.sub( "(\s+)" , "" , coll_path ) in [ "" , "any" ] :
+            flag = False
+            coll_path = "/"
+            continue 
+            
+        coll_path = os.path.abspath( coll_path )
+        
+        if os.path.isdir( coll_path ) :
+            flag = False
+        else :
+            print_msg( "  - [ %s ] is not a directory, please insert an existing directory name" % coll_path )
+    
     print_msg( "  " )
     print_msg( "---------------------------------------------------------------------------------------------- " )
+        
+    return ( db_path , coll_path )
+    
 
 def run_analysis_opt( options , path_name ):
     

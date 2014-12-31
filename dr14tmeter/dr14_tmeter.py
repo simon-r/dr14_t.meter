@@ -57,11 +57,24 @@ def main():
     #print( options )
 
     if options.enable_database :
-        local_dr_database_configure()
+        
         if not database_exists() :
+            
+            ( db_path , coll_dir ) = local_dr_database_configure()
+            try:
+                os.makedirs( db_path )
+            except :
+                pass
+            
+            db_path += "/dr14_database.db"
+            
+            set_db_path( db_path )
+            set_collection_dir( coll_dir )
+            
             print_msg( "Building database .... " )
             db = dr_database_singletone().get()
             db.build_database()
+            
         enable_db( True )
         print_msg( "The local DR database is ready and enabled! It is located in the file: %s  " % get_db_path() )
         return 
