@@ -52,6 +52,7 @@ def dr14_log_info( message ):
 def print_msg( string ) :
     global message_file
     message_file.write( "%s\n" % string )
+    message_file.flush()
    
 def print_err( string ):
     global err_file

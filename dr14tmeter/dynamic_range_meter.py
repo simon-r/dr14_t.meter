@@ -54,6 +54,7 @@ class SharedDrResObj :
         self.duration = ""
         self.sha1 = ""
         self.fail = False
+        self.dir_name = ""
 
 
 class DynamicRangeMeter:   
@@ -185,6 +186,7 @@ class DynamicRangeMeter:
             if ext in ad.formats:
                 job = SharedDrResObj()
                 job.file_name = file_name
+                job.dir_name = dir_name
                 job_queue_sh.put( job )
                 
         threads = [1 for i in range(thread_cnt)]
@@ -192,7 +194,7 @@ class DynamicRangeMeter:
         job_free = mp.Value( 'i' , 0 )
         
         for t in range( thread_cnt ):
-            threads[t] = mp.Process( target=self.run_mp , args=( dir_name , job_queue_sh , res_queue_sh ) )
+            threads[t] = mp.Process( target=self.run_mp , args=( job_queue_sh , res_queue_sh ) )
             
         for t in range( thread_cnt ):
             threads[t].start() 
@@ -237,12 +239,12 @@ class DynamicRangeMeter:
             return 0
   
 
-    def run_mp( self , dir_name , job_queue_sh , res_queue_sh ):
+    def run_mp( self , job_queue_sh , res_queue_sh ):
         
         at = AudioTrack() 
         duration = StructDuration()
         
-        #print_msg("start .... ")
+        print_msg("start .... ")
         
         while True:
             
@@ -251,7 +253,7 @@ class DynamicRangeMeter:
             
             job = job_queue_sh.get()
             
-            full_file = os.path.join( dir_name , job.file_name )
+            full_file = os.path.join( job.dir_name , job.file_name )
             #print ( full_file )
             
             if at.open( full_file ):
