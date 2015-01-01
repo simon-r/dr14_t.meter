@@ -369,7 +369,9 @@ class dr_database :
                   limit ? ;
         """
         
-        return self.query( q , (limit,) , my_dict_factory )
+        keys = [ "dr" , "title" , "id" ]
+        
+        return ( self.query( q , (limit,) , my_dict_factory ) , keys )
     
     
     def query_worst_dr( self , limit=30 ):
@@ -381,7 +383,9 @@ class dr_database :
                   limit ? ;
         """
         
-        return self.query( q , (limit,) , my_dict_factory )    
+        keys = [ "dr" , "title" , "id" ]
+        
+        return ( self.query( q , (limit,) , my_dict_factory ) , keys )    
         
         
     def query_dr_histogram(self):
@@ -392,7 +396,9 @@ class dr_database :
             order by (dr) ;
         """
         
-        return self.query( q , dict_factory_arg=my_dict_factory )
+        keys = [ "dr" , "dr_cnt" ]
+        
+        return ( self.query( q , dict_factory_arg=my_dict_factory ) , keys )
          
     
     def query_date_evolution(self):
@@ -406,7 +412,9 @@ class dr_database :
                   order by date ;
         """
         
-        return self.query( q , dict_factory_arg=my_dict_factory ) 
+        keys = [ "date" , "mean" ]
+        
+        return ( self.query( q , dict_factory_arg=my_dict_factory ) , keys ) 
              
     def dr14_db_main_structure_v1(self):
         db = """

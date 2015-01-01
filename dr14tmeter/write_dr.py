@@ -74,6 +74,45 @@ class WriteDr :
         
         db.commit_insert_session()
         
+    
+    def write_query_result( self , res_dl , tm , table_title , desired_keys=None ):
+        txt = "" 
+        
+        if len(res_dl) == 0 :
+            return txt
+        
+        if desired_keys != None :
+            keys = desired_keys
+        else :
+            keys = res_dl[0].keys()
+        
+        if len(keys) == 0 :
+            return txt
+        
+        txt = tm.new_table(txt)
+        txt = tm.new_head( txt )
+        
+        txt = tm.end_head( txt )
+        txt = tm.append_separator_line( txt )
+        txt = tm.add_title( txt , table_title )
+        txt = tm.end_head( txt )
+        
+        txt = tm.new_tbody( txt )
+        
+        txt = tm.append_separator_line( txt )
+        txt = tm.append_row( txt , keys , 'h' )
+        txt = tm.append_separator_line( txt )
+        
+        txt = tm.end_tbody( txt )
+        
+        for row in res_dl :
+            txt = tm.append_row( txt , [ str(row[k]) for k in keys ] )
+        
+        txt = tm.end_tbody( txt )
+        
+        txt = tm.end_table(txt)
+        
+        return txt 
         
     
     def write_dr( self , drm , tm ):

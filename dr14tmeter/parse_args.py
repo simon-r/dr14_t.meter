@@ -85,6 +85,11 @@ def parse_args():
         dest="disable_database",
         help="Disable the local DR database" )
     
+    parser.add_argument( "-q" , "--query" ,
+        nargs="*" ,
+        dest="query",
+        help="query the database. Options: [ -q top #nr ] [ -q worst ] [ -q hist ] [ -q evol ] [ -q help ] " )    
+    
     parser.add_argument("-d", "--dr_database",
         action="store_false",
         dest="dr_database",

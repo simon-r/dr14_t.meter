@@ -83,10 +83,18 @@ def main():
         enable_db( False )
         print_msg( "The local DR database is disabled! " )
         return
-    
-#     db = dr_database_singletone().get()
-#     print( db.query_date_evolution() )
-#     return  
+
+    if options.query != None :
+        if len( options.query ) == 0 :
+            print_query_help()
+            return 
+        
+        if options.query[0] not in [ "help" , "top" , "worst" , "hist" , "evol" ] :
+            print_err( "Error: -q invalid parameter ." )
+            print_err( "Error: type dr14_tmeter -q for more info." )
+        
+        database_exec_query( options )
+        return  
     
     
     if options.path_name != None:
