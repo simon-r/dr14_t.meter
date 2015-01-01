@@ -30,6 +30,13 @@ unique_db_object = 0 ;
 lock_db = threading.Lock()
 
 
+def my_dict_factory(cursor, row):
+    d = {}
+    for idx, col in enumerate(cursor.description):
+        d[col[0]] = row[idx]
+    return d
+
+
 class dr_database :
     
     def __init__(self):
@@ -336,44 +343,14 @@ class dr_database :
         
         return self._id_album - 1
         
-    def __insert_artist( self , name ):
+               
+    def query( self , query , t = () , dict_factory_arg=None ):
         
-        self._artists[self._id_artist] = name
-        self._id_artist = self._id_artist + 1
-                
-        return self._id_artist - 1
-        
-    def __insert_codec( self , codec ):
-        
-        self._codec[self._id_codec] = codec
-        self._id_codec = self._id_codec + 1
-                
-        return self._id_codec - 1
-    
-    def __insert_genre( self , genre ):
-        
-        self._genre[self._id_genre] = genre
-        self._id_genre = self._id_genre + 1
-                
-        return self._id_genre - 1
-    
-    def __insert_dr( self , dr ):
-        
-        self._dr[self._id_dr] = dr
-        self._id_dr = self._id_dr + 1
-                
-        return self._id_dr - 1   
-    
-    def __insert_date( self , date ):
-        
-        self._date[self._id_date] = date
-        self._id_date = self._id_date + 1
-                
-        return self._id_date - 1       
-        
-        
-    def query( self , query , t = () ):
         conn = sqlite3.connect( get_db_path() )
+        
+        if dict_factory != None :
+            con.row_factory = dict_factory_arg
+        
         c = conn.cursor()
         
         c.execute( query , t )
@@ -382,6 +359,17 @@ class dr_database :
         
         return res_l
  
+ 
+    def query_top_dr( self , limit=30 ):
+        q = """
+        select track.id as id , track.title as title , dr.dr as dr 
+           from track inner join DR_Track on DR_Track.idtrack = track.id 
+                  inner join dr on dr.id = DR_Track.iddr 
+                  order by dr desc
+                  limit ? ;
+        """
+        
+        return self.query( q , (limit) , my_dict_factory )
              
     def dr14_db_main_structure_v1(self):
         db = """
@@ -517,6 +505,42 @@ class dr_database :
     
     def ungrade_db(self):
         None
+    
+    # privates methods:    
+    def __insert_artist( self , name ):
+        
+        self._artists[self._id_artist] = name
+        self._id_artist = self._id_artist + 1
+                
+        return self._id_artist - 1
+        
+    def __insert_codec( self , codec ):
+        
+        self._codec[self._id_codec] = codec
+        self._id_codec = self._id_codec + 1
+                
+        return self._id_codec - 1
+    
+    def __insert_genre( self , genre ):
+        
+        self._genre[self._id_genre] = genre
+        self._id_genre = self._id_genre + 1
+                
+        return self._id_genre - 1
+    
+    def __insert_dr( self , dr ):
+        
+        self._dr[self._id_dr] = dr
+        self._id_dr = self._id_dr + 1
+                
+        return self._id_dr - 1   
+    
+    def __insert_date( self , date ):
+        
+        self._date[self._id_date] = date
+        self._id_date = self._id_date + 1
+                
+        return self._id_date - 1               
     
     
 
