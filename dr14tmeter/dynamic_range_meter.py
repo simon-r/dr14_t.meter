@@ -53,6 +53,7 @@ class SharedDrResObj :
         self.dB_rms = 0.0 
         self.duration = ""
         self.sha1 = ""
+        self.fail = False
 
 
 class DynamicRangeMeter:   
@@ -209,6 +210,8 @@ class DynamicRangeMeter:
         
         while not res_queue_sh.empty() :
             res = res_queue_sh.get()
+            if res.fail :
+                continue
             self.res_list.append( { 'file_name':   res.file_name ,
                                     'dr14':        res.dr14 ,
                                     'dB_peak':     res.dB_peak ,
@@ -216,7 +219,6 @@ class DynamicRangeMeter:
                                     'duration':    dur.float_to_str( res.duration ) , 
                                     'sha1':        res.sha1 } )
             
-        
         self.res_list = sorted( self.res_list , key=lambda res: res['file_name'] )
             
         #    i = i + 1
@@ -264,9 +266,11 @@ class DynamicRangeMeter:
                 job.duration = duration.to_float() 
                 job.sha1 = sha1
                 
-                res_queue_sh.put(job)
             else:
+                job.fail = True
                 print_msg( "- fail - " + full_file )
+                
+            res_queue_sh.put( job )
 
     
 

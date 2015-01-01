@@ -45,10 +45,7 @@ class WriteDr :
         db.insert_album( album_sha1 , album_title , int(drm.dr14)  )
         
         for i in range( len( drm.res_list ) ) :
-            
-            if drm.res_list[i]['dr14'] == dr14.min_dr() :
-                continue 
-            
+                        
             curr_file_name = drm.res_list[i]['file_name']
             
             track_sha1      = drm.res_list[i]['sha1']
