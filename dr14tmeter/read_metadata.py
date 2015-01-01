@@ -145,8 +145,6 @@ class RetirveMetadata:
             else :
                 track['bit'] = mm.group(1)
                 
-                
-            
             #print ( m.group(1) + " " + m.group(2)+ " " + m.group(3)+ " " + m.group(4) )
         
         #print( track )
@@ -166,6 +164,9 @@ class RetirveMetadata:
 
     def get_album_cnt( self ):
         return len( self._album )
+    
+    def get_album_list(self):
+        return self._album
 
     def get_album_title( self ):
 
@@ -177,8 +178,7 @@ class RetirveMetadata:
             for k in self._album.keys():
                 res = k
             return res
-    
-    
+
     def get_album_sha1( self ):
         key_string = ""
         key_string = key_string + str( self.get_album_title() ) + str( self.get_album_artist() )
