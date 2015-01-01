@@ -117,10 +117,17 @@ class DynamicRangeMeter:
         
         #( dr14, dB_peak, dB_rms ) = self.compute_dr.compute( at.Y , at.Fs )
         ( dr14, dB_peak, dB_rms ) = compute_dr14( at.Y , at.Fs , duration )
+        sha1 = sha1_track_v1( at.Y )
         
         self.dr14 = self.dr14 + dr14
         
-        res = { 'file_name': file_name , 'dr14': dr14 , 'dB_peak': dB_peak , 'dB_rms': dB_rms , 'duration':duration.to_float() }
+        res = { 'file_name': file_name , 
+               'dr14': dr14 , 
+               'dB_peak': dB_peak , 
+               'dB_rms': dB_rms , 
+               'duration':duration.to_float() ,
+               'sha1': sha1 }
+        
         self.res_list.append(res)
         
         print_msg( file_name + ": \t DR " + str( int(dr14) ) )
