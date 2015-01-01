@@ -83,7 +83,12 @@ def main():
         enable_db( False )
         print_msg( "The local DR database is disabled! " )
         return
-
+    
+#     db = dr_database_singletone().get()
+#     print( db.query_date_evolution() )
+#     return  
+    
+    
     if options.path_name != None:
         path_name = os.path.abspath( options.path_name )
     else:

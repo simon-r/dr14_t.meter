@@ -348,8 +348,8 @@ class dr_database :
         
         conn = sqlite3.connect( get_db_path() )
         
-        if dict_factory != None :
-            con.row_factory = dict_factory_arg
+        if dict_factory_arg != None :
+            conn.row_factory = dict_factory_arg
         
         c = conn.cursor()
         
@@ -369,7 +369,44 @@ class dr_database :
                   limit ? ;
         """
         
-        return self.query( q , (limit) , my_dict_factory )
+        return self.query( q , (limit,) , my_dict_factory )
+    
+    
+    def query_worst_dr( self , limit=30 ):
+        q = """
+        select track.id as id , track.title as title , dr.dr as dr 
+           from track inner join DR_Track on DR_Track.idtrack = track.id 
+                  inner join dr on dr.id = DR_Track.iddr 
+                  order by dr asc
+                  limit ? ;
+        """
+        
+        return self.query( q , (limit,) , my_dict_factory )    
+        
+        
+    def query_dr_histogram(self):
+        q = """
+        select dr.dr as dr , count(dr.dr) as dr_cnt 
+            from  DR_Track inner join dr on dr.id = DR_Track.iddr 
+            group by (dr.dr) 
+            order by (dr) ;
+        """
+        
+        return self.query( q , dict_factory_arg=my_dict_factory )
+         
+    
+    def query_date_evolution(self):
+        q = """
+        select date.date as date , avg( dr.dr ) as mean
+           from track inner join DR_Track on DR_Track.idtrack = track.id 
+                  inner join dr on dr.id = DR_Track.iddr 
+                  inner join Date_Track on Date_Track.idtrack = track.id
+                  inner join date on date.id = Date_Track.iddate 
+                  group by date 
+                  order by date ;
+        """
+        
+        return self.query( q , dict_factory_arg=my_dict_factory ) 
              
     def dr14_db_main_structure_v1(self):
         db = """
