@@ -51,21 +51,28 @@ class WriteDr :
             
             curr_file_name = drm.res_list[i]['file_name']
             
-            track_sha1 = drm.res_list[i]['sha1']
-            title      = drm.meta_data.get_value( curr_file_name , 'title' )
-            dr         = drm.res_list[i]['dr14']
-            rms        = drm.res_list[i]['dB_rms']
-            peak       = drm.res_list[i]['dB_peak']
-            duration   = drm.res_list[i]['duration']
-            codec      = drm.meta_data.get_value( curr_file_name , 'codec' )
-            artist     = drm.meta_data.get_value( curr_file_name , 'artist' )
-            genre      = drm.meta_data.get_value( curr_file_name , 'genre' )
-            date       = drm.meta_data.get_value( curr_file_name , 'date' )
-            track_nr   = drm.meta_data.get_value( curr_file_name , 'track_nr' )
+            track_sha1      = drm.res_list[i]['sha1']
+            title           = drm.meta_data.get_value( curr_file_name , 'title' )
+            dr              = drm.res_list[i]['dr14']
+            rms             = drm.res_list[i]['dB_rms']
+            peak            = drm.res_list[i]['dB_peak']
+            duration        = drm.res_list[i]['duration']
+            bit             = drm.meta_data.get_value( curr_file_name , 'bit' )
+            bitrate         = drm.meta_data.get_value( curr_file_name , 'bitrate' )
+            sampling_rate   = drm.meta_data.get_value( curr_file_name , 'sampling_rate' )
+            codec           = drm.meta_data.get_value( curr_file_name , 'codec' )
+            artist          = drm.meta_data.get_value( curr_file_name , 'artist' )
+            genre           = drm.meta_data.get_value( curr_file_name , 'genre' )
+            date            = drm.meta_data.get_value( curr_file_name , 'date' )
+            track_nr        = drm.meta_data.get_value( curr_file_name , 'track_nr' )
+            
+            if title == None :
+                title = os.path.split( drm.meta_data.get_value( curr_file_name , ( 'file_name' ) ) )[1]
             
             db.insert_track( track_sha1 , title , 
                       dr , rms , peak , duration , 
-                      codec , album_sha1 , artist , 
+                      codec ,  bit , bitrate , sampling_rate , 
+                      album_sha1 , artist , 
                       genre , date , track_nr )
         
         db.commit_insert_session()
@@ -202,7 +209,7 @@ class WriteDrExtended( WriteDr ) :
                 if tr_title == None :
                     row.append( drm.res_list[i]['file_name'] )
                 else:
-                    nr = drm.meta_data.get_value( curr_file_name , 'nr' )
+                    nr = drm.meta_data.get_value( curr_file_name , 'track_nr' )
                     codec = drm.meta_data.get_value( curr_file_name , 'codec' )
                     
                     if nr == None :
@@ -212,7 +219,7 @@ class WriteDrExtended( WriteDr ) :
                     
                 bitrate = drm.meta_data.get_value( curr_file_name , 'bitrate' )
                 bit = drm.meta_data.get_value( curr_file_name , 'bit' )
-                s_rate = drm.meta_data.get_value( curr_file_name , 's_rate' )
+                s_rate = drm.meta_data.get_value( curr_file_name , 'sampling_rate' )
                 
                 kbs = drm.meta_data.get_value( curr_file_name , 'bitrate' )
                 

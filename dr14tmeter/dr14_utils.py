@@ -215,7 +215,7 @@ def local_dr_database_configure():
         
         if re.sub( "\s+" , "" , db_path ) == "" :
             flag = False
-            db_path = "%s/.config/dr14tmeter" % os.path.expanduser("~")
+            db_path = os.path.split( get_db_path() )[0]
             continue
         
         db_path = os.path.abspath( db_path )

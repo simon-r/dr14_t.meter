@@ -38,6 +38,7 @@ from dr14tmeter.audio_decoder import AudioDecoder
 from dr14tmeter.duration import StructDuration
 from dr14tmeter.write_dr import WriteDr, WriteDrExtended
 from dr14tmeter.audio_math import sha1_track_v1 
+from dr14tmeter.dr14_config import get_collection_dir
 
 import dr14tmeter.dr14_global as dr14
 
@@ -63,6 +64,7 @@ class DynamicRangeMeter:
         self.meta_data = RetirveMetadata()        
         self.compute_dr = ComputeDR14()
         self.__write_to_local_db = False
+        self.coll_dir = os.path.realpath( get_collection_dir() )
     
     def write_to_local_db( self , f=False ):
         self.__write_to_local_db = f
@@ -134,7 +136,7 @@ class DynamicRangeMeter:
         
         self.table_txt = wr.write_dr( self , tm )
         
-        if self.__write_to_local_db :
+        if self.__write_to_local_db and os.path.realpath( self.dir_name ).startswith( self.coll_dir ) :
             wr.write_to_local_dr_database( self )
         
         if std_out:

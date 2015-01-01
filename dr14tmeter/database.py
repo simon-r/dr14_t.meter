@@ -14,6 +14,13 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+
+# select track.title as title , track.id as id , dr_track.iddr , dr.dr as dr 
+#        from track inner join DR_Track on DR_Track.idtrack = track.id 
+#                   inner join dr on dr.id = DR_Track.iddr ;
+
+# select dr.dr as dr , count(dr.dr) as dr_cnt from  DR_Track join dr on dr.id = DR_Track.iddr group by (dr.dr) ;
+
 import sqlite3 
 import threading
 
@@ -152,17 +159,24 @@ class dr_database :
             
         for k_track in self._tracks.keys() :
             
-            if self._tracks[k_track].get( "track_nr" , None ) == None :
-                c.execute( "insert into Track ( Id , Title , rms , peak , duration , sha1 ) values ( ? , ? , ? , ? , ? , ? ) " , 
-                           ( self._tracks[k_track]["id"] , self._tracks[k_track]["title"] , self._tracks[k_track]["rms"] ,
-                             self._tracks[k_track]["peak"] , self._tracks[k_track]["duration"] ,
-                             k_track ) )
-            else :
-                c.execute( "insert into Track ( Id , Title , rms , peak , duration , sha1 , track_nr ) values ( ? , ? , ? , ? , ? , ? , ? ) " , 
-                           ( self._tracks[k_track]["id"] , self._tracks[k_track]["title"] , self._tracks[k_track]["rms"] ,
-                             self._tracks[k_track]["peak"] , self._tracks[k_track]["duration"] ,
-                             k_track , self._tracks[k_track]["track_nr"] ) )
+            q = """insert into Track  ( Id , Title , rms , peak , duration , bit , bitrate , sampling_rate , sha1 <1s> ) 
+                               values ( ? ,   ?    ,  ?  ,  ?   ,   ?      ,  ?  ,   ?     ,   ?           ,  ?   <2s> ) """
             
+            arg_list = [ self._tracks[k_track]["id"] , self._tracks[k_track]["title"] , self._tracks[k_track]["rms"] ,
+                             self._tracks[k_track]["peak"] , self._tracks[k_track]["duration"] ,
+                             self._tracks[k_track]["bit"] , self._tracks[k_track]["bitrate"] , self._tracks[k_track]["sampling_rate"] ,
+                             k_track ]
+            
+            if self._tracks[k_track].get( "track_nr" , None ) != None :
+                q = q.replace("<1s>", " , track_nr <1s> ")
+                q = q.replace("<2s>", " , ? <2s> ")
+                arg_list.append( self._tracks[k_track]["track_nr"] )
+            
+            q = q.replace("<1s>", "")
+            q = q.replace("<2s>", "")
+            
+            c.execute( q , tuple( arg_list ) )
+                        
             c.execute( "insert into DR_Track ( IdDr , IdTrack ) values ( ? , ? ) " ,
                        ( self._tracks[k_track]["dr_id"] , self._tracks[k_track]["id"] ) )
             
@@ -195,10 +209,10 @@ class dr_database :
     
     def insert_track( self , track_sha1 , title , 
                       dr , rms , peak , duration , 
-                      codec , album_sha1=None , artist=None , 
+                      codec , bit , bitrate , sampling_rate , 
+                      album_sha1=None , artist=None , 
                       genre=None , date = None , track_nr=None ):
-        
-        
+                
         global lock_db
         lock_db.acquire()
         if self._insert_session == False :
@@ -284,7 +298,8 @@ class dr_database :
         self._tracks[track_sha1] = { "id": self._id_track , "title": title , "dr_id": dr_id , 
                                     "peak": peak , "rms": rms , "duration": duration ,
                                     "codec_id": codec_id , "album_sha1": album_sha1 , "artist_id": artist_id , 
-                                    "genre_id": genre_id , "date_id": date_id , "album_id": album_id , "track_nr": track_nr }
+                                    "genre_id": genre_id , "date_id": date_id , "album_id": album_id , "track_nr": track_nr , 
+                                    "bit": bit , "bitrate": bitrate , "sampling_rate":sampling_rate }
         
         self._id_track = self._id_track + 1
         
@@ -391,6 +406,9 @@ class dr_database :
                 rms float ,
                 peak float ,
                 duration float ,
+                bit integer,
+                bitrate integer ,
+                sampling_rate integer ,
                 sha1 varchar(40) not null                 
             ) ;
             create index Track_indx on Track ( sha1 ) ;
@@ -403,7 +421,9 @@ class dr_database :
                 Title varchar(100) 
             ) ;
             create index Album_indx on Album ( sha1 ) ;
-            create index Album_title_indx on Track ( Title ) ;  
+            create index Album_title_indx on Track ( Title ) ;
+            
+            insert into Album ( Id , Title , sha1 ) values ( 0 , "None" , "0000000000000000000000000000000000000000" ) ; 
             
             
             create table DR (

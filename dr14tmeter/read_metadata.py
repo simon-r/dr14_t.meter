@@ -88,7 +88,8 @@ class RetirveMetadata:
         
         m = re.search( r"\s*track\s*\:\s*(\d+)$" , data_txt , re_flags )
         if m != None:
-            track['nr'] = int( m.group(1) )
+            #track['nr'] = int( m.group(1) )
+            track['track_nr'] = int( m.group(1) )
         
         m = re.search( r"\s*album\s*\:\s*(.*)$" , data_txt , re_flags )
         if m != None:
@@ -110,21 +111,21 @@ class RetirveMetadata:
         if m != None:
             track['genre'] = m.group(1)
             
-        m = re.search( r"\s*date\s*\:\s*(\d*)$" , data_txt , re_flags )
+        m = re.search( r"\s*date\s*\:\s*(\d+).*$" , data_txt , re_flags )
         if m != None:
             track['date'] = m.group(1)     
             
-        m = re.search( r"\s*genre\s*\:\s*(.*)$" , data_txt , re_flags )
-        if m != None:
-            track['genre'] = m.group(1)  
+#         m = re.search( r"\s*genre\s*\:\s*(.*)$" , data_txt , re_flags )
+#         if m != None:
+#             track['genre'] = m.group(1)  
             
         m = re.search( r"\s*size\s*\=\s*(\d+)$" , data_txt , re_flags )
         if m != None:
             track['size'] = m.group(1)  
             
-        m = re.search( r"\s*track\s*\=\s*(\d+)$" , data_txt , re_flags )
-        if m != None:
-            track['track_nr'] = m.group(1)  
+#         m = re.search( r"\s*track\s*\=\s*(\d+)$" , data_txt , re_flags )
+#         if m != None:
+#             track['track_nr'] = m.group(1)  
          
         ##########################################
         # string examples:   
@@ -135,7 +136,7 @@ class RetirveMetadata:
         m = re.search( r"\:\s*Audio\s*\:\s*(\w+)[^,]*,\s*(\d*)\s*Hz\s*,\s*([\w\s]*)\s*,\s*(\w+)" , data_txt , re_flags )
         if m != None:
             track['codec'] = m.group(1)
-            track['s_rate'] = m.group(2)
+            track['sampling_rate'] = m.group(2)
             track['channel'] = m.group(3)
             track['bit'] = m.group(4)
             mm = re.search( "s(\d+)" , track['bit'] )
@@ -163,6 +164,8 @@ class RetirveMetadata:
     def album_len( self ):
         return len( self._tracks )
 
+    def get_album_cnt( self ):
+        return len( self._album )
 
     def get_album_title( self ):
 
@@ -176,7 +179,7 @@ class RetirveMetadata:
             return res
     
     
-    def get_album_sha1(self):
+    def get_album_sha1( self ):
         key_string = ""
         key_string = key_string + str( self.get_album_title() ) + str( self.get_album_artist() )
         
