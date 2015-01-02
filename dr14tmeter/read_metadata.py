@@ -34,6 +34,7 @@ class RetirveMetadata:
         self._album = {}
         self._artist = {}
         self._tracks = {}
+        self._disk_nr = []
         
         if get_ffmpeg_cmd() == "ffmpeg" :
             self.__ffprobe_cmd = "ffprobe"
@@ -46,6 +47,7 @@ class RetirveMetadata:
         self._album = {}
         self._tracks = {}
         self._artist = {}
+        self._disk_nr = []
         
         if files_list == None:
             dir_name = os.path.abspath( dir_name )
@@ -98,9 +100,10 @@ class RetirveMetadata:
         if m != None:
             track['track_nr'] = int( m.group(1) )
             
-        m = re.search( r"^TAG:track=\s*\d+\s*/\s*(\d+)\s*$" , format_tags , re_flags )
+        m = re.search( r"^TAG:disc=\s*(\d+).*$" , format_tags , re_flags )
         if m != None:
-            track['disk_nr'] = int( m.group(1) )            
+            track['disk_nr'] = int( m.group(1) )
+            self._disk_nr.append( int( int( m.group(1) ) ) )
                 
         m = re.search( r"^TAG:GENRE=%s"%pattern , format_tags , re_flags )
         if m != None:
@@ -259,12 +262,17 @@ class RetirveMetadata:
         self._tracks[f_key] = track 
         
 
-
     def album_len( self ):
         return len( self._tracks )
 
     def get_album_cnt( self ):
         return len( self._album )
+    
+    def get_disk_nr(self):
+        if len( self._disk_nr ) > 0 :
+            return self._disk_nr[0]
+        else :
+            return None
     
     def get_album_list(self):
         return self._album

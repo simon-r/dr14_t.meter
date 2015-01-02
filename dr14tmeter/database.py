@@ -155,13 +155,21 @@ class dr_database :
             
         for k_date in self._date.keys() :
             c.execute( "insert into Date ( Id , Date ) values ( ? , ? ) " , ( k_date , self._date[k_date] ) )                
+        
          
         for k_album in self._albums.keys() :
-            c.execute( "insert into Album ( Id , sha1 , title ) values ( ? , ? , ? ) " , 
-                       ( self._albums[k_album][0] , k_album , self._albums[k_album][1] ) )
+            q = "insert into Album ( Id , sha1 , title <s1> ) values ( :Id , :sha1 , :Title <s2> ) "
             
-            c.execute( "insert into DR_Album ( IdDr , IdAlbum ) values ( ? , ? ) " , 
-                       ( self._albums[k_album][2] , self._albums[k_album][0] ) )
+            if self._albums[k_album]["disk_nr"] != None :
+                q = q.replace("<s1>", " , disk_nr <s1> ")
+                q = q.replace("<s2>", " , :disk_nr <s2> ")
+            
+            q = q.replace("<s1>", "")
+            q = q.replace("<s2>", "")            
+            
+            c.execute( q , self._albums[k_album] )
+                         
+            c.execute( "insert into DR_Album ( IdDr , IdAlbum ) values ( :dr_id , :Id )" ,  self._albums[k_album] )
             
             
         for k_track in self._tracks.keys() :
@@ -299,10 +307,10 @@ class dr_database :
             elif len( rq ) > 0 :
                 album_id = rq.pop()[0]
             else :
-                album_id = [ self._albums[k][0] for k in self._albums.keys() if k == album_sha1 ][0]
+                album_id = [ self._albums[k]["Id"] for k in self._albums.keys() if k == album_sha1 ][0]
    
             
-        self._tracks[track_sha1] = { "id": self._id_track , "title": title , "dr_id": dr_id , 
+        self._tracks[track_sha1] = { "id": self._id_track , "sha1":track_sha1 , "title": title , "dr_id": dr_id , 
                                     "peak": peak , "rms": rms , "duration": duration ,
                                     "codec_id": codec_id , "album_sha1": album_sha1 , "artist_id": artist_id , 
                                     "genre_id": genre_id , "date_id": date_id , "album_id": album_id , "track_nr": track_nr , 
@@ -315,7 +323,7 @@ class dr_database :
         return self._id_track - 1
     
         
-    def insert_album( self , album_sha1 , title , dr ):
+    def insert_album( self , album_sha1 , title , dr , disk_nr=None ):
         global lock_db
         lock_db.acquire()
         
@@ -336,7 +344,7 @@ class dr_database :
         else :
             dr_id = [k for (k, v) in self._dr.items() if v == dr][0] 
         
-        self._albums[album_sha1] = [ self._id_album , title , dr_id ]
+        self._albums[album_sha1] = { "Id":self._id_album , "sha1":album_sha1 , "Title":title , "dr_id":dr_id , "disk_nr":disk_nr }
         self._id_album = self._id_album + 1
         
         lock_db.release()
@@ -451,7 +459,8 @@ class dr_database :
             create table Album (
                 Id integer primary key autoincrement ,
                 sha1 varchar(40) not null ,
-                Title varchar(100) 
+                Title varchar(100) ,
+                disk_nr integer
             ) ;
             create index Album_indx on Album ( sha1 ) ;
             create index Album_title_indx on Track ( Title ) ;
