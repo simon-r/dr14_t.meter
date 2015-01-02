@@ -27,8 +27,15 @@ from dr14tmeter.audio_file_reader import *
 class AudioDecoder:
 
     def __init__(self):
+        # Attention!!! do not modify the order of this list!!!!
+        # It is used for computing the sha1 of the track
         self.formats = [ '.flac' , '.mp3' , '.ogg' , '.mp4' , '.m4a' , '.wav' , '.ape' , '.ac3', '.wma' ]
+        
+        self._ext = -1
     
+    def get_file_ext_code(self):
+        return self._ext 
+        
     def read_track_new( self , file_name , target ):
 
         ( f , ext ) = os.path.splitext( file_name )
@@ -60,6 +67,7 @@ class AudioDecoder:
 
         #af = PipeFileReader() 
 
+        self._ext = self.formats.index( ext )
         ret_f = af.read_audio_file_new( file_name , target )
 
         return ret_f

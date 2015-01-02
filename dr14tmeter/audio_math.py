@@ -49,11 +49,11 @@ def normalize( y , ml=1.0 ):
 
 # compute the sha1 fingerprint of the track 
 # Do not modify this function !!
-def sha1_track_v1( y ):
+def sha1_track_v1( y , ext_code=0 ):
     n = y.shape
     if n[0] <= 44100*2 :
-        return hashlib.sha1( y ).hexdigest()
+        return hashlib.sha1( y+ext_code ).hexdigest()
     else :
-        return hashlib.sha1( y[ :44100*2 , : ] ).hexdigest()
+        return hashlib.sha1( y[ :44100*2 , : ]+ext_code ).hexdigest()
         
     

@@ -27,9 +27,14 @@ class AudioTrack:
         self.Fs = 0
         self.channels = 0
         self.sample_width = 0 
+        self._ext = -1
+        self._de = AudioDecoder()
 
     def time(self):
         return 1/self.Fs * self.Y.shape[0]
+
+    def get_file_ext_code(self):
+        return self._ext 
 
     def open( self , file_name ):
 
@@ -40,9 +45,8 @@ class AudioTrack:
         if not ( os.path.exists( file_name ) ) :
             return False
 
-        de = AudioDecoder()
-
-        res_f = de.read_track_new( file_name , self )
+        res_f = self._de.read_track_new( file_name , self )
+        self._ext = self._de.get_file_ext_code()
 
         return res_f 
   
