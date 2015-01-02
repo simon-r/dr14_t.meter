@@ -75,7 +75,7 @@ class WriteDr :
         db.commit_insert_session()
         
     
-    def write_query_result( self , res_dl , tm , table_title , desired_keys=None ):
+    def write_query_result( self , res_dl , tm , table_title , desired_keys=None , desired_keys_titles=None ):
         txt = "" 
         
         if len(res_dl) == 0 :
