@@ -182,7 +182,7 @@ class WriteDrExtended( WriteDr ) :
         txt = tm.append_separator_line( txt )
         
         album_t = drm.meta_data.get_album_title()
-        artist = drm.meta_data.get_album_artist()
+        artist = drm.meta_data.get_album_artist()[0]
         
         if not isinstance( tm , table.TextTable ) :
             self.set_loudness_war_db_compatible( False )

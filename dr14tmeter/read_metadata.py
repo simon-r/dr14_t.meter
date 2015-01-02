@@ -65,12 +65,10 @@ class RetirveMetadata:
     
     
     def scan_file( self , file_name ):
-        
-        #print("")
-        #print( file_name )
-        
+                
         try:
-            data_txt = subprocess.check_output( [ self.__ffprobe_cmd , "-show_format" , file_name ] , stderr=subprocess.STDOUT , shell=False )
+            data_txt = subprocess.check_output( [ self.__ffprobe_cmd , "-show_format" , file_name ] , 
+                                                stderr=subprocess.STDOUT , shell=False )
         except :
             data_txt = "ffprobe ERROR"
          
@@ -96,6 +94,7 @@ class RetirveMetadata:
             #print( m.group(1) )
             self._album.setdefault( m.group(1) , 0 )
             self._album[m.group(1)] += 1
+            track['album'] = m.group(1)
             
         m = re.search( r"\s*title\s*\:\s*(.*)$" , data_txt , re_flags )
         if m != None:
@@ -179,21 +178,45 @@ class RetirveMetadata:
                 res = k
             return res
 
-    def get_album_sha1( self ):
-        key_string = ""
-        key_string = key_string + str( self.get_album_title() ) + str( self.get_album_artist() )
+#     def get_album_sha1_old( self ):
+#         key_string = ""
+#         key_string = key_string + str( self.get_album_title() ) + str( self.get_album_artist() )
+#         
+#         for track in self._tracks.keys() :
+#             if not self._tracks[track].get( 'size' , False ) or not self._tracks[track].get( 'codec', False ) :
+#                 continue
+#             key_string = key_string + track 
+#             key_string = key_string + str( self._tracks[track]['size'] )
+#             key_string = key_string + str( self._tracks[track]['codec'] )
+#         
+#         return hashlib.sha1( bytearray( key_string.encode("utf8") ) ).hexdigest()
+            
+    
+    def get_album_sha1( self , title=None ):
         
-        for track in self._tracks.keys() :
+        if title == None :
+            p_title = self.get_album_title()
+        else :
+            p_title = title 
+        
+        key_string = ""
+        key_string = key_string + str( p_title ) + str( self.get_album_artist() )
+        
+        for track in sorted ( self._tracks.keys() ) :
             if not self._tracks[track].get( 'size' , False ) or not self._tracks[track].get( 'codec', False ) :
                 continue
+            
+            if title != None and not self._tracks[track]["album"] != title :
+                continue
+            
             key_string = key_string + track 
             key_string = key_string + str( self._tracks[track]['size'] )
             key_string = key_string + str( self._tracks[track]['codec'] )
         
         return hashlib.sha1( bytearray( key_string.encode("utf8") ) ).hexdigest()
+    
             
-            
-    def get_album_artist( self ):
+    def get_album_artist_old( self ):
 
         if len( self._artist ) > 1 :
             return "Various Artists"
@@ -203,6 +226,21 @@ class RetirveMetadata:
             for k in self._artist.keys():
                 res = k
             return res
+    
+    
+    def get_album_artist( self , album=None ):
+
+        if album == None :
+            return [ self.get_album_artist_old() ]
+
+        artists = []
+        for track in self._tracks.keys() :
+            if track["album"] == album :
+                if not track["artist"] in artists :
+                    artists.append( track["artist"] )
+        
+        return artists 
+    
     
     def get_value( self , file_name , field ):
         

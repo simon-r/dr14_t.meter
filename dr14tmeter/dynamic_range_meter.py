@@ -125,7 +125,7 @@ class DynamicRangeMeter:
                'dr14': dr14 , 
                'dB_peak': dB_peak , 
                'dB_rms': dB_rms , 
-               'duration':duration.to_float() ,
+               'duration': duration.to_str() ,
                'sha1': sha1 }
         
         self.res_list.append(res)
@@ -251,7 +251,7 @@ class DynamicRangeMeter:
         at = AudioTrack() 
         duration = StructDuration()
         
-        print_msg("start .... ")
+        #print_msg("start .... ")
         
         while True:
             
