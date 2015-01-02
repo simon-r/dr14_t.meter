@@ -42,7 +42,7 @@ class WriteDr :
             
         album_sha1 = drm.meta_data.get_album_sha1()
 
-        db.insert_album( album_sha1 , album_title , int(drm.dr14)  )
+        db.insert_album( album_sha1 , album_title , int(drm.dr14) )
         
         for i in range( len( drm.res_list ) ) :
                         
