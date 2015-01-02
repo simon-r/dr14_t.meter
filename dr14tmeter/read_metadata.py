@@ -77,6 +77,108 @@ class RetirveMetadata:
                 data_txt = data_txt.decode(encoding='UTF-8')
             except:
                 data_txt = data_txt.decode(encoding='ISO-8859-1')
+                
+        track = {} 
+        
+        track['file_name'] = file_name
+        
+        re_flags = ( re.MULTILINE | re.IGNORECASE | re.UNICODE )
+        
+        m = re.search( r"\[FORMAT\](.*)\[/FORMAT\]" , data_txt , re_flags | re.DOTALL )
+        if m != None:
+            format_tags = m.group(1)
+        
+        pattern = "[ \t\f\v]*([\S \t\f\v]+\S).*$"
+            
+        m = re.search( r"^format_name=%s"%pattern , format_tags , re_flags )
+        if m != None:
+            track['codec'] = m.group(1)
+            
+        m = re.search( r"^TAG:track=\s*(\d+).*$" , format_tags , re_flags )
+        if m != None:
+            track['track_nr'] = int( m.group(1) )
+            
+        m = re.search( r"^TAG:track=\s*\d+\s*/\s*(\d+)\s*$" , format_tags , re_flags )
+        if m != None:
+            track['disk_nr'] = int( m.group(1) )            
+                
+        m = re.search( r"^TAG:GENRE=%s"%pattern , format_tags , re_flags )
+        if m != None:
+            track['genre'] = m.group(1)
+                 
+        m = re.search( r"^TAG:DATE=\s*(\d+).*$" , format_tags , re_flags )
+        if m != None:
+            track['date'] = m.group(1)
+               
+        m = re.search( r"^TAG:ARTIST=%s"%pattern , format_tags , re_flags )
+        if m != None:
+            self._artist.setdefault( m.group(1) , 0 )
+            self._artist[m.group(1)] += 1
+            track['artist'] = m.group(1)
+                 
+        m = re.search( r"^TAG:TITLE=%s"%pattern , format_tags , re_flags )
+        if m != None:
+            track['title'] = m.group(1)
+            
+        m = re.search( r"^TAG:ALBUM=%s"%pattern , format_tags , re_flags )
+        if m != None:
+            self._album.setdefault( m.group(1) , 0 )
+            self._album[m.group(1)] += 1
+            track['album'] = m.group(1)
+              
+        m = re.search( r"^size=\s*(\d+)\s*$" , format_tags , re_flags )
+        if m != None:
+            track['size'] = m.group(1)
+               
+        m = re.search( r"^bit_rate=\s*(\d+)\s*$" , format_tags , re_flags )
+        if m != None:
+            track['bitrate'] = m.group(1)
+                
+            
+        
+        ##########################################
+        # string examples:   
+        #Audio: flac, 44100 Hz, stereo, s16
+        #Stream #0:0(und): Audio: alac (alac / 0x63616C61), 44100 Hz, 2 channels, s16, 634 kb/s
+        #Stream #0:0(und): Audio: aac (LC) (mp4a / 0x6134706D), 44100 Hz, stereo, fltp, 255 kb/s (default
+        #Stream #0:0: Audio: flac, 44100 Hz, stereo, s16        
+        m = re.search( r"Stream.*Audio:(.*)$" , data_txt , re_flags )
+        if m != None:
+            fmt = m.group(1)
+            #print(fmt)
+            
+        fmt = re.split( "," , fmt )
+        
+        #print( fmt )
+        track['codec'] = re.search( "\s*(\w+)" , fmt[0] , re_flags ).group(1)
+        track['sampling_rate'] = re.search( "\s*(\d+)" , fmt[1] , re_flags ).group(1)
+        track['channel'] = re.search( "^\s*([\S][\s|\S]*[\S])\s*$" , fmt[2] , re_flags ).group(1)
+        
+        m = re.search( "(\d+)" , fmt[3] , re_flags )
+        if m != None:
+            track['bit'] = m.group(1) 
+        else :
+            track['bit'] = "16"
+            
+        ( foo , f_key ) = os.path.split( file_name )
+        self._tracks[f_key] = track             
+            
+        
+        
+    
+    def scan_file_old( self , file_name ):
+                
+        try:
+            data_txt = subprocess.check_output( [ self.__ffprobe_cmd , "-show_format" , file_name ] , 
+                                                stderr=subprocess.STDOUT , shell=False )
+        except :
+            data_txt = "ffprobe ERROR"
+         
+        if data_txt != "ffprobe ERROR" :
+            try:
+                data_txt = data_txt.decode(encoding='UTF-8')
+            except:
+                data_txt = data_txt.decode(encoding='ISO-8859-1')
         
         track = {} 
         
