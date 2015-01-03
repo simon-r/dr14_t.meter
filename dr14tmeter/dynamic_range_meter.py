@@ -39,6 +39,7 @@ from dr14tmeter.duration import StructDuration
 from dr14tmeter.write_dr import WriteDr, WriteDrExtended
 from dr14tmeter.audio_math import sha1_track_v1 
 from dr14tmeter.dr14_config import get_collection_dir
+from dr14tmeter.out_messages import print_msg, flush_msg
 
 import dr14tmeter.dr14_global as dr14
 
@@ -174,8 +175,8 @@ class DynamicRangeMeter:
         
         self.dr14 = 0
         
-        job_queue_sh = mp.Queue()
-        res_queue_sh = mp.Queue()
+        job_queue_sh = mp.JoinableQueue( 2000 )
+        res_queue_sh = mp.Queue( 2000 )
                 
         if files_list == [] :
             if not os.path.isdir(dir_name) :
@@ -205,10 +206,10 @@ class DynamicRangeMeter:
             
         for t in range( thread_cnt ):
             threads[t].start() 
-        
-        for t in range( thread_cnt ):
-            threads[t].join()
-            
+  
+  
+        job_queue_sh.join()
+                                
         succ = 0
         
         self.res_list = [] 
@@ -268,6 +269,7 @@ class DynamicRangeMeter:
                 sha1 = sha1_track_v1( at.Y , at.get_file_ext_code() )
     
                 print_msg( job.file_name + ": \t DR " + str( int(dr14) ) )
+                flush_msg()
                 
                 job.dr14 = dr14
                 job.dB_peak = dB_peak
@@ -278,8 +280,9 @@ class DynamicRangeMeter:
             else:
                 job.fail = True
                 print_msg( "- fail - " + full_file )
-                
+               
             res_queue_sh.put( job )
+            job_queue_sh.task_done()
 
     
 
