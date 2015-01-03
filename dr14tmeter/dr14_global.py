@@ -34,7 +34,7 @@ else:
 # Current version
 v_major    = 1
 v_minor    = 0
-v_revision = 90
+v_revision = 98
 ###########################
 
 # latest version
