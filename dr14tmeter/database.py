@@ -174,45 +174,33 @@ class dr_database :
             
         for k_track in self._tracks.keys() :
             
-            q = """insert into Track  ( Id , Title , rms , peak , duration , bit , bitrate , sampling_rate , sha1 <1s> ) 
-                               values ( ? ,   ?    ,  ?  ,  ?   ,   ?      ,  ?  ,   ?     ,   ?           ,  ?   <2s> ) """
-            
-            arg_list = [ self._tracks[k_track]["id"] , self._tracks[k_track]["title"] , self._tracks[k_track]["rms"] ,
-                             self._tracks[k_track]["peak"] , self._tracks[k_track]["duration"] ,
-                             self._tracks[k_track]["bit"] , self._tracks[k_track]["bitrate"] , self._tracks[k_track]["sampling_rate"] ,
-                             k_track ]
-            
+            q = """insert into Track  ( Id  ,  Title  , rms   , peak  , duration  , bit  , bitrate  , sampling_rate  , sha1  <1s> ) 
+                               values ( :id , :title  , :rms  , :peak , :duration , :bit , :bitrate , :sampling_rate , :sha1 <2s> ) 
+                """                                                       
             if self._tracks[k_track].get( "track_nr" , None ) != None :
                 q = q.replace("<1s>", " , track_nr <1s> ")
-                q = q.replace("<2s>", " , ? <2s> ")
-                arg_list.append( self._tracks[k_track]["track_nr"] )
+                q = q.replace("<2s>", " , :track_nr <2s> ")
             
             q = q.replace("<1s>", "")
             q = q.replace("<2s>", "")
             
-            c.execute( q , tuple( arg_list ) )
+            c.execute( q , self._tracks[k_track] )
                         
-            c.execute( "insert into DR_Track ( IdDr , IdTrack ) values ( ? , ? ) " ,
-                       ( self._tracks[k_track]["dr_id"] , self._tracks[k_track]["id"] ) )
+            c.execute( "insert into DR_Track ( IdDr , IdTrack ) values ( :dr_id , :id )" , self._tracks[k_track] )
             
-            c.execute( "insert into Codec_Track ( IdCodec , IdTrack ) values ( ? , ? ) " , 
-                       ( self._tracks[k_track]["codec_id"] , self._tracks[k_track]["id"] ) )
-            
+            c.execute( "insert into Codec_Track ( IdCodec , IdTrack ) values ( :codec_id , :id )" , self._tracks[k_track] )
+                                    
             if self._tracks[k_track]["genre_id"] >= 0 :
-                c.execute( "insert into Genre_Track ( IdGenre , IdTrack ) values ( ? , ? ) " , 
-                           ( self._tracks[k_track]["genre_id"] , self._tracks[k_track]["id"] ) )
+                c.execute( "insert into Genre_Track ( IdGenre , IdTrack ) values ( :genre_id , :id ) " , self._tracks[k_track] )
             
             if self._tracks[k_track]["date_id"] >= 0 :
-                c.execute( "insert into Date_Track ( IdDate , IdTrack ) values ( ? , ? ) " , 
-                           ( self._tracks[k_track]["date_id"] , self._tracks[k_track]["id"] ) )
+                c.execute( "insert into Date_Track ( IdDate , IdTrack ) values ( :date_id , :id ) " ,  self._tracks[k_track] )
                 
             if self._tracks[k_track]["artist_id"] >= 0 :
-                c.execute( "insert into Artist_Track ( IdArtist , IdTrack ) values ( ? , ? ) " , 
-                           ( self._tracks[k_track]["artist_id"] , self._tracks[k_track]["id"] ) )
+                c.execute( "insert into Artist_Track ( IdArtist , IdTrack ) values ( :artist_id , :id ) " , self._tracks[k_track] )
             
             if self._tracks[k_track]["album_id"] >= 0 :
-                c.execute( "insert into Album_Track ( IdAlbum , IdTrack ) values ( ? , ? ) " , 
-                           ( self._tracks[k_track]["album_id"] , self._tracks[k_track]["id"] ) ) 
+                c.execute( "insert into Album_Track ( IdAlbum , IdTrack ) values ( :album_id , :id ) " , self._tracks[k_track] ) 
         
         conn.commit()
         conn.close()
@@ -344,7 +332,8 @@ class dr_database :
         else :
             dr_id = [k for (k, v) in self._dr.items() if v == dr][0] 
         
-        self._albums[album_sha1] = { "Id":self._id_album , "sha1":album_sha1 , "Title":title , "dr_id":dr_id , "disk_nr":disk_nr }
+        self._albums[album_sha1] = { "Id":self._id_album , "sha1":album_sha1 , 
+                                    "Title":title , "dr_id":dr_id , "disk_nr":disk_nr }
         self._id_album = self._id_album + 1
         
         lock_db.release()

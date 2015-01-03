@@ -104,14 +104,13 @@ def _dr14_get_latest_version():
             vr = f.read()
     except:
         return 
-    
+
     re_flags = ( re.MULTILINE | re.IGNORECASE | re.UNICODE )
     m = re.search( r"<div\s+id=\"version\">\s*(\d+)\.(\d+)\.(\d+)\s*</div>" , vr , re_flags )
-    
+
     if m == None:
         return 
-    
-    
+
     lock_ver.acquire()
     if len( m.groups() ) == 3 :
         l_major = int( m.groups()[0] )

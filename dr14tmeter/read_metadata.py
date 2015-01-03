@@ -99,16 +99,9 @@ class RetirveMetadata:
         else:
             self._tracks[f_key] = None
             raise UnreadableAudioFileException( "problematic file: file_name" )
-            
-        #print( file_name )            
-        #print( format_tags )
         
         pattern = "[ \t\f\v]*([\S \t\f\v]+\S).*$"
-            
-#         m = re.search( r"^format_name=%s"%pattern , format_tags , re_flags )
-#         if m != None:
-#             track['codec'] = m.group(1)
-            
+                        
         m = re.search( r"^TAG:track=\s*(\d+).*$" , format_tags , re_flags )
         if m != None:
             track['track_nr'] = int( m.group(1) )
