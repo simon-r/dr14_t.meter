@@ -356,7 +356,15 @@ class dr_database :
         
         return res_l
  
- 
+    def get_db_version(self):
+        q = """
+        select max( Version ) from Db_Version ;
+        """
+        r = self.query( q )
+        
+        return int( r[0][0] )
+        
+    
     def query_top_dr( self , limit=30 ):
         q = """
         select track.id as id , track.title as title , dr.dr as dr 
@@ -367,6 +375,33 @@ class dr_database :
         """
         
         keys = [ "dr" , "title" , "id" ]
+        
+        return ( self.query( q , (limit,) , my_dict_factory ) , keys )
+    
+    def query_top_albums_dr( self , limit=30 ):
+        q = """
+        select album.title as album_title , dr.dr as dr , album.id as id 
+           from album inner join DR_Album on DR_Album.idalbum = album.id 
+                  inner join dr on dr.id = DR_Album.iddr 
+                  order by dr desc
+                  limit ? ;
+        """
+        
+        keys = [ "dr" , "album_title" , "id" ]
+        
+        return ( self.query( q , (limit,) , my_dict_factory ) , keys )
+    
+    
+    def query_worst_albums_dr( self , limit=30 ):
+        q = """
+        select album.title as album_title , dr.dr as dr , album.id as id 
+           from album inner join DR_Album on DR_Album.idalbum = album.id 
+                  inner join dr on dr.id = DR_Album.iddr 
+                  order by dr asc
+                  limit ? ;
+        """
+        
+        keys = [ "dr" , "album_title" , "id" ]
         
         return ( self.query( q , (limit,) , my_dict_factory ) , keys )
     
@@ -384,6 +419,26 @@ class dr_database :
         
         return ( self.query( q , (limit,) , my_dict_factory ) , keys )    
         
+        
+    def query_top_artists( self , limit=5 ):
+        q = """
+        select artist, mean_dr , track_cnt from 
+        ( 
+            select artist.name as artist , avg( dr.dr ) as mean_dr , count( track.id ) as track_cnt
+               from track inner join DR_Track on DR_Track.idtrack = track.id 
+                      inner join dr on dr.id = DR_Track.iddr 
+                      inner join Artist_Track on Artist_Track.idtrack = track.id
+                      inner join Artist on Artist.id = Artist_Track.IdArtist
+                      group by artist                  
+        )
+        where track_cnt >= ? 
+        order by mean_dr desc  ;
+        """ 
+        
+        keys = [ "mean_dr" , "artist" , "track_cnt" ]
+        
+        return ( self.query( q , (limit,) , my_dict_factory ) , keys )
+    
         
     def query_dr_histogram(self):
         q = """
@@ -412,12 +467,31 @@ class dr_database :
         keys = [ "date" , "mean" ]
         
         return ( self.query( q , dict_factory_arg=my_dict_factory ) , keys ) 
+
+
+    def query_codec(self):
+        q = """
+        select codec.name as codec , avg( dr.dr ) as mean_dr , count( Codec_Track.IdCodec ) as codec_freq 
+           from track inner join DR_Track on DR_Track.idtrack = track.id 
+                  inner join dr on dr.id = DR_Track.iddr 
+                  inner join Codec_Track on Codec_Track.idtrack = track.id
+                  inner join Codec on Codec.id = Codec_Track.IdCodec 
+                  group by name 
+                  order by mean_dr desc ;  
+        """
+        
+        keys = [ "codec" , "mean_dr" , "codec_freq" ]
+        
+        return ( self.query( q , dict_factory_arg=my_dict_factory ) , keys )
+        
+        
              
     def dr14_db_main_structure_v1(self):
         db = """
         
             create table Db_Version (
-                Version integer not null unique 
+                Version integer not null unique ,
+                constraint OnlyPositive check ( Version > 0 )
             ) ;
             
             insert into Db_Version ( Version ) values ( 1 ) ;
@@ -547,7 +621,10 @@ class dr_database :
         return db
     
     def ungrade_db(self):
-        None
+        pass
+        
+    def dump(self):
+        pass
     
     # privates methods:    
     def __insert_artist( self , name ):

@@ -276,7 +276,7 @@ def exec_limited_query( options , qf ):
     
     
 def database_exec_query( options ):
-    ## [ "help" , "top" , "worst" , "hist" , "evol" ]
+    ## [ "help" , "top" , "top_alb" ,  "worst" , "worst_alb" , "art_top" , "hist" , "evol" , "codec" ] :
     
     res_dl = [{}]
     db = dr_database_singletone().get()
@@ -289,9 +289,21 @@ def database_exec_query( options ):
         table_title = "Top DR tracks"
         (res_dl, keys) = exec_limited_query( options , db.query_top_dr )
         
+    elif options.query[0] == "top_alb" :
+        table_title = "Top DR Albums"
+        (res_dl, keys) = exec_limited_query( options , db.query_top_albums_dr )        
+        
     elif options.query[0] == "worst" :
         table_title = "Worst DR Tracks"
         (res_dl, keys) = exec_limited_query( options , db.query_worst_dr )  
+        
+    elif options.query[0] == "worst_alb" :
+        table_title = "Worst DR Albums"
+        (res_dl, keys) = exec_limited_query( options , db.query_worst_albums_dr )          
+        
+    elif options.query[0] == "art_top" :
+        table_title = "Top Artists"
+        (res_dl, keys) = exec_limited_query( options , db.query_top_artists )
         
     elif options.query[0] == "hist" :
         table_title = "DR histogram"
@@ -301,6 +313,10 @@ def database_exec_query( options ):
         table_title = "DR evolution"
         (res_dl, keys) = db.query_date_evolution()
         
+    elif options.query[0] == "codec" :
+        table_title = "Codec Info"
+        (res_dl, keys) = db.query_codec()        
+      
     wr = WriteDr()        
     tm = TextTable() 
     table_code = wr.write_query_result( res_dl , tm , table_title , keys )

@@ -89,7 +89,10 @@ def main():
             print_query_help()
             return 
         
-        if options.query[0] not in [ "help" , "top" , "worst" , "hist" , "evol" ] :
+        if options.query[0] not in [ "help" , "top" , "top_alb" , 
+                                    "worst" , "worst_alb" , "art_top" ,
+                                    "hist" , "evol" , "codec" ] :
+            
             print_err( "Error: -q invalid parameter ." )
             print_err( "Error: type dr14_tmeter -q for more info." )
         
