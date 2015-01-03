@@ -48,6 +48,9 @@ class WriteDr :
                         
             curr_file_name = drm.res_list[i]['file_name']
             
+            if drm.meta_data.track_unreadable_failure( curr_file_name ):
+                continue
+            
             track_sha1      = drm.res_list[i]['sha1']
             title           = drm.meta_data.get_value( curr_file_name , 'title' )
             dr              = drm.res_list[i]['dr14']
@@ -64,7 +67,7 @@ class WriteDr :
             track_nr        = drm.meta_data.get_value( curr_file_name , 'track_nr' )
             
             if title == None :
-                title = os.path.split( drm.meta_data.get_value( curr_file_name , ( 'file_name' ) ) )[1]
+                title = curr_file_name
             
             db.insert_track( track_sha1 , title , 
                       dr , rms , peak , duration , 

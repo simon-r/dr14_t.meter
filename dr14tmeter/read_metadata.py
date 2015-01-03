@@ -28,6 +28,9 @@ from dr14tmeter.dr14_global import get_ffmpeg_cmd
 # a = subprocess.check_output( [ "ffprobe" , "-show_format" , "/media/esterno_xfs/data/Musica/Musica/aavv/01-blitzkrieg_bop_160_lame_abr.mp3" ] , stderr=subprocess.STDOUT , shell=False )
 
 
+class UnreadableAudioFileException(Exception):
+    pass
+
 class RetirveMetadata:
     
     def __init__( self ):
@@ -61,7 +64,10 @@ class RetirveMetadata:
             full_file = os.path.join( dir_name , file_name )
             
             if ext in ad.formats :
-                self.scan_file( full_file )
+                try :
+                    self.scan_file( full_file )
+                except UnreadableAudioFileException as euaf :
+                    pass
                 
         #print( self._tracks )
     
@@ -79,8 +85,9 @@ class RetirveMetadata:
                 data_txt = data_txt.decode(encoding='UTF-8')
             except:
                 data_txt = data_txt.decode(encoding='ISO-8859-1')
-                
+        
         track = {} 
+        ( foo , f_key ) = os.path.split( file_name )
         
         track['file_name'] = file_name
         
@@ -89,12 +96,18 @@ class RetirveMetadata:
         m = re.search( r"\[FORMAT\](.*)\[/FORMAT\]" , data_txt , re_flags | re.DOTALL )
         if m != None:
             format_tags = m.group(1)
+        else:
+            self._tracks[f_key] = None
+            raise UnreadableAudioFileException( "problematic file: file_name" )
+            
+        #print( file_name )            
+        #print( format_tags )
         
         pattern = "[ \t\f\v]*([\S \t\f\v]+\S).*$"
             
-        m = re.search( r"^format_name=%s"%pattern , format_tags , re_flags )
-        if m != None:
-            track['codec'] = m.group(1)
+#         m = re.search( r"^format_name=%s"%pattern , format_tags , re_flags )
+#         if m != None:
+#             track['codec'] = m.group(1)
             
         m = re.search( r"^TAG:track=\s*(\d+).*$" , format_tags , re_flags )
         if m != None:
@@ -163,103 +176,102 @@ class RetirveMetadata:
         else :
             track['bit'] = "16"
             
-        ( foo , f_key ) = os.path.split( file_name )
         self._tracks[f_key] = track             
             
         
         
     
-    def scan_file_old( self , file_name ):
-                
-        try:
-            data_txt = subprocess.check_output( [ self.__ffprobe_cmd , "-show_format" , file_name ] , 
-                                                stderr=subprocess.STDOUT , shell=False )
-        except :
-            data_txt = "ffprobe ERROR"
-         
-        if data_txt != "ffprobe ERROR" :
-            try:
-                data_txt = data_txt.decode(encoding='UTF-8')
-            except:
-                data_txt = data_txt.decode(encoding='ISO-8859-1')
-        
-        track = {} 
-        
-        track['file_name'] = file_name
-        
-        re_flags = ( re.MULTILINE | re.IGNORECASE | re.UNICODE )
-        
-        m = re.search( r"\s*track\s*\:\s*(\d+)$" , data_txt , re_flags )
-        if m != None:
-            #track['nr'] = int( m.group(1) )
-            track['track_nr'] = int( m.group(1) )
-        
-        m = re.search( r"\s*album\s*\:\s*(.*)$" , data_txt , re_flags )
-        if m != None:
-            #print( m.group(1) )
-            self._album.setdefault( m.group(1) , 0 )
-            self._album[m.group(1)] += 1
-            track['album'] = m.group(1)
-            
-        m = re.search( r"\s*title\s*\:\s*(.*)$" , data_txt , re_flags )
-        if m != None:
-            track['title'] = m.group(1)
-        
-        m = re.search( r"\s*artist\s*\:\s*(.*)$" , data_txt , re_flags )
-        if m != None:
-            self._artist.setdefault( m.group(1) , 0 )
-            self._artist[m.group(1)] += 1
-            track['artist'] = m.group(1)
-        
-        m = re.search( r"\s*genre\s*\:\s*(.*)$" , data_txt , re_flags )
-        if m != None:
-            track['genre'] = m.group(1)
-            
-        m = re.search( r"\s*date\s*\:\s*(\d+).*$" , data_txt , re_flags )
-        if m != None:
-            track['date'] = m.group(1)     
-            
+#     def scan_file_old( self , file_name ):
+#                 
+#         try:
+#             data_txt = subprocess.check_output( [ self.__ffprobe_cmd , "-show_format" , file_name ] , 
+#                                                 stderr=subprocess.STDOUT , shell=False )
+#         except :
+#             data_txt = "ffprobe ERROR"
+#          
+#         if data_txt != "ffprobe ERROR" :
+#             try:
+#                 data_txt = data_txt.decode(encoding='UTF-8')
+#             except:
+#                 data_txt = data_txt.decode(encoding='ISO-8859-1')
+#         
+#         track = {} 
+#         
+#         track['file_name'] = file_name
+#         
+#         re_flags = ( re.MULTILINE | re.IGNORECASE | re.UNICODE )
+#         
+#         m = re.search( r"\s*track\s*\:\s*(\d+)$" , data_txt , re_flags )
+#         if m != None:
+#             #track['nr'] = int( m.group(1) )
+#             track['track_nr'] = int( m.group(1) )
+#         
+#         m = re.search( r"\s*album\s*\:\s*(.*)$" , data_txt , re_flags )
+#         if m != None:
+#             #print( m.group(1) )
+#             self._album.setdefault( m.group(1) , 0 )
+#             self._album[m.group(1)] += 1
+#             track['album'] = m.group(1)
+#             
+#         m = re.search( r"\s*title\s*\:\s*(.*)$" , data_txt , re_flags )
+#         if m != None:
+#             track['title'] = m.group(1)
+#         
+#         m = re.search( r"\s*artist\s*\:\s*(.*)$" , data_txt , re_flags )
+#         if m != None:
+#             self._artist.setdefault( m.group(1) , 0 )
+#             self._artist[m.group(1)] += 1
+#             track['artist'] = m.group(1)
+#         
 #         m = re.search( r"\s*genre\s*\:\s*(.*)$" , data_txt , re_flags )
 #         if m != None:
-#             track['genre'] = m.group(1)  
-            
-        m = re.search( r"\s*size\s*\=\s*(\d+)$" , data_txt , re_flags )
-        if m != None:
-            track['size'] = m.group(1)  
-            
-#         m = re.search( r"\s*track\s*\=\s*(\d+)$" , data_txt , re_flags )
+#             track['genre'] = m.group(1)
+#             
+#         m = re.search( r"\s*date\s*\:\s*(\d+).*$" , data_txt , re_flags )
 #         if m != None:
-#             track['track_nr'] = m.group(1)  
-         
-        ##########################################
-        # string examples:   
-        #Audio: flac, 44100 Hz, stereo, s16
-        #Stream #0:0(und): Audio: alac (alac / 0x63616C61), 44100 Hz, 2 channels, s16, 634 kb/s
-        #Stream #0:0(und): Audio: aac (LC) (mp4a / 0x6134706D), 44100 Hz, stereo, fltp, 255 kb/s (default
-        #Stream #0:0: Audio: flac, 44100 Hz, stereo, s16
-        m = re.search( r"\:\s*Audio\s*\:\s*(\w+)[^,]*,\s*(\d*)\s*Hz\s*,\s*([\w\s]*)\s*,\s*(\w+)" , data_txt , re_flags )
-        if m != None:
-            track['codec'] = m.group(1)
-            track['sampling_rate'] = m.group(2)
-            track['channel'] = m.group(3)
-            track['bit'] = m.group(4)
-            mm = re.search( "s(\d+)" , track['bit'] )
-            if mm == None :
-                track['bit'] = "16"
-            else :
-                track['bit'] = mm.group(1)
-                
-            #print ( m.group(1) + " " + m.group(2)+ " " + m.group(3)+ " " + m.group(4) )
-        
-        #print( track )
-        
-        m = re.search( r"\,\s*bitrate\s*\:\s*(\d*)\s*kb" , data_txt , re_flags )
-        if m != None:
-            track['bitrate'] = m.group(1)
-            #print ( m.group(1) )
-            
-        ( foo , f_key ) = os.path.split( file_name )
-        self._tracks[f_key] = track 
+#             track['date'] = m.group(1)     
+#             
+# #         m = re.search( r"\s*genre\s*\:\s*(.*)$" , data_txt , re_flags )
+# #         if m != None:
+# #             track['genre'] = m.group(1)  
+#             
+#         m = re.search( r"\s*size\s*\=\s*(\d+)$" , data_txt , re_flags )
+#         if m != None:
+#             track['size'] = m.group(1)  
+#             
+# #         m = re.search( r"\s*track\s*\=\s*(\d+)$" , data_txt , re_flags )
+# #         if m != None:
+# #             track['track_nr'] = m.group(1)  
+#          
+#         ##########################################
+#         # string examples:   
+#         #Audio: flac, 44100 Hz, stereo, s16
+#         #Stream #0:0(und): Audio: alac (alac / 0x63616C61), 44100 Hz, 2 channels, s16, 634 kb/s
+#         #Stream #0:0(und): Audio: aac (LC) (mp4a / 0x6134706D), 44100 Hz, stereo, fltp, 255 kb/s (default
+#         #Stream #0:0: Audio: flac, 44100 Hz, stereo, s16
+#         m = re.search( r"\:\s*Audio\s*\:\s*(\w+)[^,]*,\s*(\d*)\s*Hz\s*,\s*([\w\s]*)\s*,\s*(\w+)" , data_txt , re_flags )
+#         if m != None:
+#             track['codec'] = m.group(1)
+#             track['sampling_rate'] = m.group(2)
+#             track['channel'] = m.group(3)
+#             track['bit'] = m.group(4)
+#             mm = re.search( "s(\d+)" , track['bit'] )
+#             if mm == None :
+#                 track['bit'] = "16"
+#             else :
+#                 track['bit'] = mm.group(1)
+#                 
+#             #print ( m.group(1) + " " + m.group(2)+ " " + m.group(3)+ " " + m.group(4) )
+#         
+#         #print( track )
+#         
+#         m = re.search( r"\,\s*bitrate\s*\:\s*(\d*)\s*kb" , data_txt , re_flags )
+#         if m != None:
+#             track['bitrate'] = m.group(1)
+#             #print ( m.group(1) )
+#             
+#         ( foo , f_key ) = os.path.split( file_name )
+#         self._tracks[f_key] = track 
         
 
     def album_len( self ):
@@ -288,18 +300,12 @@ class RetirveMetadata:
                 res = k
             return res
 
-#     def get_album_sha1_old( self ):
-#         key_string = ""
-#         key_string = key_string + str( self.get_album_title() ) + str( self.get_album_artist() )
-#         
-#         for track in self._tracks.keys() :
-#             if not self._tracks[track].get( 'size' , False ) or not self._tracks[track].get( 'codec', False ) :
-#                 continue
-#             key_string = key_string + track 
-#             key_string = key_string + str( self._tracks[track]['size'] )
-#             key_string = key_string + str( self._tracks[track]['codec'] )
-#         
-#         return hashlib.sha1( bytearray( key_string.encode("utf8") ) ).hexdigest()
+
+    def track_unreadable_failure( self , file_name ):
+        if self._tracks[file_name] == None :
+            return True
+        else :
+            return False
             
     
     def get_album_sha1( self , title=None ):
@@ -313,6 +319,10 @@ class RetirveMetadata:
         key_string = key_string + str( p_title ) + str( self.get_album_artist() )
         
         for track in sorted ( self._tracks.keys() ) :
+            
+            if self._tracks[track] == None : 
+                continue
+            
             if not self._tracks[track].get( 'size' , False ) or not self._tracks[track].get( 'codec', False ) :
                 continue
             
