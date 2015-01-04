@@ -262,12 +262,12 @@ class RetirveMetadata:
             pass
         
         try :
-            track['size'] = str( int( config.getfloat( "format.tags" , "title" ) ) )
+            track['size'] = str( int( config.getfloat( "format.tags" , "size" ) ) )
         except ConfigParser.NoOptionError :
             pass
         
         try :
-            track['bitrate'] = str( int( config.getfloat( "format.tags" , "title" ) ) )
+            track['bitrate'] = str( int( config.getfloat( "format.tags" , "bit_rate" ) ) )
         except ConfigParser.NoOptionError :
             pass        
         
