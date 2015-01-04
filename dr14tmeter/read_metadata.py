@@ -24,6 +24,14 @@ import hashlib
 from dr14tmeter.audio_decoder import AudioDecoder
 from dr14tmeter.dr14_global import get_ffmpeg_cmd
 
+if sys.version_info[0] == 2:
+    import ConfigParser
+else:
+    import configparser as ConfigParser
+    
+import StringIO
+
+
 # Test example !!!!!
 # a = subprocess.check_output( [ "ffprobe" , "-show_format" , "/media/esterno_xfs/data/Musica/Musica/aavv/01-blitzkrieg_bop_160_lame_abr.mp3" ] , stderr=subprocess.STDOUT , shell=False )
 
@@ -173,98 +181,66 @@ class RetirveMetadata:
             
         
         
-    
-#     def scan_file_old( self , file_name ):
-#                 
-#         try:
-#             data_txt = subprocess.check_output( [ self.__ffprobe_cmd , "-show_format" , file_name ] , 
-#                                                 stderr=subprocess.STDOUT , shell=False )
-#         except :
-#             data_txt = "ffprobe ERROR"
-#          
-#         if data_txt != "ffprobe ERROR" :
-#             try:
-#                 data_txt = data_txt.decode(encoding='UTF-8')
-#             except:
-#                 data_txt = data_txt.decode(encoding='ISO-8859-1')
-#         
-#         track = {} 
-#         
-#         track['file_name'] = file_name
-#         
-#         re_flags = ( re.MULTILINE | re.IGNORECASE | re.UNICODE )
-#         
-#         m = re.search( r"\s*track\s*\:\s*(\d+)$" , data_txt , re_flags )
-#         if m != None:
-#             #track['nr'] = int( m.group(1) )
-#             track['track_nr'] = int( m.group(1) )
-#         
-#         m = re.search( r"\s*album\s*\:\s*(.*)$" , data_txt , re_flags )
-#         if m != None:
-#             #print( m.group(1) )
-#             self._album.setdefault( m.group(1) , 0 )
-#             self._album[m.group(1)] += 1
-#             track['album'] = m.group(1)
-#             
-#         m = re.search( r"\s*title\s*\:\s*(.*)$" , data_txt , re_flags )
-#         if m != None:
-#             track['title'] = m.group(1)
-#         
-#         m = re.search( r"\s*artist\s*\:\s*(.*)$" , data_txt , re_flags )
-#         if m != None:
-#             self._artist.setdefault( m.group(1) , 0 )
-#             self._artist[m.group(1)] += 1
-#             track['artist'] = m.group(1)
-#         
-#         m = re.search( r"\s*genre\s*\:\s*(.*)$" , data_txt , re_flags )
-#         if m != None:
-#             track['genre'] = m.group(1)
-#             
-#         m = re.search( r"\s*date\s*\:\s*(\d+).*$" , data_txt , re_flags )
-#         if m != None:
-#             track['date'] = m.group(1)     
-#             
-# #         m = re.search( r"\s*genre\s*\:\s*(.*)$" , data_txt , re_flags )
-# #         if m != None:
-# #             track['genre'] = m.group(1)  
-#             
-#         m = re.search( r"\s*size\s*\=\s*(\d+)$" , data_txt , re_flags )
-#         if m != None:
-#             track['size'] = m.group(1)  
-#             
-# #         m = re.search( r"\s*track\s*\=\s*(\d+)$" , data_txt , re_flags )
-# #         if m != None:
-# #             track['track_nr'] = m.group(1)  
-#          
-#         ##########################################
-#         # string examples:   
-#         #Audio: flac, 44100 Hz, stereo, s16
-#         #Stream #0:0(und): Audio: alac (alac / 0x63616C61), 44100 Hz, 2 channels, s16, 634 kb/s
-#         #Stream #0:0(und): Audio: aac (LC) (mp4a / 0x6134706D), 44100 Hz, stereo, fltp, 255 kb/s (default
-#         #Stream #0:0: Audio: flac, 44100 Hz, stereo, s16
-#         m = re.search( r"\:\s*Audio\s*\:\s*(\w+)[^,]*,\s*(\d*)\s*Hz\s*,\s*([\w\s]*)\s*,\s*(\w+)" , data_txt , re_flags )
-#         if m != None:
-#             track['codec'] = m.group(1)
-#             track['sampling_rate'] = m.group(2)
-#             track['channel'] = m.group(3)
-#             track['bit'] = m.group(4)
-#             mm = re.search( "s(\d+)" , track['bit'] )
-#             if mm == None :
-#                 track['bit'] = "16"
-#             else :
-#                 track['bit'] = mm.group(1)
-#                 
-#             #print ( m.group(1) + " " + m.group(2)+ " " + m.group(3)+ " " + m.group(4) )
-#         
-#         #print( track )
-#         
-#         m = re.search( r"\,\s*bitrate\s*\:\s*(\d*)\s*kb" , data_txt , re_flags )
-#         if m != None:
-#             track['bitrate'] = m.group(1)
-#             #print ( m.group(1) )
-#             
-#         ( foo , f_key ) = os.path.split( file_name )
-#         self._tracks[f_key] = track 
+    def scan_file_avprobe( self , file_name ):
+        try:
+            data_txt = subprocess.check_output( [ self.__ffprobe_cmd , "-show_format" , file_name ] , 
+                                                stderr=subprocess.STDOUT , shell=False )
+        except :
+            data_txt = "ffprobe ERROR"
+         
+        if data_txt != "ffprobe ERROR" :
+            try:
+                data_txt = data_txt.decode(encoding='UTF-8')
+            except:
+                data_txt = data_txt.decode(encoding='ISO-8859-1')
+                
+        track = {} 
+        ( foo , f_key ) = os.path.split( file_name )
+        
+        track['file_name'] = file_name
+        
+        re_flags = ( re.MULTILINE | re.IGNORECASE | re.UNICODE )
+        
+        m = re.search( r"(\[format].*)" , data_txt , re_flags | re.DOTALL )
+        if m != None:
+            format_tags = m.group(1)
+        else:
+            self._tracks[f_key] = None
+            raise UnreadableAudioFileException( "problematic file: file_name" )   
+        
+        buf = StringIO.StringIO( format_tags )
+        config = ConfigParser.ConfigParser()
+        config.readfp(buf)
+        
+        
+                     
+        ##########################################
+        # string examples:   
+        #Audio: flac, 44100 Hz, stereo, s16
+        #Stream #0:0(und): Audio: alac (alac / 0x63616C61), 44100 Hz, 2 channels, s16, 634 kb/s
+        #Stream #0:0(und): Audio: aac (LC) (mp4a / 0x6134706D), 44100 Hz, stereo, fltp, 255 kb/s (default
+        #Stream #0:0: Audio: flac, 44100 Hz, stereo, s16        
+        m = re.search( r"Stream.*Audio:(.*)$" , data_txt , re_flags )
+        if m != None:
+            fmt = m.group(1)
+            #print(fmt)
+            
+        fmt = re.split( "," , fmt )
+        
+        #print( fmt )
+        track['codec'] = re.search( "\s*(\w+)" , fmt[0] , re_flags ).group(1)
+        track['sampling_rate'] = re.search( "\s*(\d+)" , fmt[1] , re_flags ).group(1)
+        track['channel'] = re.search( "^\s*([\S][\s|\S]*[\S])\s*$" , fmt[2] , re_flags ).group(1)
+        
+        m = re.search( "(\d+)" , fmt[3] , re_flags )
+        if m != None:
+            track['bit'] = m.group(1) 
+        else :
+            track['bit'] = "16"
+            
+        self._tracks[f_key] = track 
+        
+
         
 
     def album_len( self ):
