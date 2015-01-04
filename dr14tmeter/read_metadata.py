@@ -225,50 +225,50 @@ class RetirveMetadata:
             track['title'] = config.get( "format.tags" , "title" )
             self._album.setdefault( m.group(1) , 0 )
             self._album[m.group(1)] += 1            
-        except NoOptionError :
+        except ConfigParser.NoOptionError :
             pass
         
         try :
             track['track_nr'] = config.get( "format.tags" , "track" )
-        except NoOptionError :
+        except ConfigParser.NoOptionError :
             pass
         
         try :
             track['disk'] = config.get( "format.tags" , "disc" )
             self._disk_nr.append( int( int( m.group(1) ) ) )
-        except NoOptionError :
+        except ConfigParser.NoOptionError :
             pass 
         
         try :
             track['genre'] = config.get( "format.tags" , "genre" )
-        except NoOptionError :
+        except ConfigParser.NoOptionError :
             pass         
         
         try :
             track['date'] = config.get( "format.tags" , "date" )
-        except NoOptionError :
+        except ConfigParser.NoOptionError :
             pass
         
         try :
             track['artist'] = config.get( "format.tags" , "artist" )
             self._artist.setdefault( m.group(1) , 0 )
             self._artist[m.group(1)] += 1
-        except NoOptionError :
+        except ConfigParser.NoOptionError :
             pass
         
         try :
             track['album'] = config.get( "format.tags" , "album" )
-        except NoOptionError :
+        except ConfigParser.NoOptionError :
             pass
         
         try :
             track['size'] = str( int( config.getfloat( "format.tags" , "title" ) ) )
-        except NoOptionError :
+        except ConfigParser.NoOptionError :
             pass
         
         try :
             track['bitrate'] = str( int( config.getfloat( "format.tags" , "title" ) ) )
-        except NoOptionError :
+        except ConfigParser.NoOptionError :
             pass        
         
         
