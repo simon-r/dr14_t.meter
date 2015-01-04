@@ -238,7 +238,9 @@ class RetirveMetadata:
             track['disk_nr'] = int( re.search( "(\d+)" , track['disk_nr'] ).group(1) )
             self._disk_nr.append( track['disk'] )
         except ConfigParser.NoOptionError :
-            pass 
+            pass
+        except :
+            del track['disk_nr']
         
         try :
             track['genre'] = config.get( "format.tags" , "genre" )
