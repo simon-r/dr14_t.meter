@@ -229,7 +229,7 @@ class RetirveMetadata:
             pass
         
         try :
-            track['track_nr'] = config.get( "format.tags" , "track" )
+            track['track_nr'] = config.getint( "format.tags" , "track" )
         except ConfigParser.NoOptionError :
             pass
         
