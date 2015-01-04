@@ -29,7 +29,7 @@ if sys.version_info[0] == 2:
 else:
     import configparser as ConfigParser
     
-import StringIO
+from io import StringIO
 
 
 # Test example !!!!!
@@ -49,8 +49,11 @@ class RetirveMetadata:
         
         if get_ffmpeg_cmd() == "ffmpeg" :
             self.__ffprobe_cmd = "ffprobe"
+            self.__scan_file = self.scan_file_ffprobe
         elif get_ffmpeg_cmd() == "avconv" :
-            self.__ffprobe_cmd = "avprobe"        
+            self.__ffprobe_cmd = "avprobe"
+            self.__scan_file = self.scan_file_avprobe
+        
     
     
     def scan_dir( self , dir_name , files_list=None ):
@@ -78,9 +81,15 @@ class RetirveMetadata:
                     pass
                 
         #print( self._tracks )
+     
+        
+    def get_scan_file(self):
+        return self.__scan_file
+    
+    scan_file = property( get_scan_file )
     
     
-    def scan_file( self , file_name ):
+    def scan_file_ffprobe( self , file_name ):
                 
         try:
             data_txt = subprocess.check_output( [ self.__ffprobe_cmd , "-show_format" , file_name ] , 
@@ -208,12 +217,61 @@ class RetirveMetadata:
             self._tracks[f_key] = None
             raise UnreadableAudioFileException( "problematic file: file_name" )   
         
-        buf = StringIO.StringIO( format_tags )
+        buf = StringIO( format_tags )
         config = ConfigParser.ConfigParser()
-        config.readfp(buf)
+        config.readfp( buf )
+        
+        try :
+            track['title'] = config.get( "format.tags" , "title" )
+            self._album.setdefault( m.group(1) , 0 )
+            self._album[m.group(1)] += 1            
+        except NoOptionError :
+            pass
+        
+        try :
+            track['track_nr'] = config.get( "format.tags" , "track" )
+        except NoOptionError :
+            pass
+        
+        try :
+            track['disk'] = config.get( "format.tags" , "disc" )
+            self._disk_nr.append( int( int( m.group(1) ) ) )
+        except NoOptionError :
+            pass 
+        
+        try :
+            track['genre'] = config.get( "format.tags" , "genre" )
+        except NoOptionError :
+            pass         
+        
+        try :
+            track['date'] = config.get( "format.tags" , "date" )
+        except NoOptionError :
+            pass
+        
+        try :
+            track['artist'] = config.get( "format.tags" , "artist" )
+            self._artist.setdefault( m.group(1) , 0 )
+            self._artist[m.group(1)] += 1
+        except NoOptionError :
+            pass
+        
+        try :
+            track['album'] = config.get( "format.tags" , "album" )
+        except NoOptionError :
+            pass
+        
+        try :
+            track['size'] = config.get( "format" , "size" )
+        except NoOptionError :
+            pass
+        
+        try :
+            track['bitrate'] = config.get( "format" , "bit_rate" )
+        except NoOptionError :
+            pass        
         
         
-                     
         ##########################################
         # string examples:   
         #Audio: flac, 44100 Hz, stereo, s16
