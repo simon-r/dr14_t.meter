@@ -53,6 +53,8 @@ class RetirveMetadata:
         elif get_ffmpeg_cmd() == "avconv" :
             self.__ffprobe_cmd = "avprobe"
             self.__scan_file = self.scan_file_avprobe
+            
+        self.__scan_file = self.scan_file_old
         
     
     
@@ -139,17 +141,23 @@ class RetirveMetadata:
             
         m = re.search( r"^\s*date\s*\:\s*(\d+).*$" , data_txt , re_flags )
         if m != None:
-            track['date'] = m.group(1)     
+            track['date'] = m.group(1)
+            
+        m = re.search( r"^\s*disc\s*:\s*(\d+).*$" , data_txt , re_flags )
+        if m != None:
+            track['disk_nr'] = int( m.group(1) )
              
-        m = re.search( r"^size=\s*(\d+)\s*$" , format_tags , re_flags )
+        m = re.search( r"^size=\s*(\d+)\s*$" , data_txt , re_flags )
         if m != None:
             track['size'] = m.group(1)
                
-        m = re.search( r"^bit_rate=\s*(\d+)\s*$" , format_tags , re_flags )
+        m = re.search( r"^bit_rate=\s*(\d+)\s*$" , data_txt , re_flags )
         if m != None:
             track['bitrate'] = m.group(1)
             
         self.__read_stream_info(data_txt, track)
+        
+        ( foo , f_key ) = os.path.split( file_name )
         self._tracks[f_key] = track    
   
  

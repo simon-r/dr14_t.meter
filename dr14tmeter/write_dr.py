@@ -287,7 +287,7 @@ class WriteDrExtended( WriteDr ) :
         txt = tm.add_title( txt , " Sampling rate: \t\t %s Hz" % sampl_rate[0] )
         
         if cnt > 0:
-            txt = tm.add_title( txt , " Average bitrate: \t\t %dkbs " % ( sum_kbs / cnt )  )
+            txt = tm.add_title( txt , " Average bitrate: \t\t %d kbs " % ( ( sum_kbs / 1000 ) / cnt )  )
         
         mf_bit = max( set( list_bit ) , key=list_bit.count )
         txt = tm.add_title( txt , " Bits per sample: \t\t %s bit" % ( mf_bit ) )
