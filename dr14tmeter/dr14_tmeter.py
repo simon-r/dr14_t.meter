@@ -71,7 +71,7 @@ def main():
             set_db_path( db_path )
             set_collection_dir( coll_dir )
             
-            print_msg( "Building database .... " )
+            print_msg( "Preparing database .... " )
             db = dr_database_singletone().get()
             db.build_database()
             

@@ -210,7 +210,12 @@ def local_dr_database_configure():
     flag = True
     while flag :
         print_out( "  1. Insert the database directory: Default [%s]:" % os.path.split( get_db_path() )[0] )
-        db_path = input("     > ")
+        
+        if sys.version_info[0] == 2:
+            db_path = raw_input("     > ")
+        else:        
+            db_path = input("     > ")
+            
         db_path = os.path.expanduser( db_path )
         db_path = os.path.expandvars( db_path )
         
@@ -236,7 +241,12 @@ def local_dr_database_configure():
     flag = True
     while flag :
         print_out( "  2. Insert your collection directory: Dafault [%s] " % "any" )
-        coll_path = input("     > ")
+        
+        if sys.version_info[0] == 2:
+            coll_path = raw_input("     > ")
+        else:        
+            coll_path = input("     > ")
+            
         coll_path = os.path.expanduser( coll_path )
         coll_path = os.path.expandvars( coll_path )
         
