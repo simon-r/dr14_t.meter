@@ -255,6 +255,8 @@ class RetirveMetadata:
                 data_txt = data_txt.decode(encoding='UTF-8')
             except:
                 data_txt = data_txt.decode(encoding='ISO-8859-1')
+        
+        print( data_txt )
                 
         track = {} 
         ( foo , f_key ) = os.path.split( file_name )
@@ -273,8 +275,6 @@ class RetirveMetadata:
         buf = StringIO( format_tags )
         config = ConfigParser.ConfigParser()
         config.readfp( buf )
-        
-        print( format_tags )
         
         try :
             track['title'] = config.get( "format.tags" , "title" )
