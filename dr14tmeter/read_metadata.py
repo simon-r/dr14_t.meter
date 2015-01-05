@@ -88,8 +88,17 @@ class RetirveMetadata:
         return self.__scan_file
     
     scan_file = property( get_scan_file )     
-            
+    
+    
+    def match_repetitive_title( self , data_txt ):
+        re_flags = ( re.MULTILINE | re.IGNORECASE | re.UNICODE  )
+        m = re.search( r"(\w[\w ]+\w)\s*;\s*\1" , data_txt , re_flags )
+        if m != None:
+            return  m.group(1)
+        else :
+            return data_txt
    
+        
     def scan_file_orig( self , file_name ):
         
         try:
@@ -99,7 +108,7 @@ class RetirveMetadata:
             data_txt = "ffprobe ERROR"
         
         ( foo , f_key ) = os.path.split( file_name )
-         
+        
         if data_txt != "ffprobe ERROR" :
             try:
                 data_txt = data_txt.decode(encoding='UTF-8')
@@ -117,6 +126,8 @@ class RetirveMetadata:
                 
         pattern = "[ \t\f\v]*([\S \t\f\v]+\S).*$"
         
+       
+        
         m = re.search( r"^\s*track\s*\:\s*(\d+).*$" , data_txt , re_flags )
         if m != None:
             #track['nr'] = int( m.group(1) )
@@ -125,23 +136,23 @@ class RetirveMetadata:
         m = re.search( r"^\s*album\s*\:%s"%pattern , data_txt , re_flags )
         if m != None:
             #print( m.group(1) )
-            self._album.setdefault( m.group(1) , 0 )
-            self._album[m.group(1)] += 1
-            track['album'] = m.group(1)
+            track['album'] = self.match_repetitive_title( m.group(1) )
+            self._album.setdefault( track['album'] , 0 )
+            self._album[ track['album'] ] += 1
             
         m = re.search( r"^\s*title\s*\:%s"%pattern , data_txt , re_flags )
         if m != None:
-            track['title'] = m.group(1)
+            track['title'] = self.match_repetitive_title( m.group(1) )
         
         m = re.search( r"^\s*artist\s*\:%s"%pattern , data_txt , re_flags )
         if m != None:
-            self._artist.setdefault( m.group(1) , 0 )
-            self._artist[m.group(1)] += 1
-            track['artist'] = m.group(1)
+            track['artist'] = self.match_repetitive_title( m.group(1) )
+            self._artist.setdefault( track['artist'] , 0 )
+            self._artist[ track['artist'] ] += 1
         
         m = re.search( r"^\s*genre\s*\:%s"%pattern , data_txt , re_flags )
         if m != None:
-            track['genre'] = m.group(1)
+            track['genre'] = self.match_repetitive_title( m.group(1) ) 
             
         m = re.search( r"^\s*date\s*\:\s*(\d+).*$" , data_txt , re_flags )
         if m != None:
