@@ -245,8 +245,7 @@ class RetirveMetadata:
         
     def scan_file_avprobe( self , file_name ):
         try:
-            data_txt = subprocess.check_output( [ self.__ffprobe_cmd , " -show_format " , file_name ] , 
-                                                stderr=subprocess.STDOUT , shell=False )
+            data_txt = subprocess.check_output( [ self.__ffprobe_cmd , "-show_format" , file_name ] , stderr=subprocess.STDOUT , shell=False )
         except :
             data_txt = "ffprobe ERROR"
          
