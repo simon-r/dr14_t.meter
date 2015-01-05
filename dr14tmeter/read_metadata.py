@@ -263,7 +263,7 @@ class RetirveMetadata:
         
         re_flags = ( re.MULTILINE | re.IGNORECASE | re.UNICODE )
         
-        m = re.search( r"(\[format].*)" , data_txt , re_flags | re.DOTALL )
+        m = re.search( r"(\[format\].*)" , data_txt , re_flags | re.DOTALL )
         if m != None:
             format_tags = m.group(1)
         else:
