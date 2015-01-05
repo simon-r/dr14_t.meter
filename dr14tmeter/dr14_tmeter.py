@@ -95,6 +95,7 @@ def main():
             
             print_err( "Error: -q invalid parameter ." )
             print_err( "Error: type dr14_tmeter -q for more info." )
+            return 
         
         database_exec_query( options )
         return  
