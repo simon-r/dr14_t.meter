@@ -23,6 +23,7 @@ import hashlib
 
 from dr14tmeter.audio_decoder import AudioDecoder
 from dr14tmeter.dr14_global import get_ffmpeg_cmd
+from dr14tmeter.out_messages import print_msg, flush_msg
 
 if sys.version_info[0] == 2:
     import ConfigParser
@@ -54,7 +55,7 @@ class RetirveMetadata:
             self.__ffprobe_cmd = "avprobe"
             self.__scan_file = self.scan_file_avprobe
             
-        self.__scan_file = self.scan_file_old
+        self.__scan_file = self.scan_file_orig
         
     
     
@@ -79,38 +80,42 @@ class RetirveMetadata:
             if ext in ad.formats :
                 try :
                     self.scan_file( full_file )
-                except UnreadableAudioFileException as euaf :
+                except UnreadableAudioFileException as uafe :
                     pass
-                
-        #print( self._tracks )
-     
-        
+
+    
     def get_scan_file(self):
         return self.__scan_file
     
-    scan_file = property( get_scan_file )
-    
+    scan_file = property( get_scan_file )     
+            
    
-    def scan_file_old( self , file_name ):
-                
+    def scan_file_orig( self , file_name ):
+        
         try:
-            data_txt = subprocess.check_output( [ self.__ffprobe_cmd , "-show_format" , file_name ] , 
+            data_txt = subprocess.check_output( [ self.__ffprobe_cmd , " -show_format -show_streams " , file_name ] , 
                                                 stderr=subprocess.STDOUT , shell=False )
         except :
             data_txt = "ffprobe ERROR"
+        
+        ( foo , f_key ) = os.path.split( file_name )
          
         if data_txt != "ffprobe ERROR" :
             try:
                 data_txt = data_txt.decode(encoding='UTF-8')
             except:
                 data_txt = data_txt.decode(encoding='ISO-8859-1')
+        else :
+            self._tracks[f_key] = None
+            raise UnreadableAudioFileException( "problematic file: file_name" )
+            
         
         track = {} 
         
         track['file_name'] = file_name
         
         re_flags = ( re.MULTILINE | re.IGNORECASE | re.UNICODE )
-        
+                
         pattern = "[ \t\f\v]*([\S \t\f\v]+\S).*$"
         
         m = re.search( r"^\s*track\s*\:\s*(\d+).*$" , data_txt , re_flags )
@@ -157,7 +162,6 @@ class RetirveMetadata:
             
         self.__read_stream_info(data_txt, track)
         
-        ( foo , f_key ) = os.path.split( file_name )
         self._tracks[f_key] = track    
   
  
@@ -165,7 +169,7 @@ class RetirveMetadata:
     def scan_file_ffprobe( self , file_name ):
                 
         try:
-            data_txt = subprocess.check_output( [ self.__ffprobe_cmd , "-show_format" , file_name ] , 
+            data_txt = subprocess.check_output( [ self.__ffprobe_cmd , " -show_format -show_streams " , file_name ] , 
                                                 stderr=subprocess.STDOUT , shell=False )
         except :
             data_txt = "ffprobe ERROR"
@@ -241,7 +245,7 @@ class RetirveMetadata:
         
     def scan_file_avprobe( self , file_name ):
         try:
-            data_txt = subprocess.check_output( [ self.__ffprobe_cmd , "-show_format" , file_name ] , 
+            data_txt = subprocess.check_output( [ self.__ffprobe_cmd , " -show_format -show_streams " , file_name ] , 
                                                 stderr=subprocess.STDOUT , shell=False )
         except :
             data_txt = "ffprobe ERROR"
@@ -337,11 +341,15 @@ class RetirveMetadata:
         # Audio: flac, 44100 Hz, stereo, s16
         # Stream #0:0(und): Audio: alac (alac / 0x63616C61), 44100 Hz, 2 channels, s16, 634 kb/s
         # Stream #0:0(und): Audio: aac (LC) (mp4a / 0x6134706D), 44100 Hz, stereo, fltp, 255 kb/s (default
-        # Stream #0:0: Audio: flac, 44100 Hz, stereo, s16        
+        # Stream #0:0: Audio: flac, 44100 Hz, stereo, s16    
+        
+        print_msg( data_txt )
+        flush_msg()
+            
         m = re.search( r"Stream.*Audio:(.*)$" , data_txt , re_flags )
         if m != None:
             fmt = m.group(1)
-            #print(fmt)
+            print(fmt)
             
         fmt = re.split( "," , fmt )
         
