@@ -274,6 +274,8 @@ class RetirveMetadata:
         config = ConfigParser.ConfigParser()
         config.readfp( buf )
         
+        print( format_tags )
+        
         try :
             track['title'] = config.get( "format.tags" , "title" )
             self._album.setdefault( m.group(1) , 0 )
