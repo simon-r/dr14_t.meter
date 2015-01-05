@@ -25,6 +25,7 @@ import sqlite3
 import threading
 
 from dr14tmeter.dr14_config import get_db_path
+from decorator import __call__
 
 unique_db_object = 0 ;
 lock_db = threading.Lock()
@@ -457,9 +458,10 @@ class dr_database :
         q = """
         select date.date as date , avg( dr.dr ) as mean
            from track inner join DR_Track on DR_Track.idtrack = track.id 
-                  inner join dr on dr.id = DR_Track.iddr 
+                  inner join dr on dr.id = DR_Track.iddr
                   inner join Date_Track on Date_Track.idtrack = track.id
-                  inner join date on date.id = Date_Track.iddate 
+                  inner join date on date.id = Date_Track.iddate
+                  where dr.dr >= 0  
                   group by date 
                   order by date ;
         """
@@ -666,6 +668,9 @@ class dr_database :
 
 class dr_database_singletone():
     __database_singletone = None
+    
+    def __call__(self):
+        return self.get()
     
     def get(self):
         if dr_database_singletone.__database_singletone == None :

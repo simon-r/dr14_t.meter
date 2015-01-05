@@ -92,7 +92,7 @@ class RetirveMetadata:
     
     def match_repetitive_title( self , data_txt ):
         re_flags = ( re.MULTILINE | re.IGNORECASE | re.UNICODE  )
-        m = re.search( r"(\w[\w ]+\w)\s*;\s*\1" , data_txt , re_flags )
+        m = re.search( r"(\S[\S ]+\S)\s*;\s*\1" , data_txt , re_flags )
         if m != None:
             return  m.group(1)
         else :
