@@ -109,7 +109,6 @@ class RetirveMetadata:
             self._tracks[f_key] = None
             raise UnreadableAudioFileException( "problematic file: file_name" )
             
-        
         track = {} 
         
         track['file_name'] = file_name
@@ -255,8 +254,6 @@ class RetirveMetadata:
             except:
                 data_txt = data_txt.decode(encoding='ISO-8859-1')
         
-        print( data_txt )
-                
         track = {} 
         ( foo , f_key ) = os.path.split( file_name )
         
@@ -343,14 +340,10 @@ class RetirveMetadata:
         # Stream #0:0(und): Audio: alac (alac / 0x63616C61), 44100 Hz, 2 channels, s16, 634 kb/s
         # Stream #0:0(und): Audio: aac (LC) (mp4a / 0x6134706D), 44100 Hz, stereo, fltp, 255 kb/s (default
         # Stream #0:0: Audio: flac, 44100 Hz, stereo, s16    
-        
-        print_msg( data_txt )
-        flush_msg()
             
         m = re.search( r"Stream.*Audio:(.*)$" , data_txt , re_flags )
         if m != None:
             fmt = m.group(1)
-            print(fmt)
             
         fmt = re.split( "," , fmt )
         
