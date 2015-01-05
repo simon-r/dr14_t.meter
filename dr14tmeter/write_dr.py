@@ -109,7 +109,7 @@ class WriteDr :
         txt = tm.end_tbody( txt )
         
         for row in res_dl :
-            txt = tm.append_row( txt , [ str(row[k]) for k in keys ] )
+            txt = tm.append_row( txt , [ row[k] for k in keys ] )
         
         txt = tm.end_tbody( txt )
         

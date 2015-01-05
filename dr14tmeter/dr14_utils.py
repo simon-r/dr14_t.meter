@@ -311,7 +311,7 @@ def database_exec_query( options ):
         table_title = "Worst DR Albums"
         (res_dl, keys) = exec_limited_query( options , db.query_worst_albums_dr )          
         
-    elif options.query[0] == "art_top" :
+    elif options.query[0] == "top_art" :
         table_title = "Top Artists"
         (res_dl, keys) = exec_limited_query( options , db.query_top_artists )
         

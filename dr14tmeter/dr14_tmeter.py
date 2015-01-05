@@ -90,7 +90,7 @@ def main():
             return 
         
         if options.query[0] not in [ "help" , "top" , "top_alb" , 
-                                    "worst" , "worst_alb" , "art_top" ,
+                                    "worst" , "worst_alb" , "top_art" ,
                                     "hist" , "evol" , "codec" ] :
             
             print_err( "Error: -q invalid parameter ." )

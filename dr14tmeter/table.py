@@ -21,11 +21,20 @@ import sys
 
 class Table:
     
+    def __init__(self):
+        self.__float_format = "%.2f"
+    
     def nl(self):
         if sys.platform.startswith('linux') or sys.platform.startswith('darwin'):
             return '\n'
         elif sys.platform.startswith('win'):
             return '\n\r'
+    
+    def format_element( self , el ):
+        if isinstance( el , float ) :
+            return "%s" % self.__float_format % el
+        else :
+            return str( el )
     
     def append_row( self , txt , row_el , cell_type='d'):
         
@@ -40,7 +49,7 @@ class Table:
         
         for i in row_el:
             txt = n_cell(txt)
-            txt = txt + i
+            txt = txt + self.format_element( i )
             txt = e_cell(txt)
             
         txt = self.end_row(txt)
