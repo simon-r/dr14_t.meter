@@ -55,7 +55,7 @@ class RetirveMetadata:
             self.__ffprobe_cmd = "avprobe"
             self.__scan_file = self.scan_file_avprobe
             
-        self.__scan_file = self.scan_file_orig
+        #self.__scan_file = self.scan_file_orig
         
     
     
