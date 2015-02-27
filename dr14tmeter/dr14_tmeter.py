@@ -107,11 +107,11 @@ def main():
         path_name = os.path.abspath( '.' )
         
     if not( os.path.exists( path_name ) ) :
-        print_msg( "Error: The input directory \"%s\" don't exixst! " % path_name )
+        print_msg( "Error: The input directory \"%s\"  does not exists!" % path_name )
         return 
 
     if options.out_dir and not( os.path.exists( options.out_dir ) ) :
-        print_msg( "Error (-o): The target directory \"%s\" don't exixst! " % options.out_dir )
+        print_msg( "Error (-o): The target directory \"%s\"  does not exists! " % options.out_dir )
         return 
 
     if options.quiet :
