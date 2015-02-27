@@ -266,9 +266,11 @@ def local_dr_database_configure():
     print_out( "---------------------------------------------------------------------------------------------- " )
         
     return ( db_path , coll_path )
+
     
 def print_query_help():
     print_msg( "query help" )
+
 
 def exec_limited_query( options , qf ):
             
@@ -283,8 +285,8 @@ def exec_limited_query( options , qf ):
     (res_dict, keys) = qf( limit=limit )
 
     return (res_dict, keys)
-    
-    
+  
+      
 def database_exec_query( options ):
     ## [ "help" , "top" , "top_alb" ,  "worst" , "worst_alb" , "art_top" , "hist" , "evol" , "codec" ] :
     

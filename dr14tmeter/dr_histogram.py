@@ -88,7 +88,7 @@ def compute_hist ( Y , Fs , duration=None , bins=100 , block_duration = 0.2 , pl
         pyplot.text( -85 , numpy.max(hist)*(text_rel_pos-0.15) ,"max rms:  %.3f dB"%rms_max , fontsize=15,)
         
         pyplot.xlabel('RMS dB')
-        pyplot.ylabel('Probability')
+        pyplot.ylabel('Relative frequency')
         
         if title != None:
             hist_title = title
