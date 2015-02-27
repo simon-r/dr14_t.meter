@@ -124,7 +124,20 @@ class query_top_artists( query ):
     def __init__(self):
         super( query_top_dr , self ).__init__()
         self.keys = [ "mean_dr" , "artist" , "track_cnt" ]
+        self.track_cnt = 10 ;
+
+    def set_min_track( self, mt ):
+        self.track_cnt = mt 
+    
+    def get_min_track(self):
+        return self.track_cnt
         
+    min_track = property( get_min_track , set_min_track )
+    
+    def exec_query(self):
+        db = dr_database_singletone() ;
+        return db.query( self.query , ( self.limit, self.min_track ) , dict_factory_arg=my_dict_factory )
+    
     def get_query(self):
         q = """
         select artist, mean_dr , track_cnt from 
@@ -137,7 +150,8 @@ class query_top_artists( query ):
                       group by artist                  
         )
         where track_cnt >= ? 
-        order by mean_dr desc  ;
+        order by mean_dr desc  
+        limit ? ;
         """
         
         return q 
