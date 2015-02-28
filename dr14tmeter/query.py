@@ -28,14 +28,23 @@ def my_dict_factory(cursor, row):
 
 class query :
     def __init__(self):
-        self.limit = 30 
-        self.keys = [] 
+        self.keys = []
+        self.__params = list( [ 30 ] ) 
+    
+    def append_parameter( self , p ):
+        self.__params.append(p)
+        
+    def set_parameter( self , i , p ):
+        self.__params[i] = p
+        
+    def get_parameter( self , i ):
+        return self.__params[i]
     
     def get_limit(self):
-        return self.limit 
+        return self.__params[0] 
     
     def set_limit( self , limit ):
-        self.limit = limit 
+        self.__params[0] = limit
         
     limit = property( get_limit , set_limit )
     
@@ -50,6 +59,7 @@ class query :
     
     def get_col_keys(self):
         return self.keys
+        
         
 
 class query_top_dr( query ):
@@ -124,13 +134,13 @@ class query_top_artists( query ):
     def __init__(self):
         super( query_top_dr , self ).__init__()
         self.keys = [ "mean_dr" , "artist" , "track_cnt" ]
-        self.track_cnt = 10 ;
+        self.append_parameter( 10 )
 
     def set_min_track( self, mt ):
-        self.track_cnt = mt 
+        self.set_parameter( 1 , mt ) 
     
     def get_min_track(self):
-        return self.track_cnt
+        return self.get_parameter(i)
         
     min_track = property( get_min_track , set_min_track )
     
