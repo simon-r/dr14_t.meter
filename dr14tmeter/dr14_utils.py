@@ -26,6 +26,7 @@ from dr14tmeter.table import *
 from dr14tmeter.audio_analysis import *
 from dr14tmeter.dr14_global import *
 from dr14tmeter.dr14_config import *
+from dr14tmeter.query import *
 
 import subprocess
 import sys
@@ -271,27 +272,8 @@ def local_dr_database_configure():
 def print_query_help():
     print_msg( "query help" )
 
-
-def exec_limited_query( options , qf ):
-            
-    if len( options.query ) == 1 :
-        limit = 30 
-    else :
-        try:
-            limit = int( float( options.query[1] ) )
-        except ValueError:
-             limit = 30
-             
-    (res_dict, keys) = qf( limit=limit )
-
-    return (res_dict, keys)
   
-      
-def database_exec_query( options ):
-    ## [ "help" , "top" , "top_alb" ,  "worst" , "worst_alb" , "art_top" , "hist" , "evol" , "codec" ] :
-    
-    res_dl = [{}]
-    db = dr_database_singletone().get()
+def database_exec_query( options , tm = TextTable() ):
     
     if options.query[0] == "help" :
         print_query_help()
@@ -299,41 +281,43 @@ def database_exec_query( options ):
     
     elif options.query[0] == "top" :
         table_title = "Top DR tracks"
-        (res_dl, keys) = exec_limited_query( options , db.query_top_dr )
+        q = query_top_dr() 
         
     elif options.query[0] == "top_alb" :
         table_title = "Top DR Albums"
-        (res_dl, keys) = exec_limited_query( options , db.query_top_albums_dr )        
+        q = query_top_albums_dr()
         
     elif options.query[0] == "worst" :
         table_title = "Worst DR Tracks"
-        (res_dl, keys) = exec_limited_query( options , db.query_worst_dr )  
+        q = query_worst_dr()
         
     elif options.query[0] == "worst_alb" :
         table_title = "Worst DR Albums"
-        (res_dl, keys) = exec_limited_query( options , db.query_worst_albums_dr )          
+        q = query_worst_albums_dr()
         
     elif options.query[0] == "top_art" :
         table_title = "Top Artists"
-        (res_dl, keys) = exec_limited_query( options , db.query_top_artists )
+        q = query_top_artists()
         
     elif options.query[0] == "hist" :
         table_title = "DR histogram"
-        (res_dl, keys) = db.query_dr_histogram()
+        q = query_dr_histogram()
+        
         
     elif options.query[0] == "evol" :
         table_title = "DR evolution"
-        (res_dl, keys) = db.query_date_evolution()
+        q = query_date_dr_evolution()
         
     elif options.query[0] == "codec" :
         table_title = "Codec Info"
-        (res_dl, keys) = db.query_codec()        
-      
-    wr = WriteDr()        
-    tm = TextTable() 
-    table_code = wr.write_query_result( res_dl , tm , table_title , keys )
-    print_out( table_code )
-
+        q = query_dr_codec()
+        
+    wr = WriteDr()
+    table_code = wr.write_query_result( q.exec_query() , tm , table_title , q.get_col_keys() )
+    
+    return table_code
+    
+    
 
 def run_analysis_opt( options , path_name ):
     

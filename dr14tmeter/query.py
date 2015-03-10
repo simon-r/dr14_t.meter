@@ -83,7 +83,7 @@ class query_top_albums_dr( query ):
         
     def get_query(self):
         q = """
-        select track.id as id , track.title as title , dr.dr as dr 
+        select track.id as id , track.title as album_title , dr.dr as dr 
            from track inner join DR_Track on DR_Track.idtrack = track.id 
                   inner join dr on dr.id = DR_Track.iddr 
                   order by dr desc
@@ -95,7 +95,7 @@ class query_top_albums_dr( query ):
 
 class query_worst_albums_dr( query ):
     def __init__(self):
-        super( query_top_dr , self ).__init__()
+        super().__init__()
         self.keys = [ "dr" , "album_title" , "id" ]
         
     def get_query(self):
@@ -112,7 +112,7 @@ class query_worst_albums_dr( query ):
     
 class query_worst_dr( query ):
     def __init__(self):
-        super( query_top_dr , self ).__init__()
+        super().__init__()
         self.keys = [ "dr" , "title" , "id" ]
         
     def get_query(self):
@@ -129,7 +129,7 @@ class query_worst_dr( query ):
     
 class query_top_artists( query ):
     def __init__(self):
-        super( query_top_dr , self ).__init__()
+        super().__init__()
         self.keys = [ "mean_dr" , "artist" , "track_cnt" ]
         self.append_parameter( 10 )
 
@@ -137,12 +137,12 @@ class query_top_artists( query ):
         self.set_parameter( 1 , mt ) 
     
     def get_min_track(self):
-        return self.get_parameter(i)
+        return self.get_parameter(1)
         
     min_track = property( get_min_track , set_min_track )
     
     def exec_query(self):
-        db = dr_database_singletone() ;
+        db = dr_database_singletone().get() ;
         return db.query( self.get_query() , ( self.limit, self.min_track ) , dict_factory_arg=my_dict_factory )
     
     def get_query(self):
@@ -167,11 +167,11 @@ class query_top_artists( query ):
 
 class query_dr_histogram( query ):
     def __init__(self):
-        super( query_top_dr , self ).__init__()
+        super().__init__()
         self.keys = [ "dr" , "dr_cnt" ]
 
     def exec_query(self):
-        db = dr_database_singletone() ;
+        db = dr_database_singletone().get() ;
         return db.query( self.get_query() , () , dict_factory_arg=my_dict_factory )
         
     def get_query(self):
@@ -187,11 +187,11 @@ class query_dr_histogram( query ):
     
 class query_date_dr_evolution( query ):
     def __init__(self):
-        super( query_top_dr , self ).__init__()
+        super().__init__()
         self.keys = [ "date" , "mean" ]
 
     def exec_query(self):
-        db = dr_database_singletone() ;
+        db = dr_database_singletone().get() ;
         return db.query( self.get_query() , () , dict_factory_arg=my_dict_factory )
         
     def get_query(self):
@@ -212,11 +212,11 @@ class query_date_dr_evolution( query ):
     
 class query_dr_codec( query ):
     def __init__(self):
-        super( query_top_dr , self ).__init__()
+        super().__init__()
         self.keys = [ "codec" , "mean_dr" , "codec_freq" ]
 
     def exec_query(self):
-        db = dr_database_singletone() ;
+        db = dr_database_singletone().get() ;
         return db.query( self.get_query() , () , dict_factory_arg=my_dict_factory )
         
     def get_query(self):

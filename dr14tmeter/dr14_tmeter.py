@@ -27,7 +27,6 @@ from dr14tmeter.dr14_global import dr14_version, TestVer, test_new_version, get_
 from dr14tmeter.dr14_utils import *
 from dr14tmeter.out_messages import *
 from dr14tmeter.dr14_config import *
-from dr14tmeter.query import *
 
 import os
 import time
@@ -98,7 +97,9 @@ def main():
             print_err( "Error: type dr14_tmeter -q for more info." )
             return 
         
-        database_exec_query( options )
+        table_code = database_exec_query( options )
+        print_out( table_code )
+        
         return  
     
     
