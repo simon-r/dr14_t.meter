@@ -51,11 +51,9 @@ class query :
     def get_query(self):
         NotImplementedError( "%s : is virutal and must be overridden." % sys._getframe().f_code.co_name )
         
-    query = property( get_query )
-    
     def exec_query(self):
-        db = dr_database_singletone() ;
-        return db.query( self.query , (self.limit,) , dict_factory_arg=my_dict_factory )
+        db = dr_database_singletone().get() ;
+        return db.query( self.get_query() , (self.limit,) , dict_factory_arg=my_dict_factory )
     
     def get_col_keys(self):
         return self.keys
@@ -64,9 +62,9 @@ class query :
 
 class query_top_dr( query ):
     def __init__(self):
-        super( query_top_dr , self ).__init__()
+        super().__init__()
         self.keys = [ "dr" , "title" , "id" ]
-        
+     
     def get_query(self):
         q = """
         select track.id as id , track.title as title , dr.dr as dr 
@@ -76,12 +74,11 @@ class query_top_dr( query ):
                   limit ? ;
         """
         
-        return q 
-
+        return q
 
 class query_top_albums_dr( query ):
     def __init__(self):
-        super( query_top_dr , self ).__init__()
+        super().__init__()
         self.keys = [ "dr" , "album_title" , "id" ]
         
     def get_query(self):
@@ -146,7 +143,7 @@ class query_top_artists( query ):
     
     def exec_query(self):
         db = dr_database_singletone() ;
-        return db.query( self.query , ( self.limit, self.min_track ) , dict_factory_arg=my_dict_factory )
+        return db.query( self.get_query() , ( self.limit, self.min_track ) , dict_factory_arg=my_dict_factory )
     
     def get_query(self):
         q = """
@@ -175,7 +172,7 @@ class query_dr_histogram( query ):
 
     def exec_query(self):
         db = dr_database_singletone() ;
-        return db.query( self.query , () , dict_factory_arg=my_dict_factory )
+        return db.query( self.get_query() , () , dict_factory_arg=my_dict_factory )
         
     def get_query(self):
         q = """
@@ -195,7 +192,7 @@ class query_date_dr_evolution( query ):
 
     def exec_query(self):
         db = dr_database_singletone() ;
-        return db.query( self.query , () , dict_factory_arg=my_dict_factory )
+        return db.query( self.get_query() , () , dict_factory_arg=my_dict_factory )
         
     def get_query(self):
         q = """
@@ -220,7 +217,7 @@ class query_dr_codec( query ):
 
     def exec_query(self):
         db = dr_database_singletone() ;
-        return db.query( self.query , () , dict_factory_arg=my_dict_factory )
+        return db.query( self.get_query() , () , dict_factory_arg=my_dict_factory )
         
     def get_query(self):
         q = """

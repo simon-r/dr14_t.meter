@@ -27,6 +27,7 @@ from dr14tmeter.dr14_global import dr14_version, TestVer, test_new_version, get_
 from dr14tmeter.dr14_utils import *
 from dr14tmeter.out_messages import *
 from dr14tmeter.dr14_config import *
+from dr14tmeter.query import *
 
 import os
 import time
