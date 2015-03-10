@@ -143,7 +143,7 @@ class query_top_artists( query ):
     
     def exec_query(self):
         db = dr_database_singletone().get() ;
-        return db.query( self.get_query() , ( self.limit, self.min_track ) , dict_factory_arg=my_dict_factory )
+        return db.query( self.get_query() , ( self.min_track, self.limit ) , dict_factory_arg=my_dict_factory )
     
     def get_query(self):
         q = """

@@ -275,6 +275,16 @@ def print_query_help():
   
 def database_exec_query( options , tm = TextTable() ):
     
+    if len( options.query ) >= 2 :
+        limit = int( options.query[1] )
+    else :
+        limit = 30 ;
+        
+    if len( options.query ) >= 3 :
+        second_opt = options.query[2] 
+    else :
+        second_opt = None ;
+    
     if options.query[0] == "help" :
         print_query_help()
         return
@@ -298,11 +308,12 @@ def database_exec_query( options , tm = TextTable() ):
     elif options.query[0] == "top_art" :
         table_title = "Top Artists"
         q = query_top_artists()
+        if second_opt is not None :
+            q.min_track = int( second_opt )
         
     elif options.query[0] == "hist" :
         table_title = "DR histogram"
         q = query_dr_histogram()
-        
         
     elif options.query[0] == "evol" :
         table_title = "DR evolution"
@@ -312,6 +323,11 @@ def database_exec_query( options , tm = TextTable() ):
         table_title = "Codec Info"
         q = query_dr_codec()
         
+    else :
+        raise Exception("Option not allowed")
+        
+    q.limit = limit ;
+    
     wr = WriteDr()
     table_code = wr.write_query_result( q.exec_query() , tm , table_title , q.get_col_keys() )
     
