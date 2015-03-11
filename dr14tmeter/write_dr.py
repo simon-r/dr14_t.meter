@@ -79,64 +79,62 @@ class WriteDr :
         
     
     def write_query_result( self , res_dl , tm , table_title , desired_keys=None , desired_keys_titles=None ):
-        txt = "" 
-        
+         
         if len(res_dl) == 0 :
-            return txt
+            return ""
         
-        if desired_keys != None :
+        if desired_keys is not None :
             keys = desired_keys
         else :
             keys = res_dl[0].keys()
         
         if len(keys) == 0 :
-            return txt
+            return ""
         
-        txt = tm.new_table(txt)
-        txt = tm.new_head( txt )
+        tm.new_table()
+        tm.new_head()
         
-        txt = tm.end_head( txt )
-        txt = tm.append_separator_line( txt )
-        txt = tm.add_title( txt , table_title )
-        txt = tm.end_head( txt )
+        tm.end_head()
+        tm.append_separator_line()
+        tm.add_title( table_title )
+        tm.end_head()
         
-        txt = tm.new_tbody( txt )
+        tm.new_tbody()
         
-        txt = tm.append_separator_line( txt )
-        txt = tm.append_row( txt , keys , 'h' )
-        txt = tm.append_separator_line( txt )
+        tm.append_separator_line()
+        tm.append_row( keys , 'h' )
+        tm.append_separator_line()
         
-        txt = tm.end_tbody( txt )
+        tm.end_tbody()
         
         for row in res_dl :
-            txt = tm.append_row( txt , [ row[k] for k in keys ] )
+            tm.append_row( [ row[k] for k in keys ] )
         
-        txt = tm.end_tbody( txt )
+        tm.end_tbody()
         
-        txt = tm.end_table(txt)
+        tm.end_table()
         
-        return txt 
+        return tm.write_table() 
         
     
     def write_dr( self , drm , tm ):
-        txt = ""
         
         ( head , album_dir ) = os.path.split( drm.dir_name )
         
-        txt = tm.new_table(txt)
+        tm.new_table()
         
-        txt = tm.new_head( txt )
+        tm.new_head()
         
-        txt = tm.append_separator_line( txt )
-        txt = tm.add_title( txt , " Analyzed folder:  " + album_dir )
+        tm.append_separator_line()
+        tm.add_title( " Analyzed folder:  " + album_dir )
         
-        txt = tm.end_head( txt )
+        tm.end_head()
         
-        txt = tm.new_tbody( txt )
+        tm.new_tbody()
         
-        txt = tm.append_separator_line( txt )
-        txt = tm.append_row( txt , [ " DR", "Peak", "RMS", "Duration" , "File name" ] , 'h' )
-        txt = tm.append_separator_line( txt )
+        tm.append_separator_line()
+        tm.append_row( [ " DR", "Peak", "RMS", "Duration" , "File name" ] , 'h' )
+        tm.append_separator_line()
         
         for i in range( len( drm.res_list ) ) :
             
@@ -148,25 +146,25 @@ class WriteDr :
                 row.append( " %s" % drm.res_list[i]['duration'] )
                 row.append( " %s" % drm.res_list[i]['file_name'] )
             
-                txt = tm.append_row( txt , row )
+                tm.append_row( row )
 
-        txt = tm.end_tbody( txt )
+        tm.end_tbody()
         
-        txt = tm.new_foot( txt )
-        txt = tm.append_separator_line( txt )
+        tm.new_foot()
+        tm.append_separator_line()
                
-        txt = tm.add_title( txt , "Number of files:    " + str(len( drm.res_list )) )
-        txt = tm.add_title( txt , "Official DR value:  DR%d" % int(drm.dr14) )
+        tm.add_title( "Number of files:    " + str(len( drm.res_list )) )
+        tm.add_title( "Official DR value:  DR%d" % int(drm.dr14) )
         
-        txt = tm.append_empty_line( txt )
-        txt = tm.add_title( txt , "Dr14 T.meter %s " % dr14.dr14_version() )
+        tm.append_empty_line()
+        tm.add_title( "Dr14 T.meter %s " % dr14.dr14_version() )
         
-        txt = tm.append_closing_line( txt )
-        txt = tm.end_foot( txt )
+        tm.append_closing_line()
+        tm.end_foot()
         
-        txt = tm.end_table(txt)
+        tm.end_table()
         
-        return txt 
+        return tm.write_table()
     
 
 class WriteDrExtended( WriteDr ) :
@@ -175,14 +173,13 @@ class WriteDrExtended( WriteDr ) :
         WriteDr.__init__(self)
 
     def write_dr( self , drm , tm ):
-        txt = ""
          
         ( head , album_dir ) = os.path.split( drm.dir_name )
         
-        txt = tm.new_table( txt )
+        tm.new_table()
         
-        txt = tm.new_head( txt )
-        txt = tm.append_separator_line( txt )
+        tm.new_head()
+        tm.append_separator_line()
         
         album_t = drm.meta_data.get_album_title()
         artist = drm.meta_data.get_album_artist()[0]
@@ -200,25 +197,25 @@ class WriteDrExtended( WriteDr ) :
                 title = " Analyzed: " + album_t 
                 if artist != None :
                     title = title + " /  Artist: " + artist
-            txt = tm.add_title( txt , title )
+            tm.add_title( title )
         
         else:
         
             if album_t == None :
-                txt = tm.add_title( txt , " Analyzed folder:  " + album_dir )
+                tm.add_title( " Analyzed folder:  " + album_dir )
             else:
-                txt = tm.add_title( txt , " Album: " + album_t )
+                tm.add_title( " Album: " + album_t )
                 if artist != None :
-                    txt = tm.add_title( txt , " Artist: " + artist )
+                    tm.add_title( " Artist: " + artist )
             
         
-        txt = tm.end_head( txt )
+        tm.end_head()
         
-        txt = tm.new_tbody( txt )
+        tm.new_tbody()
         
-        txt = tm.append_separator_line( txt )
-        txt = tm.append_row( txt , [ "DR", "Peak", "RMS", "Duration" , "Title [codec]" ] , 'h' )
-        txt = tm.append_separator_line( txt )
+        tm.append_separator_line()
+        tm.append_row( [ "DR", "Peak", "RMS", "Duration" , "Title [codec]" ] , 'h' )
+        tm.append_separator_line()
         
         list_bit = []
         
@@ -272,34 +269,34 @@ class WriteDrExtended( WriteDr ) :
                 if s_rate not in sampl_rate :
                     sampl_rate.append( s_rate )
                     
-                txt = tm.append_row( txt , row )
+                tm.append_row( row )
         
-        txt = tm.end_tbody( txt )
+        tm.end_tbody()
         
-        txt = tm.new_foot( txt )
-        txt = tm.append_separator_line( txt )
+        tm.new_foot()
+        tm.append_separator_line()
                
-        txt = tm.add_title( txt , " Number of files:    " + str(len( drm.res_list )) )
-        txt = tm.add_title( txt , " Official DR value:  DR%d" % int(drm.dr14) )
+        tm.add_title( " Number of files:    " + str(len( drm.res_list )) )
+        tm.add_title( " Official DR value:  DR%d" % int(drm.dr14) )
         
-        txt = tm.append_empty_line( txt )
+        tm.append_empty_line()
         
-        txt = tm.add_title( txt , " Sampling rate: \t\t %s Hz" % sampl_rate[0] )
+        tm.add_title( " Sampling rate: \t\t %s Hz" % sampl_rate[0] )
         
         if cnt > 0:
-            txt = tm.add_title( txt , " Average bitrate: \t\t %d kbs " % ( ( sum_kbs / 1000 ) / cnt )  )
+            tm.add_title( " Average bitrate: \t\t %d kbs " % ( ( sum_kbs / 1000 ) / cnt )  )
         
         mf_bit = max( set( list_bit ) , key=list_bit.count )
-        txt = tm.add_title( txt , " Bits per sample: \t\t %s bit" % ( mf_bit ) )
+        tm.add_title( " Bits per sample: \t\t %s bit" % ( mf_bit ) )
         
-        txt = tm.append_empty_line( txt )
-        txt = tm.add_title( txt , "Dr14 T.meter %s " % dr14.dr14_version() )
+        tm.append_empty_line()
+        tm.add_title( "Dr14 T.meter %s " % dr14.dr14_version() )
         
-        txt = tm.append_closing_line( txt )
-        txt = tm.end_foot( txt )
+        tm.append_closing_line()
+        tm.end_foot()
         
-        txt = tm.end_table(txt)
+        tm.end_table()
         
-        return txt
+        return tm.write_table()
 
  

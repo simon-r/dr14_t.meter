@@ -27,13 +27,13 @@ class Table:
         self.__ini_txt = ""
         self.__txt = ""
     
-    def __get_txt(self):
+    def _get_txt(self):
         return self.__txt
     
-    def __set_txt( self , txt ):
+    def _set_txt( self , txt ):
         self.__txt = txt
         
-    def __append_txt( self , txt ):
+    def _append_txt( self , txt ):
         self.__txt += txt 
         
     def init_txt(self, txt = "" ):
@@ -46,7 +46,7 @@ class Table:
         NotImplementedError(" %s : is virutal and must be overridden." % sys._getframe().f_code.co_name )
 
     def write_table(self):
-        return self.__ini_txt + self.__get_txt()
+        return self.__ini_txt + self._get_txt()
         
     def nl(self):
         if sys.platform.startswith('linux') or sys.platform.startswith('darwin'):
@@ -87,10 +87,10 @@ class Table:
     col_cnt = property( get_col_cnt , set_col_cnt )
     
     def append_separator_line( self ):
-        self.__append_txt( self.format_element( "" ) )
+        self._append_txt( self.format_element( "" ) )
     
     def append_closing_line( self ):
-        self.__append_txt( self.format_element( "" ) )
+        self._append_txt( self.format_element( "" ) )
         
     def append_empty_line( self ):
         self.append_row( [ "" ]*self.col_cnt )
@@ -99,25 +99,25 @@ class Table:
         NotImplementedError(" %s : is virutal and must be overridden." % sys._getframe().f_code.co_name )
         
     def add_value( self , val ):
-        self.__append_txt( self.format_element(val) )
+        self._append_txt( self.format_element(val) )
         
     def new_head( self ):
-        self.__append_txt( self.format_element( "" ) )
+        self._append_txt( self.format_element( "" ) )
     
     def end_head( self ):
-        self.__append_txt( self.format_element( "" ) )
+        self._append_txt( self.format_element( "" ) )
     
     def new_tbody( self ):
-        self.__append_txt( self.format_element( "" ) )
+        self._append_txt( self.format_element( "" ) )
     
     def end_tbody( self ):
-        self.__append_txt( self.format_element( "" ) )
+        self._append_txt( self.format_element( "" ) )
     
     def new_foot( self ):
-        self.__append_txt( self.format_element( "" ) )
+        self._append_txt( self.format_element( "" ) )
     
     def end_foot( self ):
-        self.__append_txt( self.format_element( "" ) )
+        self._append_txt( self.format_element( "" ) )
     
     def new_row( self ):
         NotImplementedError(" %s : is virutal and must be overridden." % sys._getframe().f_code.co_name )
@@ -158,31 +158,31 @@ class TextTable ( Table ):
         self.append_row( [ "" ] ) 
 
     def add_title( self , title ):
-        self.__append_txt( title + self.nl() )
+        self._append_txt( title + self.nl() )
 
     def new_table( self ):
-        self.__set_txt("")
+        self._set_txt("")
     
     def end_table( self ):
-        self.__append_txt( self.nl() )
+        self._append_txt( self.nl() )
     
     def new_row( self ):
-        self.__append_txt("")
+        self._append_txt("")
     
     def end_row( self ):
-        self.__append_txt( self.nl() )
+        self._append_txt( self.nl() )
     
     def new_cell( self ):
-        self.__append_txt("")
+        self._append_txt("")
     
     def end_cell( self ):
-        self.__append_txt( "\t" )
+        self._append_txt( "\t" )
     
     def new_bold( self ):
-        self.__append_txt("")
+        self._append_txt("")
     
     def end_bold( self ):
-        self.__append_txt("")
+        self._append_txt("")
     
     
 
@@ -195,113 +195,116 @@ class BBcodeTable ( Table ):
         self.append_row( [ "===========", "===========", "===========", "===========", "===============================" ] )
 
     def add_title( self , title ):
-         self.__append_txt( self.nl() + "[tr]" + self.nl() + " [td  colspan=%d] " % self.col_cnt() + title + " [/td] " + self.nl() + "[/tr]" + self.nl() )
+         self._append_txt( self.nl() + "[tr]" + self.nl() + " [td  colspan=%d] " % self.col_cnt + title + " [/td] " + self.nl() + "[/tr]" + self.nl() )
 
     def new_table( self ):
-        self.__append_txt( '[table]' + self.nl() )
+        self._set_txt("")
+        self._append_txt( '[table]' + self.nl() )
     
     def end_table( self ):
-        self.__append_txt( self.nl() + '[/table]' + self.nl() ) 
+        self._append_txt( self.nl() + '[/table]' + self.nl() ) 
     
     def new_row( self ):
-        self.__append_txt( self.nl() + '[tr]' + self.nl() )
+        self._append_txt( self.nl() + '[tr]' + self.nl() )
     
     def end_row( self ):
-        self.__append_txt( self.nl() + '[/tr]' + self.nl() )
+        self._append_txt( self.nl() + '[/tr]' + self.nl() )
     
     def new_cell( self ):
-        self.__append_txt( ' [td]' )
+        self._append_txt( ' [td]' )
     
     def end_cell( self ):
-        self.__append_txt( '[/td]' )
+        self._append_txt( '[/td]' )
     
     def new_bold( self ):
-        self.__append_txt( '[b]' )
+        self._append_txt( '[b]' )
     
     def end_bold( self ):
-        self.__append_txt( '[/b]' )
+        self._append_txt( '[/b]' )
 
 
 class HtmlTable ( Table ):
 
     def add_title( self , title ):
-        self.__append_txt( self.nl() + "<tr>" + self.nl() + " <th colspan=\"%d\" > " % self.col_cnt() + title + "</th>" + self.nl() + "</tr>" + self.nl() ) 
+        self._append_txt( self.nl() + "<tr>" + self.nl() + " <th colspan=\"%d\" > " % self.col_cnt + title + "</th>" + self.nl() + "</tr>" + self.nl() ) 
 
     def new_table( self ):
-        self.__append_txt( "<table>" + self.nl() ) 
+        self._set_txt("")
+        self._append_txt( "<table>" + self.nl() ) 
     
     def end_table( self ):
-        self.__append_txt( self.nl() + "</table>" + self.nl() )
+        self._append_txt( self.nl() + "</table>" + self.nl() )
         
     def new_head( self ):
-        self.__append_txt( self.nl() + "<thead>" + self.nl() ) 
+        self._append_txt( self.nl() + "<thead>" + self.nl() ) 
     
     def end_head( self ):
-        self.__append_txt( self.nl() + "</thead>" + self.nl() )
+        self._append_txt( self.nl() + "</thead>" + self.nl() )
         
     def new_tbody( self ):
-        self.__append_txt( self.nl() + "<tbody>" + self.nl() ) 
+        self._append_txt( self.nl() + "<tbody>" + self.nl() ) 
     
     def end_tbody( self ):
-        self.__append_txt( self.nl() + "</tbody>" + self.nl() ) 
+        self._append_txt( self.nl() + "</tbody>" + self.nl() ) 
     
     def new_foot( self ):
-        self.__append_txt( self.nl() + "<tfoot>" + self.nl() ) 
+        self._append_txt( self.nl() + "<tfoot>" + self.nl() ) 
     
     def end_foot( self ):
-        self.__append_txt( self.nl() + "</tfoot>" + self.nl() ) 
+        self._append_txt( self.nl() + "</tfoot>" + self.nl() ) 
     
     def new_row( self ):
-        self.__append_txt( self.nl() + "<tr>" + self.nl() ) 
+        self._append_txt( self.nl() + "<tr>" + self.nl() ) 
     
     def end_row( self ):
-        self.__append_txt( self.nl() + "</tr>" + self.nl() ) 
+        self._append_txt( self.nl() + "</tr>" + self.nl() ) 
     
     def new_cell( self ):
-        self.__append_txt( ' <td>' )
+        self._append_txt( ' <td>' )
     
     def end_cell( self ):
-        self.__append_txt( '</td>' )
+        self._append_txt( '</td>' )
     
     def new_hcell( self ):
-        self.__append_txt( ' <th>' )
+        self._append_txt( ' <th>' )
     
     def end_hcell( self ):
-        self.__append_txt( '</th>' )
+        self._append_txt( '</th>' )
     
     def new_bold( self ):
-        self.__append_txt( '<b>' )
+        self._append_txt( '<b>' )
     
     def end_bold( self ):
-        self.__append_txt( '</b>' )
+        self._append_txt( '</b>' )
 
 
 class MediaWikiTable ( Table ):
 
     def add_title( self , title ):
-        self.__append_txt( "|-" + self.nl() + "!align=\"left\" colspan=\"%d\" | " % self.col_cnt() + title + self.nl() )
+        self._append_txt( "|-" + self.nl() + "!align=\"left\" colspan=\"%d\" | " % self.col_cnt + title + self.nl() )
 
     def new_table( self ):
-        self.__append_txt( "{| " + self.nl() ) 
+        self._set_txt("")
+        self._append_txt( "{| " + self.nl() ) 
     
     def end_table( self ):
-        self.__append_txt( self.nl() )
+        self._append_txt( "|}" + self.nl() )
         
     def new_row( self ):
-        self.__append_txt( "|-" + self.nl() ) 
+        self._append_txt( "|-" + self.nl() ) 
     
     def end_row( self ):
-        self.__append_txt( self.nl() )
+        self._append_txt( self.nl() )
     
     def new_cell( self ):
-        self.__append_txt( '||' )
+        self._append_txt( '||' )
     
     def end_cell( self ):
-        self.__append_txt( "" )
+        self._append_txt( "" )
         
     def new_bold( self ):
-        self.__append_txt( "\'\'\'" )
+        self._append_txt( "\'\'\'" )
     
     def end_bold( self ):
-        self.__append_txt( "\'\'\'" )
+        self._append_txt( "\'\'\'" )
 
