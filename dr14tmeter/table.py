@@ -23,7 +23,31 @@ class Table:
     
     def __init__(self):
         self.__float_format = "%.2f"
+        self.__col_cnt = 5
+        self.__ini_txt = ""
+        self.__txt = ""
     
+    def __get_txt(self):
+        return self.__txt
+    
+    def __set_txt( self , txt ):
+        self.__txt = txt
+        
+    def __append_txt( self , txt ):
+        self.__txt += txt 
+        
+    def init_txt(self, txt = "" ):
+        self.__ini_txt = txt
+    
+    def new_table( self , txt ):
+        NotImplementedError(" %s : is virutal and must be overridden." % sys._getframe().f_code.co_name )
+    
+    def end_table( self , txt ):
+        NotImplementedError(" %s : is virutal and must be overridden." % sys._getframe().f_code.co_name )
+
+    def write_table(self):
+        return self.__ini_txt + self.__txt
+        
     def nl(self):
         if sys.platform.startswith('linux') or sys.platform.startswith('darwin'):
             return '\n'
@@ -36,7 +60,7 @@ class Table:
         else :
             return str( el )
     
-    def append_row( self , txt , row_el , cell_type='d'):
+    def append_row( self , row_el , cell_type='d'):
         
         if cell_type == 'd':
             n_cell = self.new_cell
@@ -45,77 +69,78 @@ class Table:
             n_cell = self.new_hcell
             e_cell = self.end_hcell
         
-        txt = self.new_row(txt)
+        self.new_row()
         
         for i in row_el:
-            txt = n_cell(txt)
-            txt = txt + self.format_element( i )
-            txt = e_cell(txt)
+            n_cell()
+            self.add_value( i )
+            e_cell()
             
-        txt = self.end_row(txt)
-        return txt
+        self.end_row()
 
-    def col_cnt( self ):
-        return 5
-
-    def append_separator_line( self , txt ):
-        return txt
+    def get_col_cnt( self ):
+        return self.__col_cnt
     
-    def append_closing_line( self , txt ):
-        return txt
+    def set_col_cnt( self , col_cnt ):
+        self.__col_cnt = col_cnt
         
-    def append_empty_line( self , txt ):
-        return self.append_row( txt , [ "", "", "", "", "" ] )
+    col_cnt = property( get_col_cnt , set_col_cnt )
+    
+    def append_separator_line( self ):
+        self.__append_txt( self.format_element( "" ) )
+    
+    def append_closing_line( self ):
+        self.__append_txt( self.format_element( "" ) )
+        
+    def append_empty_line( self ):
+        self.append_row( [ "" ]*self.col_cnt )
 
-    def add_title( self , txt , title ):
+    def add_title( self , title ):
+        NotImplementedError(" %s : is virutal and must be overridden." % sys._getframe().f_code.co_name )
+        
+    def add_value( self , val ):
+        self.__append_txt( self.format_element(val) )
+        
+    def new_head( self ):
+        self.__append_txt( self.format_element( "" ) )
+    
+    def end_head( self ):
+        self.__append_txt( self.format_element( "" ) )
+    
+    def new_tbody( self ):
+        self.__append_txt( self.format_element( "" ) )
+    
+    def end_tbody( self ):
+        self.__append_txt( self.format_element( "" ) )
+    
+    def new_foot( self ):
+        self.__append_txt( self.format_element( "" ) )
+    
+    def end_foot( self ):
+        self.__append_txt( self.format_element( "" ) )
+    
+    def new_row( self ):
         NotImplementedError(" %s : is virutal and must be overridden." % sys._getframe().f_code.co_name )
     
-    def new_table( self , txt ):
+    def end_row( self ):
         NotImplementedError(" %s : is virutal and must be overridden." % sys._getframe().f_code.co_name )
     
-    def end_table( self , txt ):
+    def new_cell( self ):
         NotImplementedError(" %s : is virutal and must be overridden." % sys._getframe().f_code.co_name )
     
-    def new_head( self , txt ):
-        return txt
-    
-    def end_head( self , txt ):
-        return txt
-    
-    def new_tbody( self , txt ):
-        return txt
-    
-    def end_tbody( self , txt ):
-        return txt
-    
-    def new_foot( self , txt ):
-        return txt
-    
-    def end_foot( self , txt ):
-        return txt
-    
-    def new_row( self , txt ):
+    def end_cell( self ):
         NotImplementedError(" %s : is virutal and must be overridden." % sys._getframe().f_code.co_name )
     
-    def end_row( self , txt ):
+    def new_hcell( self ):
+        return self.new_cell()
+    
+    def end_hcell( self):
+        return self.end_cell()
+    
+    def new_bold( self ):
         NotImplementedError(" %s : is virutal and must be overridden." % sys._getframe().f_code.co_name )
     
-    def new_cell( self , txt ):
-        NotImplementedError(" %s : is virutal and must be overridden." % sys._getframe().f_code.co_name )
-    
-    def end_cell( self , txt ):
-        NotImplementedError(" %s : is virutal and must be overridden." % sys._getframe().f_code.co_name )
-    
-    def new_hcell( self , txt ):
-        return self.new_cell( txt )
-    
-    def end_hcell( self , txt ):
-        return self.end_cell( txt )
-    
-    def new_bold( self , txt ):
-        NotImplementedError(" %s : is virutal and must be overridden." % sys._getframe().f_code.co_name )
-    
-    def end_bold( self , txt ):
+    def end_bold( self ):
         NotImplementedError(" %s : is virutal and must be overridden." % sys._getframe().f_code.co_name )
     
     
