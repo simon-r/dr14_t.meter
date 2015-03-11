@@ -148,41 +148,41 @@ class Table:
 
 class TextTable ( Table ):
 
-    def append_separator_line( self , txt ):
-        return self.append_row( txt , [ "----------------------------------------------------------------------------------------------" ] )
+    def append_separator_line( self ):
+        self.append_row( [ "----------------------------------------------------------------------------------------------" ] )
 
-    def append_closing_line( self , txt ):
-        return self.append_row( txt , [ "==============================================================================================" ] )
+    def append_closing_line( self ):
+        self.append_row( [ "==============================================================================================" ] )
     
-    def append_empty_line( self , txt ):
-        return self.append_row( txt , [ "" ] ) 
+    def append_empty_line( self ):
+        self.append_row( [ "" ] ) 
 
-    def add_title( self , txt , title ):
-        return txt + title + self.nl()
+    def add_title( self , title ):
+        self.__append_txt( title + self.nl() )
 
-    def new_table( self , txt ):
-        return txt
+    def new_table( self ):
+        self.__set_txt("")
     
-    def end_table( self , txt ):
-        return txt + self.nl()
+    def end_table( self ):
+        self.__append_txt( self.nl() )
     
-    def new_row( self , txt ):
-        return txt + ''
+    def new_row( self ):
+        self.__append_txt("")
     
-    def end_row( self , txt ):
-        return txt + self.nl()
+    def end_row( self ):
+        self.__append_txt( self.nl() )
     
-    def new_cell( self , txt ):
-        return txt + ''
+    def new_cell( self ):
+        self.__append_txt("")
     
-    def end_cell( self , txt ):
-        return txt + '\t'
+    def end_cell( self ):
+        self.__append_txt( "\t" )
     
-    def new_bold( self , txt ):
-        return txt + ''
+    def new_bold( self ):
+        self.__append_txt("")
     
-    def end_bold( self , txt ):
-        return txt + ''
+    def end_bold( self ):
+        self.__append_txt("")
     
     
 
