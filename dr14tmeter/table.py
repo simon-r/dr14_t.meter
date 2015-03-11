@@ -188,38 +188,38 @@ class TextTable ( Table ):
 
 class BBcodeTable ( Table ):
 
-    def append_separator_line( self , txt ):
-        return self.append_row( txt , [ "-----------", "-----------", "-----------", "-----------", "-------------------------------" ] )
+    def append_separator_line( self ):
+        self.append_row( [ "-----------", "-----------", "-----------", "-----------", "-------------------------------" ] )
 
-    def append_closing_line( self , txt ):
-        return self.append_row( txt , [ "===========", "===========", "===========", "===========", "===============================" ] )
+    def append_closing_line( self ):
+        self.append_row( [ "===========", "===========", "===========", "===========", "===============================" ] )
 
-    def add_title( self , txt , title ):
-        return txt + self.nl() + "[tr]" + self.nl() + " [td  colspan=%d] " % self.col_cnt() + title + " [/td] " + self.nl() + "[/tr]" + self.nl()
+    def add_title( self , title ):
+         self.__append_txt( self.nl() + "[tr]" + self.nl() + " [td  colspan=%d] " % self.col_cnt() + title + " [/td] " + self.nl() + "[/tr]" + self.nl() )
 
-    def new_table( self , txt ):
-        return txt + '[table]' + self.nl()
+    def new_table( self ):
+        self.__append_txt( '[table]' + self.nl() )
     
-    def end_table( self , txt ):
-        return txt + self.nl() + '[/table]' + self.nl() 
+    def end_table( self ):
+        self.__append_txt( self.nl() + '[/table]' + self.nl() ) 
     
-    def new_row( self , txt ):
-        return txt + self.nl() + '[tr]' + self.nl()
+    def new_row( self ):
+        self.__append_txt( self.nl() + '[tr]' + self.nl() )
     
-    def end_row( self , txt ):
-        return txt + self.nl() + '[/tr]' + self.nl()
+    def end_row( self ):
+        self.__append_txt( self.nl() + '[/tr]' + self.nl() )
     
-    def new_cell( self , txt ):
-        return txt + ' [td]'
+    def new_cell( self ):
+        self.__append_txt( ' [td]' )
     
-    def end_cell( self , txt ):
-        return txt + '[/td]'
+    def end_cell( self ):
+        self.__append_txt( '[/td]' )
     
-    def new_bold( self , txt ):
-        return txt + '[b]'
+    def new_bold( self ):
+        self.__append_txt( '[b]' )
     
-    def end_bold( self , txt ):
-        return txt + '[/b]'
+    def end_bold( self ):
+        self.__append_txt( '[/b]' )
 
 
 class HtmlTable ( Table ):
