@@ -312,6 +312,7 @@ class MediaWikiTable ( Table ):
 class row:
     def __init__(self):
         self.row = []
+        self.cursor = 0 
         self.inds = []
         self.type = "l"
     
@@ -416,11 +417,9 @@ class ExtendedTextTable ( Table ):
         elif r.is_closing_line :
             pass
         else :
-            raise Exception( "%s : Not Allowed row model " % sys._getframe().f_code.co_name )
+            raise Exception( "%s : Row model: Not Allowed " % sys._getframe().f_code.co_name )
         
             
-          
-    
     def new_table( self , txt ):
         self._cols_sz = [0] * self.col_cnt
         self._rows = []
@@ -440,12 +439,35 @@ class ExtendedTextTable ( Table ):
         
     def append_empty_line( self ):
         self.append_row( [ "" ]*self.col_cnt )
+        self._update_col_sz()
 
     def add_title( self , title ):
-        NotImplementedError(" %s : is virutal and must be overridden." % sys._getframe().f_code.co_name )
+        r = row()
+        r.set_title()
+        r.row[0] = title 
+        self._rows.append( r )
+        self._update_col_sz()
+    
+    def new_row( self ):
+        r = row()
+        r.set_row
+        r.cursor = 0
         
+        self._rows.append( r )
+    
+    def end_row( self ):
+        self._update_col_sz()
+        
+    def new_cell( self ):
+        self._rows[-1].inds.append( self._rows[-1].cursor )
+        self._rows[-1].row.append("")
+    
+    def end_cell( self ):
+        self._rows[-1].cursor += 1 
+    
     def add_value( self , val ):
-        self._append_txt( self.format_element(val) )
+        c = self._rows[-1].cursor
+        self._rows[-1].row[c] = self.format_element( val )
         
     def new_head( self ):
         self._append_txt( self.format_element( "" ) )
@@ -464,19 +486,7 @@ class ExtendedTextTable ( Table ):
     
     def end_foot( self ):
         self._append_txt( self.format_element( "" ) )
-    
-    def new_row( self ):
-        NotImplementedError(" %s : is virutal and must be overridden." % sys._getframe().f_code.co_name )
-    
-    def end_row( self ):
-        NotImplementedError(" %s : is virutal and must be overridden." % sys._getframe().f_code.co_name )
-    
-    def new_cell( self ):
-        NotImplementedError(" %s : is virutal and must be overridden." % sys._getframe().f_code.co_name )
-    
-    def end_cell( self ):
-        NotImplementedError(" %s : is virutal and must be overridden." % sys._getframe().f_code.co_name )
-    
+            
     def new_hcell( self ):
         return self.new_cell()
     
