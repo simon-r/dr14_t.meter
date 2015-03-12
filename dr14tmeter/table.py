@@ -329,11 +329,15 @@ class row:
         self.row = []
         self.cursor = 0 
         self.inds = []
+        self.rclass = "b"
         self.type = ""
         self.cell_type = []
     
     def set_type(self, t):
         self.type = t 
+        
+    def set_rclass(self, c):
+        self.rclass = c 
     
     @property
     def set_row(self):
@@ -342,8 +346,18 @@ class row:
     
     @property
     def set_head(self):
-        self.set_type("h")
-        return self.type
+        self.set_rclass("h")
+        return self.rclass
+    
+    @property
+    def set_body(self):
+        self.set_rclass("b")
+        return self.rclass
+    
+    @property
+    def set_foot(self):
+        self.set_rclass("f")
+        return self.rclass    
 
     @property        
     def set_title(self):
@@ -369,10 +383,24 @@ class row:
         
     @property
     def is_head(self):
-        if self.type == "h" :
+        if self.rclass == "h" :
             return True
         else :
-            return False        
+            return False
+        
+    @property
+    def is_body(self):
+        if self.rclass == "b" :
+            return True
+        else :
+            return False             
+    
+    @property
+    def is_foot(self):
+        if self.rclass == "f" :
+            return True
+        else :
+            return False       
     
     @property        
     def is_title(self):
@@ -396,8 +424,6 @@ class row:
             return False
         
          
-    
-        
 class ExtendedTextTable ( Table ):
     
     def __init__(self):
@@ -405,6 +431,7 @@ class ExtendedTextTable ( Table ):
         self._cols_sz = [0] * super(ExtendedTextTable,self).get_col_cnt()
         self._rows = []
         self._bold_state = False
+        self._rclass_state = "b"
         
 
     def get_col_cnt( self ):
@@ -467,10 +494,7 @@ class ExtendedTextTable ( Table ):
         
         txt += self.nl()
         self._append_txt(txt)
-    
-    def _write_head( self , r ):
-        self._write_row(r)
-    
+        
     def _write_separator_line( self , r ):
         l = self._eval_row_len()
         txt = " "
@@ -488,8 +512,6 @@ class ExtendedTextTable ( Table ):
                 self._write_title(r)
             elif r.is_row :
                 self._write_row(r)
-            elif r.is_head :
-                self._write_head(r)
             elif r.is_separator_line :
                 self._write_separator_line(r)
             elif r.is_closing_line :
@@ -509,11 +531,15 @@ class ExtendedTextTable ( Table ):
     def append_separator_line( self ):
         r = row()
         r.set_separator_line
+        r.set_rclass( self._rclass_state )
+        
         self._rows.append( r )
     
     def append_closing_line( self ):
         r = row()
         r.set_closing_line
+        r.set_rclass( self._rclass_state )
+        
         self._rows.append( r )
         
     def append_empty_line( self ):
@@ -523,6 +549,7 @@ class ExtendedTextTable ( Table ):
     def add_title( self , title ):
         r = row()
         r.set_title
+        r.set_rclass( self._rclass_state )
         r.row.append( title ) 
         self._rows.append( r )
         self._update_col_sz()
@@ -530,6 +557,7 @@ class ExtendedTextTable ( Table ):
     def new_row( self ):
         r = row()
         r.set_row
+        r.set_rclass( self._rclass_state )
         r.cursor = 0
         
         self._rows.append( r )
@@ -550,22 +578,22 @@ class ExtendedTextTable ( Table ):
         self._rows[-1].row[c] = self.format_element( val )
         
     def new_head( self ):
-        pass
+        self._rclass_state = "h"
         
     def end_head( self ):
-        pass
+        self._rclass_state = "b"
     
     def new_tbody( self ):
-        pass
+        self._rclass_state = "b"
     
     def end_tbody( self ):
-        pass
+        self._rclass_state = "b"
     
     def new_foot( self ):
-        pass
+        self._rclass_state = "f"
     
     def end_foot( self ):
-        pass
+        self._rclass_state = "b"
             
     def new_hcell( self ):
         self._rows[-1].inds.append( self._rows[-1].cursor )
