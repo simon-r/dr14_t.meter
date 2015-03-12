@@ -92,20 +92,17 @@ class WriteDr :
             return ""
         
         tm.new_table()
-        tm.new_head()
+        tm.col_cnt = len(keys)
         
-        tm.end_head()
         tm.append_separator_line()
+        
         tm.add_title( table_title )
-        tm.end_head()
         
         tm.new_tbody()
         
         tm.append_separator_line()
         tm.append_row( keys , 'h' )
         tm.append_separator_line()
-        
-        tm.end_tbody()
         
         for row in res_dl :
             tm.append_row( [ row[k] for k in keys ] )

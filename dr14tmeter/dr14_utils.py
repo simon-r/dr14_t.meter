@@ -273,7 +273,7 @@ def print_query_help():
     print_msg( "query help" )
 
   
-def database_exec_query( options , tm = TextTable() ):
+def database_exec_query( options , tm = ExtendedTextTable() ):
     
     if len( options.query ) >= 2 :
         limit = int( options.query[1] )

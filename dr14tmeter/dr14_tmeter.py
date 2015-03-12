@@ -40,6 +40,23 @@ import numpy
 
     
 def main():
+    
+#     tm = ExtendedTextTable()
+#       
+#     tm.new_table()
+#        
+#     tm.add_title("Ciao a tutti ")
+#     tm.append_row( [ "****" , "****" , "*********" , "****" , "***************" ] )
+#     tm.append_separator_line()
+#     tm.append_row( [ "ci" , 10 , "14" , "ciao" , "ciao_ciao" ] )
+#     tm.append_row( [ "ci" , 108768768768687 , 1.4455646346345635463546345 , "ciao_ao_ao_ao" , "ciao_ciao" ] )
+#     tm.append_row( [ "ciao" , 108768768768687 , 0.00000000000000000000456543 , "ciao_ao_ao_ao_jhgfdjhg" , "ciao_ciao" ] )
+#       
+#     tm.end_table()
+#       
+#     print( tm.write_table() )
+#       
+#     return ;
         
     get_config_file()
 

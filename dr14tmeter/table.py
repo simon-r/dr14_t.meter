@@ -19,6 +19,16 @@ import os
 import sys
 
 
+def float_formatter( el ):
+    if abs( el ) >= 1.0 :
+        return "%.2f" % el
+    else :
+        return "%.2E" % el
+    
+def default_formatter( el ):
+    return str( el )    
+    
+
 class Table:
     
     def __init__(self):
@@ -26,6 +36,8 @@ class Table:
         self.__col_cnt = 5
         self.__ini_txt = ""
         self.__txt = ""
+        self.__formatter = {}
+        self.add_formatter( float , float_formatter )
     
     def _get_txt(self):
         return self.__txt
@@ -38,11 +50,14 @@ class Table:
         
     def init_txt(self, txt = "" ):
         self.__ini_txt = txt
+        
+    def get_init_txt(self):
+        return self.__ini_txt
     
-    def new_table( self , txt ):
+    def new_table( self ):
         NotImplementedError(" %s : is virutal and must be overridden." % sys._getframe().f_code.co_name )
     
-    def end_table( self , txt ):
+    def end_table( self ):
         NotImplementedError(" %s : is virutal and must be overridden." % sys._getframe().f_code.co_name )
 
     def write_table(self):
@@ -54,11 +69,11 @@ class Table:
         elif sys.platform.startswith('win'):
             return '\n\r'
     
+    def add_formatter( self , _type , formatter ):
+        self.__formatter[_type] = formatter
+    
     def format_element( self , el ):
-        if isinstance( el , float ) :
-            return "%s" % self.__float_format % el
-        else :
-            return str( el )
+        return self.__formatter.get( type(el) , default_formatter )( el )
     
     def append_row( self , row_el , cell_type='d'):
         
@@ -408,7 +423,7 @@ class ExtendedTextTable ( Table ):
 
     def _eval_row_len(self):
         l = sum(self._cols_sz)
-        l = l + len(self._cols_sz)*2
+        l = l + len(self._cols_sz)*3
         return l
        
     def _update_col_sz(self):
@@ -445,19 +460,26 @@ class ExtendedTextTable ( Table ):
         for cell , i in zip( r.row , range( len(r.row) ) ) :
             t_txt = " "
             t_txt += cell 
-            a = ( self._cols_sz[i] - len( t_txt ) )
+            a = self._cols_sz[i] - len( cell )
             if a < 0 : a = 0   
-            t_txt += " "*a
+            t_txt += " "*(a+1)
             txt += t_txt
+        
+        txt += self.nl()
+        self._append_txt(txt)
     
     def _write_head( self , r ):
         self._write_row(r)
     
     def _write_separator_line( self , r ):
-        pass
+        l = self._eval_row_len()
+        txt = " "
+        txt += "="*(l-2)
+        txt += self.nl()
+        self._append_txt(txt)
     
     def _write_closing_line( self , r ):
-        pass
+        self._write_separator_line(r)
      
     def write_table(self):
         
@@ -466,7 +488,7 @@ class ExtendedTextTable ( Table ):
                 self._write_title(r)
             elif r.is_row :
                 self._write_row(r)
-            elif r.id_head :
+            elif r.is_head :
                 self._write_head(r)
             elif r.is_separator_line :
                 self._write_separator_line(r)
@@ -475,13 +497,13 @@ class ExtendedTextTable ( Table ):
             else :
                 raise Exception( "%s : Row model: Not Allowed " % sys._getframe().f_code.co_name )
         
-        return self.__ini_txt + self._get_txt()
+        return self.get_init_txt() + self._get_txt()
             
-    def new_table( self , txt ):
+    def new_table( self ):
         self._cols_sz = [0] * self.col_cnt
         self._rows = []
     
-    def end_table( self , txt ):
+    def end_table( self ):
         pass    
     
     def append_separator_line( self ):
@@ -500,8 +522,8 @@ class ExtendedTextTable ( Table ):
 
     def add_title( self , title ):
         r = row()
-        r.set_title()
-        r.row[0] = title 
+        r.set_title
+        r.row.append( title ) 
         self._rows.append( r )
         self._update_col_sz()
     
@@ -528,12 +550,10 @@ class ExtendedTextTable ( Table ):
         self._rows[-1].row[c] = self.format_element( val )
         
     def new_head( self ):
-        r = row()
-        r.set_head
-        r.cursor = 0
+        pass
         
     def end_head( self ):
-        self.end_row()
+        pass
     
     def new_tbody( self ):
         pass
