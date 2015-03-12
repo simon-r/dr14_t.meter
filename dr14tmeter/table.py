@@ -375,7 +375,8 @@ class ExtendedTextTable ( Table ):
         super(ExtendedTextTable,self).__init__()
         self._cols_sz = [0] * super(ExtendedTextTable,self).get_col_cnt()
         self._rows = []
-    
+        
+
     def get_col_cnt( self ):
         return super(ExtendedTextTable,self).get_col_cnt()
     
@@ -389,7 +390,36 @@ class ExtendedTextTable ( Table ):
                 self._cols_sz.append(0)
                 
     col_cnt = property( get_col_cnt , set_col_cnt )
+
+    def _eval_row_len(self):
+        l = sum(self._cols_sz)
+        l = l + len(self._cols_sz)*2
+        return l
        
+    def _update_col_sz(self):
+        r = self._rows[-1]
+         
+        if r.is_row and len(r.row) == self.col_cnt :
+            for c , i in zip( r.row , range(self.col_cnt) ) :
+                if len(c) > self._cols_sz[i] :
+                    self._cols_sz[i] = len(c)
+        elif r.is_title :
+            d = self._eval_row_len() - len( r.row[0] ) 
+            if d > 0 :
+                c = 0 
+                while d > 0 :
+                  self._cols_sz[c] += 1 
+                  d-=1 
+                  c = ( c + 1 ) % len(self._cols_sz)
+        elif r.is_separator_line :
+            pass
+        elif r.is_closing_line :
+            pass
+        else :
+            raise Exception( "%s : Not Allowed row model " % sys._getframe().f_code.co_name )
+        
+            
+          
     
     def new_table( self , txt ):
         self._cols_sz = [0] * self.col_cnt
