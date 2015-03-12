@@ -189,10 +189,10 @@ class TextTable ( Table ):
 class BBcodeTable ( Table ):
 
     def append_separator_line( self ):
-        self.append_row( [ "-----------", "-----------", "-----------", "-----------", "-------------------------------" ] )
+        self.append_row( [ "------------" ] * self.col_cnt )
 
     def append_closing_line( self ):
-        self.append_row( [ "===========", "===========", "===========", "===========", "===============================" ] )
+        self.append_row( [ "============" ] * self.col_cnt )
 
     def add_title( self , title ):
          self._append_txt( self.nl() + "[tr]" + self.nl() + " [td  colspan=%d] " % self.col_cnt + title + " [/td] " + self.nl() + "[/tr]" + self.nl() )
@@ -307,4 +307,156 @@ class MediaWikiTable ( Table ):
     
     def end_bold( self ):
         self._append_txt( "\'\'\'" )
+        
+     
+class row:
+    def __init__(self):
+        self.row = []
+        self.inds = []
+        self.type = "l"
+    
+    def set_type(self, t):
+        self.type = t 
+    
+    @property
+    def set_row(self):
+        self.set_type("r")
+        return self.type
+
+    @property        
+    def set_title(self):
+        self.set_type("t")
+        return self.type
+        
+    @property        
+    def set_separator_line(self):
+        self.set_type("sl")
+        return self.type
+    
+    @property    
+    def set_closing_line(self):
+        self.set_type("cl")
+        return self.type                        
+    
+    @property
+    def is_row(self):
+        if self.type == "r" :
+            return True
+        else :
+            return False
+    
+    @property        
+    def is_title(self):
+        if self.type == "t" :
+            return True
+        else :
+            return False
+        
+    @property        
+    def is_separator_line(self):
+        if self.type == "sl" :
+            return True
+        else :
+            return False
+    
+    @property        
+    def is_closing_line(self):
+        if self.type == "cl" :
+            return True
+        else :
+            return False
+        
+         
+    
+        
+class ExtendedTextTable ( Table ):
+    
+    def __init__(self):
+        super(ExtendedTextTable,self).__init__()
+        self._cols_sz = [0] * super(ExtendedTextTable,self).get_col_cnt()
+        self._rows = []
+    
+    def get_col_cnt( self ):
+        return super(ExtendedTextTable,self).get_col_cnt()
+    
+    def set_col_cnt( self , col_cnt ):
+        super(ExtendedTextTable,self).set_col_cnt( col_cnt )
+        
+        if len( self._cols_sz ) < col_cnt :
+            self._cols_sz = self.col_sz[:col_cnt] 
+        elif len( self._cols_sz ) > col_cnt :
+            for n in range(len( self._cols_sz ), col_cnt):
+                self._cols_sz.append(0)
+                
+    col_cnt = property( get_col_cnt , set_col_cnt )
+       
+    
+    def new_table( self , txt ):
+        self._cols_sz = [0] * self.col_cnt
+        self._rows = []
+    
+    def end_table( self , txt ):
+        pass    
+    
+    def append_separator_line( self ):
+        r = row()
+        r.set_separator_line
+        self._rows.append( r )
+    
+    def append_closing_line( self ):
+        r = row()
+        r.set_closing_line
+        self._rows.append( r )
+        
+    def append_empty_line( self ):
+        self.append_row( [ "" ]*self.col_cnt )
+
+    def add_title( self , title ):
+        NotImplementedError(" %s : is virutal and must be overridden." % sys._getframe().f_code.co_name )
+        
+    def add_value( self , val ):
+        self._append_txt( self.format_element(val) )
+        
+    def new_head( self ):
+        self._append_txt( self.format_element( "" ) )
+    
+    def end_head( self ):
+        self._append_txt( self.format_element( "" ) )
+    
+    def new_tbody( self ):
+        self._append_txt( self.format_element( "" ) )
+    
+    def end_tbody( self ):
+        self._append_txt( self.format_element( "" ) )
+    
+    def new_foot( self ):
+        self._append_txt( self.format_element( "" ) )
+    
+    def end_foot( self ):
+        self._append_txt( self.format_element( "" ) )
+    
+    def new_row( self ):
+        NotImplementedError(" %s : is virutal and must be overridden." % sys._getframe().f_code.co_name )
+    
+    def end_row( self ):
+        NotImplementedError(" %s : is virutal and must be overridden." % sys._getframe().f_code.co_name )
+    
+    def new_cell( self ):
+        NotImplementedError(" %s : is virutal and must be overridden." % sys._getframe().f_code.co_name )
+    
+    def end_cell( self ):
+        NotImplementedError(" %s : is virutal and must be overridden." % sys._getframe().f_code.co_name )
+    
+    def new_hcell( self ):
+        return self.new_cell()
+    
+    def end_hcell( self):
+        return self.end_cell()
+    
+    def new_bold( self ):
+        NotImplementedError(" %s : is virutal and must be overridden." % sys._getframe().f_code.co_name )
+    
+    def end_bold( self ):
+        NotImplementedError(" %s : is virutal and must be overridden." % sys._getframe().f_code.co_name )    
+    
 
