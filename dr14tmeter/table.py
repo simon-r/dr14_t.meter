@@ -314,7 +314,8 @@ class row:
         self.row = []
         self.cursor = 0 
         self.inds = []
-        self.type = "l"
+        self.type = ""
+        self.cell_type = []
     
     def set_type(self, t):
         self.type = t 
@@ -322,6 +323,11 @@ class row:
     @property
     def set_row(self):
         self.set_type("r")
+        return self.type
+    
+    @property
+    def set_head(self):
+        self.set_type("h")
         return self.type
 
     @property        
@@ -345,6 +351,13 @@ class row:
             return True
         else :
             return False
+        
+    @property
+    def is_head(self):
+        if self.type == "h" :
+            return True
+        else :
+            return False        
     
     @property        
     def is_title(self):
@@ -376,6 +389,7 @@ class ExtendedTextTable ( Table ):
         super(ExtendedTextTable,self).__init__()
         self._cols_sz = [0] * super(ExtendedTextTable,self).get_col_cnt()
         self._rows = []
+        self._bold_state = False
         
 
     def get_col_cnt( self ):
@@ -419,6 +433,49 @@ class ExtendedTextTable ( Table ):
         else :
             raise Exception( "%s : Row model: Not Allowed " % sys._getframe().f_code.co_name )
         
+    
+    def _write_title( self , r ):
+        txt = " "
+        txt += r.row[0]
+        txt += self.nl()
+        self._append_txt(txt)
+        
+    def _write_row( self , r ):
+        txt = " "
+        for cell , i in zip( r.row , range( len(r.row) ) ) :
+            t_txt = " "
+            t_txt += cell 
+            a = ( self._cols_sz[i] - len( t_txt ) )
+            if a < 0 : a = 0   
+            t_txt += " "*a
+            txt += t_txt
+    
+    def _write_head( self , r ):
+        self._write_row(r)
+    
+    def _write_separator_line( self , r ):
+        pass
+    
+    def _write_closing_line( self , r ):
+        pass
+     
+    def write_table(self):
+        
+        for r in self._rows :
+            if r.is_title :
+                self._write_title(r)
+            elif r.is_row :
+                self._write_row(r)
+            elif r.id_head :
+                self._write_head(r)
+            elif r.is_separator_line :
+                self._write_separator_line(r)
+            elif r.is_closing_line :
+                self._write_closing_line(r)
+            else :
+                raise Exception( "%s : Row model: Not Allowed " % sys._getframe().f_code.co_name )
+        
+        return self.__ini_txt + self._get_txt()
             
     def new_table( self , txt ):
         self._cols_sz = [0] * self.col_cnt
@@ -461,6 +518,7 @@ class ExtendedTextTable ( Table ):
     def new_cell( self ):
         self._rows[-1].inds.append( self._rows[-1].cursor )
         self._rows[-1].row.append("")
+        self._rows[-1].cell_type.append("c")
     
     def end_cell( self ):
         self._rows[-1].cursor += 1 
@@ -470,33 +528,37 @@ class ExtendedTextTable ( Table ):
         self._rows[-1].row[c] = self.format_element( val )
         
     def new_head( self ):
-        self._append_txt( self.format_element( "" ) )
-    
+        r = row()
+        r.set_head
+        r.cursor = 0
+        
     def end_head( self ):
-        self._append_txt( self.format_element( "" ) )
+        self.end_row()
     
     def new_tbody( self ):
-        self._append_txt( self.format_element( "" ) )
+        pass
     
     def end_tbody( self ):
-        self._append_txt( self.format_element( "" ) )
+        pass
     
     def new_foot( self ):
-        self._append_txt( self.format_element( "" ) )
+        pass
     
     def end_foot( self ):
-        self._append_txt( self.format_element( "" ) )
+        pass
             
     def new_hcell( self ):
-        return self.new_cell()
+        self._rows[-1].inds.append( self._rows[-1].cursor )
+        self._rows[-1].row.append("")
+        self._rows[-1].cell_type.append("h")
     
     def end_hcell( self):
-        return self.end_cell()
+        self.end_cell()
     
     def new_bold( self ):
-        NotImplementedError(" %s : is virutal and must be overridden." % sys._getframe().f_code.co_name )
+        self._bold_state = True
     
     def end_bold( self ):
-        NotImplementedError(" %s : is virutal and must be overridden." % sys._getframe().f_code.co_name )    
+        self._bold_state = False
     
 
