@@ -63,15 +63,19 @@ class query :
 class query_top_dr( query ):
     def __init__(self):
         super().__init__()
-        self.keys = [ "dr" , "title" , "id" ]
+        self.keys = [ "DR" , "Title" , "Artist" , "Album" ]
      
     def get_query(self):
         q = """
-        select track.id as id , track.title as title , dr.dr as dr 
+        select track.id as id , track.title as Title , dr.dr as DR , Album.title as Album , Artist.name as Artist 
            from track inner join DR_Track on DR_Track.idtrack = track.id 
-                  inner join dr on dr.id = DR_Track.iddr 
-                  order by dr desc
-                  limit ? ;
+                inner join dr on dr.id = DR_Track.iddr
+                inner join Album_Track on Album_Track.idtrack = track.id
+                inner join Album on Album.id = Album_Track.idalbum
+                inner join Artist_Track on Artist_Track.idtrack = track.id
+                inner join Artist on Artist.id = Artist_Track.IdArtist
+                order by dr desc
+                limit ? ;
         """
         
         return q
@@ -79,15 +83,15 @@ class query_top_dr( query ):
 class query_top_albums_dr( query ):
     def __init__(self):
         super().__init__()
-        self.keys = [ "dr" , "album_title" , "id" ]
+        self.keys = [ "DR" , "Album_Title"  ]
         
     def get_query(self):
         q = """
-        select track.id as id , track.title as album_title , dr.dr as dr 
-           from track inner join DR_Track on DR_Track.idtrack = track.id 
-                  inner join dr on dr.id = DR_Track.iddr 
-                  order by dr desc
-                  limit ? ;
+        select album.title as Album_Title , dr.dr as DR , album.id as id 
+           from album inner join DR_Album on DR_Album.idalbum = album.id 
+                inner join dr on dr.id = DR_Album.iddr                 
+                order by dr desc
+                limit ? ;
         """
         
         return q 
@@ -96,15 +100,15 @@ class query_top_albums_dr( query ):
 class query_worst_albums_dr( query ):
     def __init__(self):
         super().__init__()
-        self.keys = [ "dr" , "album_title" , "id" ]
+        self.keys = [ "DR" , "Album_Title" ]
         
     def get_query(self):
         q = """
-        select album.title as album_title , dr.dr as dr , album.id as id 
+        select album.title as Album_Title , dr.dr as DR , album.id as id 
            from album inner join DR_Album on DR_Album.idalbum = album.id 
-                  inner join dr on dr.id = DR_Album.iddr 
-                  order by dr asc
-                  limit ? ;
+                inner join dr on dr.id = DR_Album.iddr                 
+                order by dr asc
+                limit ? ;
         """
         
         return q 
@@ -113,15 +117,19 @@ class query_worst_albums_dr( query ):
 class query_worst_dr( query ):
     def __init__(self):
         super().__init__()
-        self.keys = [ "dr" , "title" , "id" ]
+        self.keys = [ "DR" , "Title" , "Artist" , "Album" ]
         
     def get_query(self):
         q = """
-        select track.id as id , track.title as title , dr.dr as dr 
+        select track.id as id , track.title as Title , dr.dr as DR , Album.title as Album , Artist.name as Artist 
            from track inner join DR_Track on DR_Track.idtrack = track.id 
-                  inner join dr on dr.id = DR_Track.iddr 
-                  order by dr asc
-                  limit ? ;
+                inner join dr on dr.id = DR_Track.iddr
+                inner join Album_Track on Album_Track.idtrack = track.id
+                inner join Album on Album.id = Album_Track.idalbum
+                inner join Artist_Track on Artist_Track.idtrack = track.id
+                inner join Artist on Artist.id = Artist_Track.IdArtist
+                order by dr asc
+                limit ? ;
         """
         
         return q     
@@ -130,7 +138,7 @@ class query_worst_dr( query ):
 class query_top_artists( query ):
     def __init__(self):
         super().__init__()
-        self.keys = [ "mean_dr" , "artist" , "track_cnt" ]
+        self.keys = [ "Mean_DR" , "Artist" , "Track_Count" ]
         self.append_parameter( 10 )
 
     def set_min_track( self, mt ):
@@ -147,16 +155,16 @@ class query_top_artists( query ):
     
     def get_query(self):
         q = """
-        select artist, mean_dr , track_cnt from 
+        select Artist, Mean_DR , Track_Count from 
         ( 
-            select artist.name as artist , avg( dr.dr ) as mean_dr , count( track.id ) as track_cnt
+            select artist.name as Artist , avg( dr.dr ) as Mean_DR , count( track.id ) as Track_Count
                from track inner join DR_Track on DR_Track.idtrack = track.id 
                       inner join dr on dr.id = DR_Track.iddr 
                       inner join Artist_Track on Artist_Track.idtrack = track.id
                       inner join Artist on Artist.id = Artist_Track.IdArtist
                       group by artist                  
         )
-        where track_cnt >= ? 
+        where Track_Count >= ? 
         order by mean_dr desc  
         limit ? ;
         """
@@ -168,7 +176,7 @@ class query_top_artists( query ):
 class query_dr_histogram( query ):
     def __init__(self):
         super().__init__()
-        self.keys = [ "dr" , "dr_cnt" ]
+        self.keys = [ "DR" , "Freq" ]
 
     def exec_query(self):
         db = dr_database_singletone().get() ;
@@ -176,8 +184,9 @@ class query_dr_histogram( query ):
         
     def get_query(self):
         q = """
-        select dr.dr as dr , count(dr.dr) as dr_cnt 
-            from  DR_Track inner join dr on dr.id = DR_Track.iddr 
+        select dr.dr as DR , count(dr.dr) as Freq 
+            from  DR_Track inner join dr on dr.id = DR_Track.iddr
+            where dr.dr >= 0 
             group by (dr.dr) 
             order by (dr) ;
         """
@@ -188,7 +197,7 @@ class query_dr_histogram( query ):
 class query_date_dr_evolution( query ):
     def __init__(self):
         super().__init__()
-        self.keys = [ "date" , "mean" ]
+        self.keys = [ "Date" , "Mean" ]
 
     def exec_query(self):
         db = dr_database_singletone().get() ;
@@ -196,7 +205,7 @@ class query_date_dr_evolution( query ):
         
     def get_query(self):
         q = """
-        select date.date as date , avg( dr.dr ) as mean
+        select date.date as Date , avg( dr.dr ) as Mean
            from track inner join DR_Track on DR_Track.idtrack = track.id 
                   inner join dr on dr.id = DR_Track.iddr
                   inner join Date_Track on Date_Track.idtrack = track.id
@@ -213,7 +222,7 @@ class query_date_dr_evolution( query ):
 class query_dr_codec( query ):
     def __init__(self):
         super().__init__()
-        self.keys = [ "codec" , "mean_dr" , "codec_freq" ]
+        self.keys = [ "Codec" , "Mean_DR" , "Codec_Freq" ]
 
     def exec_query(self):
         db = dr_database_singletone().get() ;
@@ -221,7 +230,7 @@ class query_dr_codec( query ):
         
     def get_query(self):
         q = """
-        select codec.name as codec , avg( dr.dr ) as mean_dr , count( Codec_Track.IdCodec ) as codec_freq 
+        select codec.name as Codec , avg( dr.dr ) as Mean_DR , count( Codec_Track.IdCodec ) as Codec_Freq 
            from track inner join DR_Track on DR_Track.idtrack = track.id 
                   inner join dr on dr.id = DR_Track.iddr 
                   inner join Codec_Track on Codec_Track.idtrack = track.id
