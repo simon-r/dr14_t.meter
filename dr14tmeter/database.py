@@ -487,6 +487,14 @@ class dr_database :
                 foreign key ( IdArtist ) references Artist ( Id ) ,
                 foreign key ( IdTrack ) references Track ( Id )
             ) ;     
+            
+            create table Artist_Album (
+                IdArtist integer not null ,
+                IdAlbum integer not null unique ,
+                primary key ( IdArtist , IdAlbum ) ,
+                foreign key ( IdArtist ) references Artist ( Id ) ,
+                foreign key ( IdAlbum ) references Album ( Id )
+            ) ;             
                         
             create table Album_Track (
                 IdAlbum integer not null ,
