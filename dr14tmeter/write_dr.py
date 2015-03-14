@@ -41,8 +41,11 @@ class WriteDr :
             ( head , album_title ) = os.path.split( drm.dir_name )
             
         album_sha1 = drm.meta_data.get_album_sha1()
+        album_artist = drm.meta_data.get_album_artist()
 
-        db.insert_album( album_sha1 , album_title , int(drm.dr14) , disk_nr=drm.meta_data.get_disk_nr() )
+        db.insert_album( album_sha1 , album_title , 
+                         int(drm.dr14) , 
+                         disk_nr=drm.meta_data.get_disk_nr() , artist=album_artist[0] )
         
         for i in range( len( drm.res_list ) ) :
                         

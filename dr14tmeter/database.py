@@ -173,7 +173,7 @@ class dr_database :
             c.execute( "insert into DR_Album ( IdDr , IdAlbum ) values ( :dr_id , :Id )" ,  self._albums[k_album] )
             
             if self._albums[k_album]["artist_id"] >= 0 :
-                c.execute( "insert into Artist_Album ( IdArtist , IdAlbum ) values ( :artist_id , :id ) " , self._tracks[k_track] )
+                c.execute( "insert into Artist_Album ( IdArtist , IdAlbum ) values ( :artist_id , :Id ) " , self._albums[k_album] )
                             
             
         for k_track in self._tracks.keys() :
@@ -327,8 +327,8 @@ class dr_database :
             lock_db.release()
             return rq.pop()[0]
 
-        q = "select Id from DR where DR = %d " % dr 
-        rq = self.query( q )
+        q = "select Id from DR where DR = ? "  
+        rq = self.query( q , (dr,) )
         if len( rq ) == 0 and not ( dr in self._dr.values() ) :
             dr_id = self.__insert_dr( dr )
         elif len( rq ) > 0 :
@@ -337,6 +337,7 @@ class dr_database :
             dr_id = [k for (k, v) in self._dr.items() if v == dr][0] 
         
         artist_id = -1
+        print(artist)
         if artist != None :
             q = "select Id from artist where name = ? "
             rq = self.query( q , (artist,) )

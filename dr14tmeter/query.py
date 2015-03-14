@@ -83,13 +83,15 @@ class query_top_dr( query ):
 class query_top_albums_dr( query ):
     def __init__(self):
         super().__init__()
-        self.keys = [ "DR" , "Album_Title"  ]
+        self.keys = [ "DR" , "Album_Title" , "Artist" ]
         
     def get_query(self):
         q = """
-        select album.title as Album_Title , dr.dr as DR , album.id as id 
+        select album.title as Album_Title , dr.dr as DR , album.id as id , Artist.name as Artist
            from album inner join DR_Album on DR_Album.idalbum = album.id 
-                inner join dr on dr.id = DR_Album.iddr                 
+                inner join dr on dr.id = DR_Album.iddr   
+                inner join Artist_Album on album.id = Artist_Album.IdAlbum
+                inner join Artist on Artist.Id = Artist_Album.IdArtist       
                 order by dr desc
                 limit ? ;
         """
