@@ -172,6 +172,9 @@ class dr_database :
                          
             c.execute( "insert into DR_Album ( IdDr , IdAlbum ) values ( :dr_id , :Id )" ,  self._albums[k_album] )
             
+            if self._albums[k_album]["artist_id"] >= 0 :
+                c.execute( "insert into Artist_Album ( IdArtist , IdAlbum ) values ( :artist_id , :id ) " , self._tracks[k_track] )
+                            
             
         for k_track in self._tracks.keys() :
             
@@ -312,7 +315,7 @@ class dr_database :
         return self._id_track - 1
     
         
-    def insert_album( self , album_sha1 , title , dr , disk_nr=None ):
+    def insert_album( self , album_sha1 , title , dr , disk_nr=None , artist=None ):
         global lock_db
         lock_db.acquire()
         
@@ -333,8 +336,22 @@ class dr_database :
         else :
             dr_id = [k for (k, v) in self._dr.items() if v == dr][0] 
         
+        artist_id = -1
+        if artist != None :
+            q = "select Id from artist where name = ? "
+            rq = self.query( q , (artist,) )
+            if len( rq ) == 0 and not ( artist in self._artists.values() ) :
+                artist_id = self.__insert_artist( artist )
+            elif len( rq ) > 0 :
+                artist_id = rq.pop()[0]
+            else :
+                artist_id = [k for (k, v) in self._artists.items() if v == artist ]
+        
+        
         self._albums[album_sha1] = { "Id":self._id_album , "sha1":album_sha1 , 
-                                    "Title":title , "dr_id":dr_id , "disk_nr":disk_nr }
+                                     "Title":title        , "dr_id":dr_id , 
+                                     "disk_nr":disk_nr    , "artist_id":artist_id }
+        
         self._id_album = self._id_album + 1
         
         lock_db.release()
