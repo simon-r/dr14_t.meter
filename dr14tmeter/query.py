@@ -219,7 +219,6 @@ class query_date_dr_evolution( query ):
         
         return q
     
-
     
 class query_dr_codec( query ):
     def __init__(self):

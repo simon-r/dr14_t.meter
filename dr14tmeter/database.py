@@ -375,7 +375,8 @@ class dr_database :
         
         return res_l
  
-    def get_db_version(self):
+    @property
+    def db_version(self):
         q = """
         select max( Version ) from Db_Version ;
         """
