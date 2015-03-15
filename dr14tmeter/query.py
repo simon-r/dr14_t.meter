@@ -244,7 +244,7 @@ class query_dr_codec( query ):
         return q        
         
         
-        
+
         
         
         

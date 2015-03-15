@@ -264,12 +264,14 @@ def local_dr_database_configure():
             print_out( "  - [ %s ] is not a directory, please insert an existing directory name" % coll_path )
     
     print_out( "  " )
+    print_out( " type: %s -q " % get_exe_name() )
+    print_out( " For more details and querying the database " )
     print_out( "---------------------------------------------------------------------------------------------- " )
         
     return ( db_path , coll_path )
 
     
-def print_query_help():
+def query_helper():
     print_msg( "query help" )
 
   
@@ -286,7 +288,7 @@ def database_exec_query( options , tm = ExtendedTextTable() ):
         second_opt = None ;
     
     if options.query[0] == "help" :
-        print_query_help()
+        query_helper()
         return
     
     elif options.query[0] == "top" :

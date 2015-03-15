@@ -40,26 +40,7 @@ import numpy
 
     
 def main():
-    
-#     tm = ExtendedTextTable()
-#         
-#     tm.new_table()
-#      
-#     tm.append_separator_line()    
-#     tm.add_title("Ciao a tutti ")
-#     tm.append_separator_line()
-#     tm.append_row( [ "****" , "****" , "*********" , "****" , "***************" ] )
-#     tm.append_separator_line()
-#     tm.append_row( [ "ci" , 10 , "14" , "ciao" , "ciao_ciao" ] )
-#     tm.append_row( [ "ci" , 108768768768687 , 1.4455646346345635463546345 , "ciao_ao_ao_ao" , "ciao_ciao" ] )
-#     tm.append_row( [ "ciao" , 108768768768687 , 0.00000000000000000000456543 , "ciao_ao_ao_ao_jhgfdjhg" , "ciao_ciao" ] )
-#         
-#     tm.end_table()
-#         
-#     print( tm.write_table() )
-#         
-#     return ;
-        
+                
     get_config_file()
 
     options = parse_args()
@@ -104,8 +85,14 @@ def main():
         return
 
     if options.query != None :
+        
+        if not database_exists() :
+            print_err( "Error: The database does not exists" )
+            print_err( "Error: type dr14_tmeter -q for more info." )
+            return 
+        
         if len( options.query ) == 0 :
-            print_query_help()
+            query_helper()
             return 
         
         if options.query[0] not in [ "help" , "top" , "top_alb" , 
@@ -117,7 +104,9 @@ def main():
             return 
         
         table_code = database_exec_query( options )
-        print_out( table_code )
+        
+        if table_code is not None:
+            print_out( table_code )
         
         return  
     
@@ -201,6 +190,15 @@ def main():
         print_msg( "\n----------------------------------------------------------------------" )
         print_msg( " A new version of dr14_t.meter [ %s ] is available for download \n please visit: %s" % ( get_new_version() , get_home_url() ) )
         print_msg( "----------------------------------------------------------------------\n" )
+    
+    if not database_exists() :
+        print_msg( " News ... News !!! " )
+        print_msg( " With the version 2.0.0 there are the possibility to store all results in a database" )
+        print_msg( " If you want to enable this database execute the command:" )
+        print_msg( "  > %s --enable_database " % get_exe_name() )
+        print_msg( "" )
+        print_msg( " for more details visit: " )                
+        
     
     return r
 
