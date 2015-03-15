@@ -272,8 +272,79 @@ def local_dr_database_configure():
 
     
 def query_helper():
-    print_msg( "query help" )
-
+    subprocess.call( "clear" , shell=True )
+    print_out( "----- QUERY HELPER -----" )
+    print_out( "  " )
+    print_out( " Choose one of the following query: " )
+    print_out( "  " )
+    print_out( " 1. The list of the best DR tracks " )
+    print_out( " 2. The list of the best DR Albums " )
+    print_out( " 3. The list of the best DR Artists " )    
+    print_out( " 4. The DR time evolution, according your collection" )
+    print_out( " 5. The list of the worst DR tracks  " )
+    print_out( " 6. The list of the worst DR albums " )
+    print_out( " 7. The DR histogram " )
+    print_out( " 8. Used audio CODEC and mean DR " )
+    print_out( " 0. Exit " )
+    print_out( "  " )
+    
+    flag = True
+    while flag :
+        print_out( " Insert the query number [1..8] " )
+        
+        if sys.version_info[0] == 2:
+            nr = raw_input(" > ")
+        else:        
+            nr = input(" > ")
+            
+        try:
+            nr = int(nr)
+        except:
+            print_out( " !! Pleas insert a valid number " )
+            continue 
+        
+        if nr > 8 or nr < 0 :
+            print_out( " !! Pleas insert a valid option number " )
+            continue 
+        
+        flag = False
+        
+    class options: pass
+    
+    if nr == 0 : 
+        return
+    elif nr == 1 :
+        options.query = ["top"]
+    elif nr == 2 :
+        options.query = ["top_alb"]
+    elif nr == 3 :
+        options.query = ["top_art"]
+    elif nr == 4 :
+        options.query = ["evol"]
+    elif nr == 5 :
+        options.query = ["worst"] 
+    elif nr == 6 :
+        options.query = ["worst_alb"]
+    elif nr == 7 :
+        options.query = ["hist"]
+    elif nr == 8 :
+        options.query = ["codec"] 
+    
+    eq_cmd = "%s -q " % get_exe_name()
+    for o in options.query :
+        eq_cmd += "%s " % o
+    
+    print_out("")
+    print_out( "equivalent command line: %s " % eq_cmd )
+    print_out("")
+    
+    res = database_exec_query( options , tm = ExtendedTextTable() )
+    
+    print_out("")
+    print_out( res )   
+    
+        
+    
   
 def database_exec_query( options , tm = ExtendedTextTable() ):
     
