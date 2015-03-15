@@ -33,7 +33,7 @@ else:
 ###########################
 # Current version
 v_major    = 1
-v_minor    = 90
+v_minor    = 95
 v_revision = 0
 ###########################
 
