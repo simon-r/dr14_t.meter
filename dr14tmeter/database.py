@@ -178,8 +178,8 @@ class dr_database :
             
         for k_track in self._tracks.keys() :
             
-            q = """insert into Track  ( Id  ,  Title  , rms   , peak  , duration  , bit  , bitrate  , sampling_rate  , sha1  <1s> ) 
-                               values ( :id , :title  , :rms  , :peak , :duration , :bit , :bitrate , :sampling_rate , :sha1 <2s> ) 
+            q = """insert into Track  ( Id  ,  Title  , rms   , peak  , duration  , bit  , bitrate  , sampling_rate  , sha1  , size  <1s> ) 
+                               values ( :id , :title  , :rms  , :peak , :duration , :bit , :bitrate , :sampling_rate , :sha1 , :size <2s> ) 
                 """                                                       
             if self._tracks[k_track].get( "track_nr" , None ) != None :
                 q = q.replace("<1s>", " , track_nr <1s> ")
@@ -218,7 +218,7 @@ class dr_database :
                       dr , rms , peak , duration , 
                       codec , bit , bitrate , sampling_rate , 
                       album_sha1=None , artist=None , 
-                      genre=None , date = None , track_nr=None ):
+                      genre=None , date = None , track_nr=None , size=None ):
                 
         global lock_db
         lock_db.acquire()
@@ -306,7 +306,7 @@ class dr_database :
                                     "peak": peak , "rms": rms , "duration": duration ,
                                     "codec_id": codec_id , "album_sha1": album_sha1 , "artist_id": artist_id , 
                                     "genre_id": genre_id , "date_id": date_id , "album_id": album_id , "track_nr": track_nr , 
-                                    "bit": bit , "bitrate": bitrate , "sampling_rate":sampling_rate }
+                                    "bit": bit , "bitrate": bitrate , "sampling_rate":sampling_rate , "size":size }
         
         self._id_track = self._id_track + 1
         
@@ -412,6 +412,7 @@ class dr_database :
                 bit integer,
                 bitrate integer ,
                 sampling_rate integer ,
+                size integer ,
                 sha1 varchar(40) not null                 
             ) ;
             create index Track_indx on Track ( sha1 ) ;

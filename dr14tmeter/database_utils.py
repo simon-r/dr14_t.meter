@@ -17,7 +17,6 @@
 
 
 import os
-import argparse
 import time
 import multiprocessing
 
@@ -175,7 +174,7 @@ def query_helper():
     print_out( " 1. The list of the best DR tracks " )
     print_out( " 2. The list of the best DR Albums " )
     print_out( " 3. The list of the best DR Artists " )    
-    print_out( " 4. The DR time evolution, according your collection" )
+    print_out( " 4. The DR time evolution, according with your collection" )
     print_out( " 5. The list of the worst DR tracks  " )
     print_out( " 6. The list of the worst DR albums " )
     print_out( " 7. The DR histogram " )

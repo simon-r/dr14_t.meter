@@ -59,7 +59,8 @@ class WriteDr :
             dr              = drm.res_list[i]['dr14']
             rms             = drm.res_list[i]['dB_rms']
             peak            = drm.res_list[i]['dB_peak']
-            duration        = drm.res_list[i]['duration']
+            duration        = drm.meta_data.get_value( curr_file_name , 'duration')
+            size            = drm.meta_data.get_value( curr_file_name , 'size')
             bit             = drm.meta_data.get_value( curr_file_name , 'bit' )
             bitrate         = drm.meta_data.get_value( curr_file_name , 'bitrate' )
             sampling_rate   = drm.meta_data.get_value( curr_file_name , 'sampling_rate' )
@@ -76,7 +77,7 @@ class WriteDr :
                       dr , rms , peak , duration , 
                       codec ,  bit , bitrate , sampling_rate , 
                       album_sha1 , artist , 
-                      genre , date , track_nr )
+                      genre , date , track_nr , size )
         
         db.commit_insert_session()
         
