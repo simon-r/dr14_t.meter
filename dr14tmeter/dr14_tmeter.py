@@ -41,13 +41,6 @@ import numpy
 
     
 def main():
-
-#     db = dr_database_singletone().get() 
-#     l = db.query( "select duration from track" )
-#     print( l )
-#      
-#     return 
-    
                 
     get_config_file()
 
