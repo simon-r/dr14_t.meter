@@ -82,7 +82,7 @@ class query_top_dr( query ):
 
 class query_top_albums_dr( query ):
     def __init__(self):
-        super().__init__()
+        query.__init__(self)
         self.keys = [ "DR" , "Album_Title" , "Artist" ]
         
     def get_query(self):
