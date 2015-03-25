@@ -23,7 +23,6 @@
 
 import sqlite3 
 import threading
-from decorator import __call__
 
 from dr14tmeter.dr14_config import get_db_path
 from dr14tmeter.out_messages import *
