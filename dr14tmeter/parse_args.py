@@ -150,7 +150,7 @@ def parse_args():
         dest="quiet",
         help="Quiet mode")
     
-    parser.add_argument("--version",
+    parser.add_argument( "-v" , "--version" ,
         action="store_true",
         dest="version",
         help="print the current version and exit")
