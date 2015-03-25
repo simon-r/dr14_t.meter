@@ -113,7 +113,7 @@ def local_dr_database_configure():
     return ( db_path , coll_path )
 
 
-def input_number( p=" > " , rng=range(100) ):
+def input_number( p=" > " , rng=( 0 , 2**31 ) ):
     
     flag = True
     
@@ -129,7 +129,7 @@ def input_number( p=" > " , rng=range(100) ):
             print_out( " !! Please insert a valid number " )
             continue
         
-        if rng is not None and nr not in rng :
+        if rng is not None and not ( nr >= rng[0] and nr <= rng[1] )  :
             print_out( " !! Please insert a valid option number in the [%d .. %d]" % ( min(rng), max(rng) ) )
             continue
             
@@ -182,7 +182,7 @@ def query_helper():
     print_out( " 0. Exit " )
     print_out( "  " )
     
-    nr = input_number( rng=range(0,9) )
+    nr = input_number( rng=(0,9) )
             
     class options: pass
     
