@@ -113,6 +113,84 @@ def local_dr_database_configure():
     return ( db_path , coll_path )
 
 
+def fix_problematic_database():
+    
+    print_out( "  " )
+    print_out( " It likes that your database have some problems " )
+    print_out( "  " )
+    print_out( " Options: " )
+    print_out( "   1. Rebuild the database and back-up the damaged db" )
+    print_out( "   2. Disable the database " )
+    print_out( "  " )
+    nr = input_number( p=" > " , rng=( 1 , 2 ) )
+    
+    dbp = get_db_path()
+    
+    if nr == 1 :
+        if os.path.isfile(dbp) :
+            dest_file = dbp + ".d_save"
+            os.rename( dbp , dest_file )
+            print_out( "  " )
+            print_out( " The old database has been saved in the file: %s " % dest_file )
+            print_out( "  " )
+            
+        enable_database( prompt=False )
+        
+    elif nr == 2 :
+        enable_db( False ) 
+        print_out( " The database has been disabled " )
+        print_out( " Type: %s --enable_database " % get_exe_name() )
+        print_out( " For enabling the database " )
+        print_out( "  " )
+
+def enable_database( prompt=True ):
+    
+    f = False
+    
+    if database_exists() and db_is_enabled() :
+        f = True
+    
+    if database_exists() and not db_is_enabled() :
+        db = dr_database_singletone().get()
+        f = db.is_db_valid()
+    
+        if not f :
+            dbp = get_db_path()
+            dest_file = dbp + ".de_save"
+            os.rename( dbp , dest_file )
+        else :
+            f = True
+    
+    if not database_exists() :
+        
+        if prompt :
+            ( db_path , coll_dir ) = local_dr_database_configure()
+        else :
+            db_path = os.path.split( get_db_path() )[0]
+            coll_dir = get_collection_dir() 
+            
+        try:
+            os.makedirs( db_path )
+        except :
+            pass
+        
+        db_path += "/dr14_database.db"
+        
+        set_db_path( db_path )
+        set_collection_dir( coll_dir )
+        
+        print_msg( "Preparing database .... " )
+        db = dr_database_singletone().get()
+        db.build_database()
+        f = db.is_db_valid()
+        
+    if f :
+        enable_db( True )
+        print_msg( "The local DR database is ready and enabled! It is located in the file: %s  " % get_db_path() )
+    else :
+        print_err( "The building procedure of the database has failed ... retry " )
+    return 
+
 def input_number( p=" > " , rng=( 0 , 2**31 ) ):
     
     flag = True

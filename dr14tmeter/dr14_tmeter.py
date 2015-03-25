@@ -42,8 +42,6 @@ import numpy
     
 def main():
                 
-    get_config_file()
-
     options = parse_args()
 
     if options.version :
@@ -58,26 +56,7 @@ def main():
     #print( options )
 
     if options.enable_database :
-        
-        if not database_exists() :
-            
-            ( db_path , coll_dir ) = local_dr_database_configure()
-            try:
-                os.makedirs( db_path )
-            except :
-                pass
-            
-            db_path += "/dr14_database.db"
-            
-            set_db_path( db_path )
-            set_collection_dir( coll_dir )
-            
-            print_msg( "Preparing database .... " )
-            db = dr_database_singletone().get()
-            db.build_database()
-            
-        enable_db( True )
-        print_msg( "The local DR database is ready and enabled! It is located in the file: %s  " % get_db_path() )
+        enable_database()
         return 
     
     if options.disable_database :
@@ -89,6 +68,16 @@ def main():
         db = dr_database_singletone().get()
         db.dump() 
         return 
+    
+    if db_is_enabled() :
+        db = dr_database_singletone().get()
+        f = db.is_db_valid()
+        
+        if not f :
+            print_err( "It seems that there is some problem with the db ... " )
+            fix_problematic_database()
+            return 
+         
 
     if options.query != None :
         
@@ -199,7 +188,7 @@ def main():
     
     if not database_exists() :
         print_msg( " News ... News !!! " )
-        print_msg( " With the version 2.0.0 there are the possibility to store all results in a database" )
+        print_msg( " With the version 2.0.0 there is the possibility to store all results in a database" )
         print_msg( " If you want to enable this database execute the command:" )
         print_msg( "  > %s --enable_database " % get_exe_name() )
         print_msg( "" )

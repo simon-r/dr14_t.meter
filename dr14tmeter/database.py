@@ -386,6 +386,36 @@ class dr_database :
         r = self.query( q )
         
         return int( r[0][0] )
+       
+
+    def is_db_valid(self):
+        
+        if not os.path.exists( get_db_path() ) :
+            return False 
+
+        if self._pragma_schema_version() < 21 :
+            return False
+        else :
+            return True
+
+    def _pragma_schema_version(self):
+        q = """
+        pragma schema_version;
+        """
+        
+        r = self.query( q )
+        
+        return int( r[0][0] )
+    
+    def _pragma_integrity_check(self):
+        q = """
+        pragma integrity_check;
+        """
+        
+        r = self.query( q )
+        
+        return int( r[0][0] )
+        
         
                          
     def dr14_db_main_structure_v1(self):
