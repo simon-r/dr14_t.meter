@@ -85,6 +85,11 @@ def main():
         print_msg( "The local DR database is disabled! " )
         return
 
+    if options.dump_database :
+        db = dr_database_singletone().get()
+        db.dump() 
+        return 
+
     if options.query != None :
         
         if not database_exists() :

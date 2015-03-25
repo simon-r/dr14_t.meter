@@ -23,9 +23,11 @@
 
 import sqlite3 
 import threading
+from decorator import __call__
 
 from dr14tmeter.dr14_config import get_db_path
-from decorator import __call__
+from dr14tmeter.out_messages import *
+
 
 unique_db_object = 0 ;
 lock_db = threading.Lock()
@@ -69,7 +71,9 @@ class dr_database :
         self._id_genre = 0
         self._id_codec = 0
         self._id_dr = 0
-        self._id_date = 0 
+        self._id_date = 0
+        
+        self._current_schema_db_version = 1 
     
     
     def build_database(self):
@@ -529,10 +533,28 @@ class dr_database :
         return db
     
     def ungrade_db(self):
-        pass
+        if self._current_schema_db_version == self.db_version :
+            return 
         
-    def dump(self):
-        pass
+        #
+        # upgrade db here.
+        #
+        
+        return    
+        
+    def dump( self ):
+        global lock_db
+        lock_db.acquire()
+        
+        conn = sqlite3.connect( get_db_path() )
+        
+        for line in conn.iterdump():
+            print_out( '%s\n' % line )
+        
+        lock_db.release()
+
+        
+        
     
     # privates methods:    
     def __insert_artist( self , name ):
