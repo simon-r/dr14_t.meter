@@ -62,7 +62,7 @@ class query :
 
 class query_top_dr( query ):
     def __init__(self):
-        super().__init__()
+        query.__init__(self)
         self.keys = [ "DR" , "Title" , "Artist" , "Album" ]
      
     def get_query(self):
@@ -101,7 +101,7 @@ class query_top_albums_dr( query ):
 
 class query_worst_albums_dr( query ):
     def __init__(self):
-        super().__init__()
+        query.__init__(self)
         self.keys = [ "DR" , "Album_Title" ]
         
     def get_query(self):
@@ -118,7 +118,7 @@ class query_worst_albums_dr( query ):
     
 class query_worst_dr( query ):
     def __init__(self):
-        super().__init__()
+        query.__init__(self)
         self.keys = [ "DR" , "Title" , "Artist" , "Album" ]
         
     def get_query(self):
@@ -139,7 +139,7 @@ class query_worst_dr( query ):
     
 class query_top_artists( query ):
     def __init__(self):
-        super().__init__()
+        query.__init__(self)
         self.keys = [ "Mean_DR" , "Artist" , "Track_Count" ]
         self.append_parameter( 10 )
 
@@ -177,7 +177,7 @@ class query_top_artists( query ):
 
 class query_dr_histogram( query ):
     def __init__(self):
-        super().__init__()
+        query.__init__(self)
         self.keys = [ "DR" , "Freq" ]
 
     def exec_query(self):
@@ -198,7 +198,7 @@ class query_dr_histogram( query ):
     
 class query_date_dr_evolution( query ):
     def __init__(self):
-        super().__init__()
+        query.__init__(self)
         self.keys = [ "Date" , "Mean" ]
 
     def exec_query(self):
@@ -222,7 +222,7 @@ class query_date_dr_evolution( query ):
     
 class query_dr_codec( query ):
     def __init__(self):
-        super().__init__()
+        query.__init__(self)
         self.keys = [ "Codec" , "Mean_DR" , "Codec_Freq" ]
 
     def exec_query(self):

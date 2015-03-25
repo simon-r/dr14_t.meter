@@ -113,7 +113,7 @@ def local_dr_database_configure():
     return ( db_path , coll_path )
 
 
-def input_number( p=" > " , rng=range(2**64) ):
+def input_number( p=" > " , rng=range(100) ):
     
     flag = True
     

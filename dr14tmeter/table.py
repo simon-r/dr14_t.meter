@@ -26,8 +26,16 @@ def float_formatter( el ):
         return "%.2E" % el
     
 def default_formatter( el ):
-    return str( el )    
-    
+    if sys.version_info[0] == 2:
+        return unicode( el )
+    else:
+        return str( el )
+
+def string_formatter( el ):
+    if sys.version_info[0] == 2:
+        return unicode( el )
+    else:
+        return str( el )
 
 class Table:
     
@@ -37,7 +45,11 @@ class Table:
         self.__ini_txt = ""
         self.__txt = ""
         self.__formatter = {}
+        
         self.add_formatter( float , float_formatter )
+        self.add_formatter( str , string_formatter )
+        if sys.version_info[0] == 2:
+            self.add_formatter( unicode , string_formatter )
     
     def _get_txt(self):
         return self.__txt
@@ -427,18 +439,18 @@ class row:
 class ExtendedTextTable ( Table ):
     
     def __init__(self):
-        super(ExtendedTextTable,self).__init__()
-        self._cols_sz = [0] * super(ExtendedTextTable,self).get_col_cnt()
+        Table.__init__( self )
+        self._cols_sz = [0] * Table.get_col_cnt( self )
         self._rows = []
         self._bold_state = False
         self._rclass_state = "b"
         
 
     def get_col_cnt( self ):
-        return super(ExtendedTextTable,self).get_col_cnt()
+        return Table.get_col_cnt(self)
     
     def set_col_cnt( self , col_cnt ):
-        super(ExtendedTextTable,self).set_col_cnt( col_cnt )
+        Table.set_col_cnt( self , col_cnt )
         
         if len( self._cols_sz ) < col_cnt :
             self._cols_sz = self.col_sz[:col_cnt] 
