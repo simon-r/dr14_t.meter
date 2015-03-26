@@ -453,11 +453,11 @@ class RetirveMetadata:
         
         sa = np.frombuffer( bytearray( key_string.encode( "utf8") ) , dtype=np.int8 )
         
-        print( np.sum( sa ) )
-        print( len( sa ) )
-        print( len(key_string) )
+        #print( np.sum( sa ) )
+        #print( len( sa ) )
+        #print( len(key_string) )
 
-        print( bytearray( key_string.encode("utf8") ) )
+        #print( bytearray( key_string.encode("utf8") ) )
         
         sha1 = hashlib.sha1( sa ).hexdigest()
         

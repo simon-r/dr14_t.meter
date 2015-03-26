@@ -135,6 +135,14 @@ class DynamicRangeMeter:
   
 
 
+    def write_to_local_database(self):
+        
+        wr = WriteDr()
+        
+        if self.__write_to_local_db and os.path.realpath( self.dir_name ).startswith( self.coll_dir ) :
+            wr.write_to_local_dr_database( self )    
+                
+
     def fwrite_dr( self , file_name , tm , ext_table=False , std_out=False , append=False , dr_database=True ):
         
         if ext_table :
@@ -145,9 +153,6 @@ class DynamicRangeMeter:
         wr.set_loudness_war_db_compatible( dr_database )
         
         self.table_txt = wr.write_dr( self , tm )
-        
-        if self.__write_to_local_db and os.path.realpath( self.dir_name ).startswith( self.coll_dir ) :
-            wr.write_to_local_dr_database( self )
         
         if std_out:
             print_out( self.table_txt )

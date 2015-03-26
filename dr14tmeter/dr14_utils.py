@@ -169,6 +169,7 @@ def write_results( dr , options , out_dir , cur_dir ) :
     
     out_list = ""
     
+    dr.write_to_local_database()
     
     for code in tables_list.keys():
         if code in options.out_tables or all_tables :

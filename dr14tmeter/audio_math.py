@@ -52,8 +52,11 @@ def normalize( y , ml=1.0 ):
 def sha1_track_v1( y , ext_code=0 ):
     n = y.shape
     if n[0] <= 44100*2 :
-        return hashlib.sha1( y+ext_code ).hexdigest()
+        shat = hashlib.sha1( y+ext_code ).hexdigest()
     else :
-        return hashlib.sha1( y[ :44100*2 , : ]+ext_code ).hexdigest()
+        shat = hashlib.sha1( y[ ::100 , : ]+ext_code ).hexdigest()
+    
+    print( shat )
+    return shat
         
     
