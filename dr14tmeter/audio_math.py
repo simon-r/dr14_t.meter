@@ -56,7 +56,7 @@ def sha1_track_v1( y , ext_code=0 ):
     else :
         shat = hashlib.sha1( y[ ::100 , : ]+ext_code ).hexdigest()
     
-    print( shat )
+    #print( shat )
     return shat
         
     

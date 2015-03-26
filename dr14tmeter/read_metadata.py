@@ -460,9 +460,7 @@ class RetirveMetadata:
         #print( bytearray( key_string.encode("utf8") ) )
         
         sha1 = hashlib.sha1( sa ).hexdigest()
-        
-        print( sha1 )
-        
+        #print( sha1 )
         return sha1 
     
             
