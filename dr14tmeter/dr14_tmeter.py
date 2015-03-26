@@ -187,12 +187,13 @@ def main():
         print_msg( "----------------------------------------------------------------------\n" )
     
     if not database_exists() :
-        print_msg( " News ... News !!! " )
+        print_msg( " " )
+        print_msg( " News ... News ... News ... News ... News  !!! " )
         print_msg( " With the version 2.0.0 there is the possibility to store all results in a database" )
         print_msg( " If you want to enable this database execute the command:" )
         print_msg( "  > %s --enable_database " % get_exe_name() )
         print_msg( "" )
-        print_msg( " for more details visit: " )                
+        print_msg( " for more details visit: http://dr14tmeter.sourceforge.net/index.php/DR_Database " )                
         
     
     return r
