@@ -228,14 +228,15 @@ class dr_database :
         if self._insert_session == False :
             lock_db.release()
             raise Exception("Error: database.insert_track the insert session has not been opened !")
-        
-        
+                
         q = "select Id from track where sha1 = ? " 
         rq = self.query( q , (track_sha1,) )
         
         if len( rq ) > 0 :
             lock_db.release()
             return rq.pop()[0]
+        
+        #print("insert: " + title )
         
         artist_id = -1
         if artist != None :
@@ -446,7 +447,7 @@ class dr_database :
                 bitrate integer ,
                 sampling_rate integer ,
                 size integer ,
-                sha1 varchar(40) not null                 
+                sha1 varchar(40) not null unique
             ) ;
             create index Track_indx on Track ( sha1 ) ;
             create index Track_title_indx on Track ( Title ) ;
