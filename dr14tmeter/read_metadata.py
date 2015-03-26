@@ -20,6 +20,8 @@ import sys
 import os
 import re
 import hashlib
+import numpy as np
+import string
 
 from dr14tmeter.audio_decoder import AudioDecoder
 from dr14tmeter.dr14_global import get_ffmpeg_cmd
@@ -416,8 +418,16 @@ class RetirveMetadata:
         else :
             p_title = title 
         
-        key_string = ""
-        key_string = key_string + str( p_title ) + str( self.get_album_artist() )
+        if sys.version_info[0] == 2:
+            str_conv = unicode
+        else:
+            str_conv = str
+        
+        key_string = str_conv ( "" )
+        #key_string = key_string + str_conv( p_title ) + str_conv( self.get_album_artist() )
+        
+        d = np.float64( 0.0 )
+        s = np.float64( 0.0 )
         
         for track in sorted ( self._tracks.keys() ) :
             
@@ -430,11 +440,30 @@ class RetirveMetadata:
             if title != None and not self._tracks[track]["album"] != title :
                 continue
             
-            key_string = key_string + track 
-            key_string = key_string + str( self._tracks[track]['size'] )
-            key_string = key_string + str( self._tracks[track]['codec'] )
+            #key_string = key_string + str_conv( track ) 
+            key_string = key_string + str_conv( self._tracks[track]['size'] )
+            key_string = key_string + str_conv( self._tracks[track]['codec'] )
+            key_string = key_string + str_conv( self._tracks[track]['duration'] )
+            key_string = key_string + str_conv( int( self._tracks[track]['bitrate'] ) )
+            d += np.float64( self._tracks[track]['duration'] )
+            s += np.float64( self._tracks[track]['size'] )
+            
+        key_string = key_string + str_conv( d )
+        key_string = key_string + str_conv( s )
         
-        return hashlib.sha1( bytearray( key_string.encode("utf8") ) ).hexdigest()
+        sa = np.frombuffer( bytearray( key_string.encode( "utf8") ) , dtype=np.int8 )
+        
+        print( np.sum( sa ) )
+        print( len( sa ) )
+        print( len(key_string) )
+
+        print( bytearray( key_string.encode("utf8") ) )
+        
+        sha1 = hashlib.sha1( sa ).hexdigest()
+        
+        print( sha1 )
+        
+        return sha1 
     
             
     def get_album_artist_old( self ):
