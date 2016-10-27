@@ -29,8 +29,13 @@ else:
 
 def get_config_directory( create = True ):
     
-    cfg_dir = "%s/.config/dr14tmeter" % os.path.expanduser("~")
-    
+    p = os.environ.get('XDG_CONFIG_HOME')
+
+    if p is None or not os.path.isabs(p):
+        p = os.path.expanduser('~/.config')
+
+    cfg_dir = os.path.join(p, 'dr14tmeter')
+
     if not os.path.isdir(cfg_dir) and create :
         os.mkdir( cfg_dir )
     
