@@ -56,15 +56,15 @@ def plot_track( Y , Fs , Plot=True , time_range=None , utime = 0 ):
         d = ttime / f_utime(ttime) ;
         utime = ttime / d
         #print( utime )
-    
+
     Fs = int(Fs * utime)
-    
-    sec = floor( s[0] / Fs ) + 1   
-    sz = Fs * ( sec + 1 )
-    tm = floor( np.arange(sz) / Fs )
-     
-    Yc = np.zeros( sz , dtype=np.float32 )
-    
+
+    sec = floor(s[0] / Fs) + 1
+    sz = int(Fs * (sec + 1))
+    tm = floor(np.arange(sz) / Fs)
+
+    Yc = np.zeros(sz, dtype=np.float32)
+
     for i in range(ch):
         
         ax = pyplot.subplot( 210+i+1 )
