@@ -14,14 +14,14 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import numpy as np
-from dr14tmeter.audio_math import *
-from dr14tmeter.out_messages import *
-from dr14tmeter.my_time_formatter import *
-
+import datetime
 import math
 import time
-import datetime
+
+import numpy as np
+from dr14tmeter.audio_math import *
+from dr14tmeter.my_time_formatter import *
+from dr14tmeter.out_messages import *
 
 try:
     import matplotlib
@@ -33,12 +33,12 @@ try:
 except:
     ____foo = None
 
-  
+
 def on_select(vmin, vmax):
-    dr14_log_debug( "on_select: %f , %f " % (vmin , vmax) )
-    if vmin == vmax :
-        return 
-    plot_track_classic( plot_str=on_select.plot_str , start_time=vmin , end_time=vmax )
+    dr14_log_debug("on_select: %f , %f "%(vmin, vmax))
+    if vmin == vmax:
+        return
+    plot_track_classic(plot_str=on_select.plot_str, start_time=vmin, end_time=vmax)
     on_select.plot_str.plot()
  
 
@@ -175,7 +175,7 @@ class PltTrackStruct:
             if new_flag :
                 onsel = on_select
                 onsel.plot_str = self
-                self.span.append( SpanSelector( self.ax[j], onsel, 'horizontal' ) )
+                self.span.append( SpanSelector( self.ax[j], onsel, 'horizontal', button=1 ) )
                 
                 m_p = mouse_pressed
                 m_p.plot_str = self
@@ -275,8 +275,3 @@ def plot_track_classic( Y=None , Fs=None , plot_str=None , utime=0.02 , time_lim
         plot_str.sz_section = sz_section
         
     return plot_str
-    
-    
-    
-    
-    
