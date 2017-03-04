@@ -18,18 +18,20 @@
 
 from dr14tmeter.audio_math import *
 from dr14tmeter.out_messages import *
+
+import numpy as np
+
 import math
-import numpy
 import time
 
 
-def compute_dr14( Y , Fs , duration = None , Dr_lr = None ) :
+def compute_dr14(Y, Fs, duration=None, Dr_lr=None):
 
     s = Y.shape
-    
-    if len( Y.shape ) > 1 :
+
+    if len(Y.shape) > 1:
         ch = s[1]
-    else :
+    else:
         ch = 1
 
     if Fs == 44100:
@@ -39,7 +41,7 @@ def compute_dr14( Y , Fs , duration = None , Dr_lr = None ) :
 
     dr14_log_debug( "compute_dr14: Y: Fs: %d ; ch: %d ; shape: %d " %(Fs , ch , s[0]) )
     time_a = time.time()
-    
+
     block_time = 3
     cut_best_bins = 0.2
     block_samples = block_time * ( Fs + delta_fs )
@@ -51,42 +53,42 @@ def compute_dr14( Y , Fs , duration = None , Dr_lr = None ) :
         return ( 0 , -100 , -100 )
 
     curr_sam = 0
-    rms = numpy.zeros((seg_cnt, ch))
-    peaks = numpy.zeros((seg_cnt, ch))
-    
-    
+    rms = np.zeros((seg_cnt, ch))
+    peaks = np.zeros((seg_cnt, ch))
+
+
     for i in range(seg_cnt - 1):
-        rms[i,:] = numpy.sqrt( 2.0 * numpy.sum( Y[curr_sam:curr_sam+block_samples,:]**2.0 , 0 ) / float(block_samples) ) 
-        peaks[i,:] = numpy.max( numpy.abs( Y[curr_sam:curr_sam+block_samples,:] ) , 0 )
+        rms[i,:] = np.sqrt( 2.0 * np.sum( Y[curr_sam:curr_sam+block_samples,:]**2.0 , 0 ) / float(block_samples) ) 
+        peaks[i,:] = np.max( np.abs( Y[curr_sam:curr_sam+block_samples,:] ) , 0 )
         curr_sam = curr_sam + block_samples
 
-    i = seg_cnt - 1 ;
+    i = seg_cnt - 1
 
     if curr_sam < s[0]:
         rms[i,:] = dr_rms( Y[curr_sam:s[0]-1,:] )
-        peaks[i,:] = numpy.max( numpy.abs( Y[curr_sam:s[0]-1,:] ) , 0 )
+        peaks[i,:] = np.max( np.abs( Y[curr_sam:s[0]-1,:] ) , 0 )
 
-    peaks = numpy.sort( peaks , 0 )
-    rms = numpy.sort( rms , 0 )
+    peaks = np.sort( peaks , 0 )
+    rms = np.sort( rms , 0 )
     
     n_blk = int(math.floor(seg_cnt * cut_best_bins))
     if n_blk == 0:
         n_blk = 1
 
-    r = numpy.arange(seg_cnt - n_blk, seg_cnt)
+    r = np.arange(seg_cnt - n_blk, seg_cnt)
     
-    rms_sum = numpy.sum( rms[r,:]**2 , 0 )
+    rms_sum = np.sum( rms[r,:]**2 , 0 )
 
-    ch_dr14 = -20.0 * numpy.log10( numpy.sqrt( rms_sum / n_blk ) * 1.0/peaks[seg_cnt-2,:] )
+    ch_dr14 = -20.0 * np.log10( np.sqrt( rms_sum / n_blk ) * 1.0/peaks[seg_cnt-2,:] )
 
-    err_i = numpy.logical_or( rms_sum < audio_min() , numpy.abs( ch_dr14 ) > max_dynamic(24) )
+    err_i = np.logical_or( rms_sum < audio_min() , np.abs( ch_dr14 ) > max_dynamic(24) )
     ch_dr14[err_i] = 0.0 ;
 
-    dr14 = round( numpy.mean( ch_dr14 ) )
+    dr14 = round( np.mean( ch_dr14 ) )
 
-    dB_peak = decibel_u( numpy.max( peaks ) , 1.0 )
+    dB_peak = decibel_u( np.max( peaks ) , 1.0 )
 
-    y_rms = numpy.sum( numpy.mean( rms , 0 ) ) / 2.0 
+    y_rms = np.sum( np.mean( rms , 0 ) ) / 2.0 
 
     dB_rms = decibel_u( y_rms , 1 )
     
