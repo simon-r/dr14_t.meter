@@ -242,7 +242,7 @@ def plot_track_classic( Y=None , Fs=None , plot_str=None , utime=0.02 , time_lim
     
     block_len = utime
     
-    samples_block = block_len * Fs
+    samples_block = int( block_len * Fs )
     sz = int( sz_section / samples_block )
     
     curr_sample = first_sample
