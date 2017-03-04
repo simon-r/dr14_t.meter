@@ -175,7 +175,7 @@ class PltTrackStruct:
             if new_flag :
                 onsel = on_select
                 onsel.plot_str = self
-                self.span.append( SpanSelector( self.ax[j], onsel, 'horizontal', button=1 ) )
+                self.span.append( SpanSelector( self.ax[j], onsel, 'horizontal', button=1))
                 
                 m_p = mouse_pressed
                 m_p.plot_str = self
@@ -192,10 +192,10 @@ class PltTrackStruct:
 
 def plot_track_classic( Y=None , Fs=None , plot_str=None , utime=0.02 , time_lim=5 , start_time=0.0 , end_time = -1.0 ):
         
-    if Y == None and Fs == None and plot_str == None :
+    if Y is None and Fs is None and plot_str is None:
         raise
     
-    if plot_str == None and Y != None and Fs != None :        
+    if plot_str is None and Y is not None and Fs is not None :        
         s = Y.shape
         
         if len( Y.shape ) > 1 :
