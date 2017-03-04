@@ -39,12 +39,12 @@ def compute_dr14(Y, Fs, duration=None, Dr_lr=None):
     else:
         delta_fs = 0
 
-    dr14_log_debug( "compute_dr14: Y: Fs: %d ; ch: %d ; shape: %d " %(Fs , ch , s[0]) )
+    dr14_log_debug("compute_dr14: Y: Fs: %d ; ch: %d ; shape: %d "%(Fs, ch, s[0]))
     time_a = time.time()
 
     block_time = 3
     cut_best_bins = 0.2
-    block_samples = block_time * ( Fs + delta_fs )
+    block_samples = block_time * (Fs + delta_fs)
 
     seg_cnt = int( math.floor( s[0] / block_samples ) + 1 )
 
@@ -88,7 +88,8 @@ def compute_dr14(Y, Fs, duration=None, Dr_lr=None):
 
     dB_peak = decibel_u( np.max( peaks ) , 1.0 )
 
-    y_rms = np.sum( np.mean( rms , 0 ) ) / 2.0 
+    #y_rms = np.sum( np.mean( rms , 0 ) ) / 2.0
+    y_rms = np.sqrt(np.menan(np.sum((np.sum(Y, 1) / 2)**2)))
 
     dB_rms = decibel_u( y_rms , 1 )
     
