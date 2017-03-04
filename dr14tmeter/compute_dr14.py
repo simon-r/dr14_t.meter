@@ -46,11 +46,11 @@ def compute_dr14(Y, Fs, duration=None, Dr_lr=None):
     cut_best_bins = 0.2
     block_samples = block_time * (Fs + delta_fs)
 
-    seg_cnt = int( math.floor( s[0] / block_samples ) + 1 )
+    seg_cnt = int(math.floor(s[0] / block_samples) + 1)
 
     if seg_cnt < 1:
-        dr14_log_debug( "compute_dr14: EXIT - too short" )
-        return ( 0 , -100 , -100 )
+        dr14_log_debug("compute_dr14: EXIT - too short")
+        return (0, -100, -100)
 
     curr_sam = 0
     rms = np.zeros((seg_cnt, ch))
@@ -58,25 +58,25 @@ def compute_dr14(Y, Fs, duration=None, Dr_lr=None):
 
 
     for i in range(seg_cnt - 1):
-        rms[i,:] = np.sqrt( 2.0 * np.sum( Y[curr_sam:curr_sam+block_samples,:]**2.0 , 0 ) / float(block_samples) ) 
-        peaks[i,:] = np.max( np.abs( Y[curr_sam:curr_sam+block_samples,:] ) , 0 )
+        rms[i, :] = np.sqrt(2.0 * np.sum(Y[curr_sam:curr_sam+block_samples, :]**2.0, 0) / float(block_samples)) 
+        peaks[i, :] = np.max(np.abs(Y[curr_sam:curr_sam+block_samples, :]), 0)
         curr_sam = curr_sam + block_samples
 
     i = seg_cnt - 1
 
     if curr_sam < s[0]:
-        rms[i,:] = dr_rms( Y[curr_sam:s[0]-1,:] )
-        peaks[i,:] = np.max( np.abs( Y[curr_sam:s[0]-1,:] ) , 0 )
+        rms[i, :] = dr_rms(Y[curr_sam:s[0]-1, :])
+        peaks[i, :] = np.max(np.abs(Y[curr_sam:s[0]-1, :]), 0)
 
-    peaks = np.sort( peaks , 0 )
-    rms = np.sort( rms , 0 )
-    
+    peaks = np.sort(peaks, 0)
+    rms = np.sort(rms, 0)
+
     n_blk = int(math.floor(seg_cnt * cut_best_bins))
     if n_blk == 0:
         n_blk = 1
 
     r = np.arange(seg_cnt - n_blk, seg_cnt)
-    
+
     rms_sum = np.sum( rms[r,:]**2 , 0 )
 
     ch_dr14 = -20.0 * np.log10( np.sqrt( rms_sum / n_blk ) * 1.0/peaks[seg_cnt-2,:] )
@@ -86,21 +86,20 @@ def compute_dr14(Y, Fs, duration=None, Dr_lr=None):
 
     dr14 = round( np.mean( ch_dr14 ) )
 
-    dB_peak = decibel_u( np.max( peaks ) , 1.0 )
+    dB_peak = decibel_u(np.max(peaks), 1.0)
 
-    #y_rms = np.sum( np.mean( rms , 0 ) ) / 2.0
-    y_rms = np.sqrt(np.menan(np.sum((np.sum(Y, 1) / 2)**2)))
+    y_rms = np.sqrt(np.mean(np.sum((np.sum(Y, 1) / 2)**2)))
 
-    dB_rms = decibel_u( y_rms , 1 )
-    
-    if duration != None :
-        duration.set_samples( s[0] , Fs )
-        
-    if Dr_lr != None :
+    dB_rms = decibel_u(y_rms, 1.0)
+
+    if duration != None:
+        duration.set_samples(s[0], Fs)
+
+    if Dr_lr != None:
         Dr_lr = ch_dr14
 
     time_b = time.time()
-    dr14_log_info( "compute_dr14: Clock: %2.8f" % (time_b - time_a ) )
+    dr14_log_info("compute_dr14: Clock: %2.8f"%(time_b - time_a))
 
-    return ( dr14 , dB_peak , dB_rms )
-    
+    return (dr14, dB_peak, dB_rms)
+
