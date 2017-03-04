@@ -88,7 +88,7 @@ def compute_dr14(Y, Fs, duration=None, Dr_lr=None):
 
     dB_peak = decibel_u(np.max(peaks), 1.0)
 
-    y_rms = np.sqrt(np.mean(np.sum((np.sum(Y, 1) / 2)**2)))
+    y_rms = np.sqrt(np.sum(np.sum((np.sum(Y, 1) / 2)**2)) / Y.shape[0])
 
     dB_rms = decibel_u(y_rms, 1.0)
 
