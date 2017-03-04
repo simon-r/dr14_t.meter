@@ -51,8 +51,8 @@ def compute_dr14( Y , Fs , duration = None , Dr_lr = None ) :
         return ( 0 , -100 , -100 )
 
     curr_sam = 0
-    rms = zeros((seg_cnt,ch))
-    peaks = zeros((seg_cnt,ch))
+    rms = numpy.zeros((seg_cnt, ch))
+    peaks = numpy.zeros((seg_cnt, ch))
     
     
     for i in range(seg_cnt - 1):
@@ -69,11 +69,11 @@ def compute_dr14( Y , Fs , duration = None , Dr_lr = None ) :
     peaks = numpy.sort( peaks , 0 )
     rms = numpy.sort( rms , 0 )
     
-    n_blk = int( floor( seg_cnt * cut_best_bins ) )
+    n_blk = int(math.floor(seg_cnt * cut_best_bins))
     if n_blk == 0:
         n_blk = 1
 
-    r = arange(seg_cnt-n_blk,seg_cnt)
+    r = numpy.arange(seg_cnt - n_blk, seg_cnt)
     
     rms_sum = numpy.sum( rms[r,:]**2 , 0 )
 
