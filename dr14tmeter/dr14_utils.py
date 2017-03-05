@@ -19,16 +19,13 @@ import multiprocessing
 import os
 import tempfile
 import fileinput
-
 import time
-
 import sys
-
-import dr14tmeter.audio_analysis as aa
-from dr14tmeter.dynamic_range_meter import DynamicRangeMeter, TextTable, BBcodeTable, HtmlTable, MediaWikiTable
 
 from dr14tmeter import dr14_global
 from dr14tmeter import dr14_config as config
+from dr14tmeter import audio_analysis as aa
+from dr14tmeter.dynamic_range_meter import DynamicRangeMeter, TextTable, BBcodeTable, HtmlTable, MediaWikiTable
 from dr14tmeter.out_messages import print_msg
 
 
