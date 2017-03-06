@@ -122,8 +122,9 @@ def main():
     if options.quiet :
         set_quiet_msg()
 
-    l_ver = TestVer()
-    l_ver.start()
+    if not options.quiet and not options.skip_version_check:
+        l_ver = TestVer()
+        l_ver.start()
     
     print_msg( path_name )
     print_msg( "" )
