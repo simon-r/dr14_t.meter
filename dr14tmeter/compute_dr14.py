@@ -77,18 +77,18 @@ def compute_dr14(Y, Fs, duration=None, Dr_lr=None):
 
     r = np.arange(seg_cnt - n_blk, seg_cnt)
 
-    rms_sum = np.sum( rms[r,:]**2 , 0 )
+    rms_sum = np.sum(rms[r, :]**2, 0)
 
-    ch_dr14 = -20.0 * np.log10( np.sqrt( rms_sum / n_blk ) * 1.0/peaks[seg_cnt-2,:] )
+    ch_dr14 = -20.0 * np.log10(np.sqrt(rms_sum / n_blk ) * 1.0/peaks[seg_cnt-2, :])
 
-    err_i = np.logical_or( rms_sum < audio_min() , np.abs( ch_dr14 ) > max_dynamic(24) )
-    ch_dr14[err_i] = 0.0 ;
+    err_i = np.logical_or(rms_sum < audio_min(), np.abs(ch_dr14) > max_dynamic(24))
+    ch_dr14[err_i] = 0.0
 
-    dr14 = round( np.mean( ch_dr14 ) )
+    dr14 = round(np.mean(ch_dr14))
 
     dB_peak = decibel_u(np.max(peaks), 1.0)
 
-    y_rms = np.sqrt(np.sum(np.sum((np.sum(Y, 1) / 2)**2)) / Y.shape[0])
+    y_rms = np.sqrt(np.sum(((np.sum(Y, 1) / 2)**2)) / Y.shape[0])
 
     dB_rms = decibel_u(y_rms, 1.0)
 
