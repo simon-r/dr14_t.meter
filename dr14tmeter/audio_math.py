@@ -20,9 +20,9 @@ import math
 import numpy
 import hashlib
 
-def dr_rms( y ) :
+def dr_rms(y):
     n = y.shape
-    return numpy.sqrt( 2.0 * numpy.sum( y**2.0 , 0 ) / float(n[0]) )
+    return numpy.sqrt(2.0 * numpy.sum(y**2.0, 0) / float(n[0]))
 
 def u_rms( y ) :
     n = y.shape

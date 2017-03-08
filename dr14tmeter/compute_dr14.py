@@ -58,7 +58,8 @@ def compute_dr14(Y, Fs, duration=None, Dr_lr=None):
 
 
     for i in range(seg_cnt - 1):
-        rms[i, :] = np.sqrt(2.0 * np.sum(Y[curr_sam:curr_sam+block_samples, :]**2.0, 0) / float(block_samples)) 
+        rms[i, :] = np.sqrt(2.0 * np.sum(Y[curr_sam:curr_sam+block_samples, :]**2.0, 0) /
+                            float(block_samples))
         peaks[i, :] = np.max(np.abs(Y[curr_sam:curr_sam+block_samples, :]), 0)
         curr_sam = curr_sam + block_samples
 
@@ -79,18 +80,21 @@ def compute_dr14(Y, Fs, duration=None, Dr_lr=None):
 
     rms_sum = np.sum(rms[r, :]**2, 0)
 
-    ch_dr14 = -20.0 * np.log10(np.sqrt(rms_sum / n_blk ) * 1.0/peaks[seg_cnt-2, :])
+    ch_dr14 = -20.0 * np.log10(np.sqrt(rms_sum / n_blk) * 1.0/peaks[seg_cnt-2, :])
 
     err_i = np.logical_or(rms_sum < audio_min(), np.abs(ch_dr14) > max_dynamic(24))
     ch_dr14[err_i] = 0.0
 
     dr14 = round(np.mean(ch_dr14))
 
-    dB_peak = decibel_u(np.max(peaks), 1.0)
+    db_peak = decibel_u(np.max(peaks), 1.0)
 
-    y_rms = np.sqrt(np.sum(((np.sum(Y, 1) / 2)**2)) / Y.shape[0])
+    #y_rms = np.sqrt(np.sum(((np.sum(Y, 1) / 2)**2)) / Y.shape[0])
 
-    dB_rms = decibel_u(y_rms, 1.0)
+    y_rms = dr_rms(Y)
+    y_rms = np.mean(y_rms)
+
+    db_rms = decibel_u(y_rms, 1.0)
 
     if duration != None:
         duration.set_samples(s[0], Fs)
@@ -101,5 +105,5 @@ def compute_dr14(Y, Fs, duration=None, Dr_lr=None):
     time_b = time.time()
     dr14_log_info("compute_dr14: Clock: %2.8f"%(time_b - time_a))
 
-    return (dr14, dB_peak, dB_rms)
+    return (dr14, db_peak, db_rms)
 
