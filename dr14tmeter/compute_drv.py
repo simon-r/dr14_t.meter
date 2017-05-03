@@ -17,7 +17,6 @@
 
 from numpy  import *
 from dr14tmeter.audio_math import *
-import math
 import numpy
 
 def compute_DRV( Y , Fs , duration = None , Dr_lr = None ) :

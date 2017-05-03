@@ -15,11 +15,9 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
-import os.path 
+import os.path
 import os
 import sys
-
-from dr14tmeter.out_messages import print_msg
 
 if sys.version_info[0] == 2:
     import ConfigParser

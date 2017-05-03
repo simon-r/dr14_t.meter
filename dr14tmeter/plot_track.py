@@ -19,14 +19,9 @@ from dr14tmeter.audio_math import *
 from dr14tmeter.out_messages import *
 from dr14tmeter.my_time_formatter import *
 
-import math
-import time
-import datetime
-
 try:
     import matplotlib.pyplot as pyplot
     import matplotlib.mlab as mlab
-    from matplotlib import dates
 except:
     ____foo = None
 

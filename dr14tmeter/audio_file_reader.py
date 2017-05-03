@@ -24,8 +24,6 @@ import wave
 import numpy
 
 
-from io import StringIO
-
 from dr14tmeter.out_messages import print_msg, dr14_log_info
 from dr14tmeter.dr14_global import get_ffmpeg_cmd
 

@@ -16,7 +16,6 @@
 
 
 import argparse
-from dr14tmeter.dr14_global import dr14_version
 
 
 def parse_args():

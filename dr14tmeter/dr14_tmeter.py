@@ -22,21 +22,17 @@ from dr14tmeter.parse_args import parse_args
 from dr14tmeter.dynamic_range_meter import DynamicRangeMeter
 from dr14tmeter.table import *
 from dr14tmeter.audio_analysis import *
-from dr14tmeter.database import dr_database, dr_database_singletone
-from dr14tmeter.dr14_global import dr14_version, TestVer, test_new_version, get_home_url, get_new_version, get_exe_name, test_hist_modules, test_compress_modules
+from dr14tmeter.database import dr_database_singletone
+from dr14tmeter.dr14_global import dr14_version, TestVer, test_new_version, get_home_url, get_new_version, get_exe_name
 from dr14tmeter.dr14_utils import *
 from dr14tmeter.out_messages import *
 from dr14tmeter.dr14_config import *
 from dr14tmeter.database_utils import *
 
 import os
-import time
-import multiprocessing
 import subprocess
-import inspect
 import sys
-import re
-import logging 
+import logging
 import numpy
 
     

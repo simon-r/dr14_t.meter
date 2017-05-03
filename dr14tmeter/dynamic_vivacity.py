@@ -23,7 +23,6 @@ import math
 import time
 
 try:
-    import matplotlib 
     import matplotlib.pyplot as pyplot
     import matplotlib.mlab as mlab
 except:

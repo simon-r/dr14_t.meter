@@ -15,8 +15,6 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
-from numpy  import *
-import math
 import numpy
 import hashlib
 

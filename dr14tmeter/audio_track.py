@@ -15,7 +15,6 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import numpy
-import wave
 import os
 from dr14tmeter.audio_decoder import AudioDecoder
 
