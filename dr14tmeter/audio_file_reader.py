@@ -153,7 +153,7 @@ class AudioFileReader:
         return True
     
     def get_generic_ffmpeg_options( self , file_name , tmp_file ):
-        return  " -i \"%s\" -b 16 -ar 44100 -y \"%s\" -loglevel quiet " % ( file_name , tmp_file )
+        return  " -i \"%s\" -b:a 16 -ar 44100 -y \"%s\" -loglevel quiet " % ( file_name , tmp_file )
 
 
 
