@@ -26,7 +26,7 @@ try:
     import matplotlib.pyplot as pyplot
     import matplotlib.mlab as mlab
 except:
-    ____foo = None
+    pass
     
 
 def dynamic_vivacity( Y , Fs , Plot=True ):

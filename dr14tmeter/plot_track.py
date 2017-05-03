@@ -23,7 +23,7 @@ try:
     import matplotlib.pyplot as pyplot
     import matplotlib.mlab as mlab
 except:
-    ____foo = None
+    pass
 
 def f_utime( t ) :
     v = 0.25

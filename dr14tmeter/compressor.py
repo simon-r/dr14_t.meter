@@ -23,7 +23,7 @@ from dr14tmeter.out_messages import *
 try:
     from scipy.interpolate import interp1d
 except:
-    ____foo = None
+    pass
 
 
 

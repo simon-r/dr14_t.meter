@@ -26,7 +26,7 @@ try:
     from matplotlib.widgets import  *
     from pylab import *
 except:
-    ____foo = None
+    pass
 
 
 def on_select(vmin, vmax):
