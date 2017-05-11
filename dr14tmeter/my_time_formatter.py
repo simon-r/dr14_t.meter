@@ -14,19 +14,12 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import numpy
-from dr14tmeter.audio_math import *
-from dr14tmeter.out_messages import *
-
-import math
-import time
-
 try:
-    import matplotlib 
+    import matplotlib
     import matplotlib.pyplot as pyplot
     import matplotlib.mlab as mlab
 except:
-    ____foo = None
+    pass
 
 
 try:

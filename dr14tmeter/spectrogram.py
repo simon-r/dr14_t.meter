@@ -22,7 +22,7 @@ try:
     import matplotlib.mlab as mlab
     import pylab
 except:
-    ____foo = None
+    pass
  
     
 def spectrogram( Y , Fs ):

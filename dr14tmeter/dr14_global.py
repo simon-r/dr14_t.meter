@@ -19,15 +19,8 @@ import sys
 import re
 import threading
 import subprocess
-import os.path 
-import os
 
 from dr14tmeter.out_messages import print_msg
-
-if sys.version_info[0] == 2:
-    import ConfigParser
-else:
-    import configparser as ConfigParser
 
 
 ###########################

@@ -15,13 +15,8 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import os
-import threading
-import sys
-import codecs
 import tempfile
 
-from dr14tmeter.compute_dr14 import compute_dr14
-from dr14tmeter.compute_drv import compute_DRV
 from dr14tmeter.compute_dr import *
 from dr14tmeter.audio_track import *
 from dr14tmeter.table import *
@@ -31,16 +26,12 @@ from dr14tmeter.spectrogram import *
 from dr14tmeter.compressor import DynCompressor
 from dr14tmeter.wav_write import wav_write
 from dr14tmeter.read_metadata import RetirveMetadata
-from dr14tmeter.audio_decoder import AudioDecoder
 from dr14tmeter.duration import StructDuration
-from dr14tmeter.write_dr import WriteDr, WriteDrExtended
 from dr14tmeter.dynamic_vivacity import dynamic_vivacity
 from dr14tmeter.plot_track import *
 from dr14tmeter.plot_track_classic import *
 
-import dr14tmeter.dr14_global as dr14
-
-from dr14tmeter.out_messages import print_msg, print_out
+from dr14tmeter.out_messages import print_msg
 
 
 class AudioAnalysis :

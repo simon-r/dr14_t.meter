@@ -17,11 +17,8 @@
 
 
 import os
-import time
-import multiprocessing
 
-from dr14tmeter.dynamic_range_meter import DynamicRangeMeter
-from dr14tmeter.database import dr_database, dr_database_singletone
+from dr14tmeter.database import dr_database_singletone
 from dr14tmeter.table import *
 from dr14tmeter.audio_analysis import *
 from dr14tmeter.dr14_global import *
@@ -32,8 +29,6 @@ from dr14tmeter.out_messages import *
 import subprocess
 import sys
 import re
-import tempfile
-import fileinput
 
 
 def local_dr_database_configure():

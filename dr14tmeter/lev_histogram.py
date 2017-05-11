@@ -21,7 +21,7 @@ try:
     import matplotlib.pyplot as pyplot
     import matplotlib.mlab as mlab
 except:
-    ____foo = None
+    pass
     
 
 def compute_lev_hist ( Y , Fs , duration=None , bins=100 , plot=True , title=None ):

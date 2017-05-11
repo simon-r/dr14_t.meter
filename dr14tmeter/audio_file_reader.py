@@ -24,8 +24,6 @@ import wave
 import numpy
 
 
-from io import StringIO
-
 from dr14tmeter.out_messages import print_msg, dr14_log_info
 from dr14tmeter.dr14_global import get_ffmpeg_cmd
 
@@ -153,7 +151,7 @@ class AudioFileReader:
         return True
     
     def get_generic_ffmpeg_options( self , file_name , tmp_file ):
-        return  " -i \"%s\" -b 16 -ar 44100 -y \"%s\" -loglevel quiet " % ( file_name , tmp_file )
+        return  " -i \"%s\" -b:a 16 -ar 44100 -y \"%s\" -loglevel quiet " % ( file_name , tmp_file )
 
 
 

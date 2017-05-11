@@ -14,10 +14,6 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import datetime
-import math
-import time
-
 import numpy as np
 from dr14tmeter.audio_math import *
 from dr14tmeter.my_time_formatter import *
@@ -27,11 +23,10 @@ try:
     import matplotlib
     import matplotlib.pyplot as pyplot
     import matplotlib.mlab as mlab
-    from matplotlib import dates
     from matplotlib.widgets import  *
     from pylab import *
 except:
-    ____foo = None
+    pass
 
 
 def on_select(vmin, vmax):

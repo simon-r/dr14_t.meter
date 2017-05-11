@@ -21,11 +21,9 @@ import os
 import re
 import hashlib
 import numpy as np
-import string
 
 from dr14tmeter.audio_decoder import AudioDecoder
 from dr14tmeter.dr14_global import get_ffmpeg_cmd
-from dr14tmeter.out_messages import print_msg, flush_msg
 
 if sys.version_info[0] == 2:
     import ConfigParser

@@ -15,24 +15,17 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import os
-import threading
 import sys
 import codecs
-import tempfile
 import multiprocessing as mp
 
-from ctypes import Structure, c_double, c_wchar_p, c_int
-
 from dr14tmeter.compute_dr14 import compute_dr14
-from dr14tmeter.compute_drv import compute_DRV
 from dr14tmeter.compute_dr import *
 from dr14tmeter.audio_track import *
 from dr14tmeter.table import *
 from dr14tmeter.dr_histogram import *
 from dr14tmeter.lev_histogram import *
 from dr14tmeter.spectrogram import *
-from dr14tmeter.compressor import DynCompressor
-from dr14tmeter.wav_write import wav_write
 from dr14tmeter.read_metadata import RetirveMetadata
 from dr14tmeter.audio_decoder import AudioDecoder
 from dr14tmeter.duration import StructDuration
@@ -43,7 +36,7 @@ from dr14tmeter.out_messages import print_msg, flush_msg
 
 import dr14tmeter.dr14_global as dr14
 
-from dr14tmeter.out_messages import print_msg, print_out, dr14_log_debug
+from dr14tmeter.out_messages import print_msg, print_out
     
 class SharedDrResObj :
     def __init__(self):

@@ -16,9 +16,7 @@
 
 
 import os
-import shutil
 import subprocess
-import sys
 import re
 
 
@@ -67,5 +65,6 @@ setup(name = "dr14_tmeter",
         'Operating System :: Linux',
         'Programming Language :: Python',
         'Topic :: Multimedia'] ,
-    cmdclass={"install": dr14_install }
+    cmdclass={"install": dr14_install },
+    install_requires=['numpy'],
 ) 
