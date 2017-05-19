@@ -22,33 +22,33 @@ try:
     import matplotlib.mlab as mlab
 except:
     pass
-    
 
-def compute_lev_hist ( Y , Fs , duration=None , bins=100 , plot=True , title=None ):
-    
+
+def compute_lev_hist(Y, Fs, duration=None, bins=100, plot=True, title=None):
+
     s = Y.shape
-    
-    if len( Y.shape ) > 1 :
-        ch = s[1]
-    else :
-        ch = 1
-    
-    Ym = numpy.sum( Y , 1 ) / float(ch)
 
-    if plot :
-        ( hist , bin_edges , patches ) = pyplot.hist(  Ym  , 100 , normed=True  )
-        
+    if len(Y.shape) > 1:
+        ch = s[1]
+    else:
+        ch = 1
+
+    Ym = numpy.sum(Y, 1) / float(ch)
+
+    if plot:
+        (hist, bin_edges, patches) = pyplot.hist(Ym, 100, normed=True)
+
         pyplot.grid(True)
-        
+
         if title != None:
             hist_title = title
         else:
             hist_title = "Hystogram of levels"
-        
-        pyplot.title(r'%s'%hist_title)
-        
+
+        pyplot.title(r'%s' % hist_title)
+
         pyplot.show()
     else:
-        ( hist , bin_edges ) = numpy.histogram( rms , bins=bins , normed=True )
-        
-    return ( hist , bin_edges )
+        (hist, bin_edges) = numpy.histogram(rms, bins=bins, normed=True)
+
+    return (hist, bin_edges)
