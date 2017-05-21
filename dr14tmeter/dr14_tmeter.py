@@ -173,14 +173,16 @@ def main():
         print_msg(" Usage: %s [options] path_name \n\nfor more details type \n%s --help\n" %
                   (get_exe_name(), get_exe_name()))
 
-    if sys.platform.startswith('linux'):
+    if sys.platform.startswith('linux') or sys.platform.startswith('darwin'):
         subprocess.call("stty sane", shell=True)
 
     if test_new_version():
         print_msg(
             "\n----------------------------------------------------------------------")
-        print_msg(" A new version of dr14_t.meter [ %s ] is available for download \n please visit: %s" % (
-            get_new_version(), get_home_url()))
+        print_msg(" A new version of dr14_t.meter [ %s ] is available for download"
+                  " \n please visit: %s" % (
+                      get_new_version(), get_home_url()))
+
         print_msg(
             "----------------------------------------------------------------------\n")
 
