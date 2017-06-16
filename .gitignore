@@ -1,9 +1,11 @@
 build/
 *.pyc
 .directory
+.vscode
 *.e4t
 *.e4q
 *.e4p
 *.geany
+*.json
 .pydevproject
 .project
