@@ -14,6 +14,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+import time
 import numpy as np
 from dr14tmeter.audio_math import *
 from dr14tmeter.out_messages import *
@@ -55,9 +56,9 @@ def plot_track(Y, Fs, Plot=True, time_range=None, utime=0):
 
     Fs = int(Fs * utime)
 
-    sec = floor(s[0] / Fs) + 1
+    sec = np.floor(s[0] / Fs) + 1
     sz = int(Fs * (sec + 1))
-    tm = floor(np.arange(sz) / Fs)
+    tm = np.floor(np.arange(sz) / Fs)
 
     Yc = np.zeros(sz, dtype=np.float32)
 
