@@ -1,4 +1,4 @@
-#!/usr/bin/python3
+#!/usr/bin/env python3
 
 # dr14_t.meter: compute the DR14 value of the given audiofiles
 #Copyright (C) 2011  Simone Riva
