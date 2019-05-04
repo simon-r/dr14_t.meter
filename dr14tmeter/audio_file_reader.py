@@ -66,8 +66,9 @@ class AudioFileReader:
         full_command = full_command + " " + \
             self.get_cmd_options(file_name, tmp_file)
 
-        r = subprocess.call(full_command, shell=True,
+        r = subprocess.Popen(full_command, shell=True,
                             stderr=subprocess.PIPE, stdout=subprocess.PIPE)
+        stdout_data, stderr_data = r.communicate()
 
         if os.path.exists(tmp_file):
             return tmp_file
@@ -92,8 +93,9 @@ class AudioFileReader:
 
         #print_msg( full_command )
 
-        r = subprocess.call(full_command, shell=True,
+        r = subprocess.Popen(full_command, shell=True,
                             stderr=subprocess.PIPE, stdout=subprocess.PIPE)
+        stdout_data, stderr_data = r.communicate()
 
         #read_wav.read_wav( tmp_file )
 
