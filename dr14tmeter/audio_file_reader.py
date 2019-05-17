@@ -197,6 +197,13 @@ class OggFileReader(AudioFileReader):
     def get_cmd_options(self, file_name, tmp_file):
         return "--quiet " + "\"" + file_name + "\"" + " --output \"%s\"  " % tmp_file
 
+class OpusFileReader(AudioFileReader):
+
+    def get_cmd(self):
+        return self.get_ffmpeg_cmd()
+
+    def get_cmd_options(self, file_name, tmp_file):
+        return self.get_generic_ffmpeg_options(file_name, tmp_file)
 
 class ApeFileReader(AudioFileReader):
 

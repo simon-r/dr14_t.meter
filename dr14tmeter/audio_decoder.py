@@ -23,7 +23,7 @@ class AudioDecoder:
     def __init__(self):
         # Attention!!! do not modify the order of this list!!!!
         # It is used for computing the sha1 of the track
-        self.formats = ['.flac', '.mp3', '.ogg', '.mp4',
+        self.formats = ['.flac', '.mp3', '.ogg', '.opus', '.mp4',
                         '.m4a', '.wav', '.ape', '.ac3', '.wma']
 
         self._ext = -1
@@ -47,6 +47,8 @@ class AudioDecoder:
             af = FlacFileReader()
         elif ext == '.ogg':
             af = OggFileReader()
+        elif ext == '.opus':
+            af = OpusFileReader()
         elif ext in ['.mp4', '.m4a']:
             af = Mp4FileReader()
         elif ext == '.wav':
