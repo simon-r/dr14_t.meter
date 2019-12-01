@@ -80,7 +80,7 @@ class Table:
         return self.__ini_txt + self._get_txt()
 
     def nl(self):
-        if sys.platform.startswith('linux') or sys.platform.startswith('darwin'):
+        if sys.platform.startswith('linux') or sys.platform.startswith('darwin') or sys.platform.startswith(''):
             return '\n'
         elif sys.platform.startswith('win'):
             return '\n\r'
