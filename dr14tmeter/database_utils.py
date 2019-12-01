@@ -23,6 +23,7 @@ from dr14tmeter.table import *
 from dr14tmeter.audio_analysis import *
 from dr14tmeter.dr14_global import *
 from dr14tmeter.dr14_config import *
+from dr14tmeter.write_dr import WriteDr, WriteDrExtended
 from dr14tmeter.query import *
 from dr14tmeter.out_messages import *
 

@@ -25,8 +25,8 @@ from dr14tmeter.out_messages import print_msg
 
 ###########################
 # Current version
-v_major = 1
-v_minor = 96
+v_major = 2
+v_minor = 0
 v_revision = 0
 ###########################
 
