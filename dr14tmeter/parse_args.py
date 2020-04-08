@@ -97,7 +97,7 @@ def parse_args():
                                              [-q help] """ )
 
     parser.add_argument("-d", "--dr_database",
-                        action="store_false",
+                        action="store_true",
                         dest="dr_database",
                         help="Output file compatible with the DR database at http:///www.dr.loudness-war.info")
 
