@@ -362,11 +362,15 @@ class RetirveMetadata:
         track['channel'] = re.search(
             "^\s*([\S][\s|\S]*[\S])\s*$", fmt[2], re_flags).group(1)
 
-        m = re.search("(\d+)", fmt[3], re_flags)
+        m = re.search("\((\d+) bit\)", fmt[3], re_flags)
         if m != None:
             track['bit'] = m.group(1)
         else:
-            track['bit'] = "16"
+            m = re.search("(\d+)", fmt[3], re_flags)
+            if m != None:
+                track['bit'] = m.group(1)
+            else:
+                track['bit'] = "16"
 
     def album_len(self):
         return len(self._tracks)
