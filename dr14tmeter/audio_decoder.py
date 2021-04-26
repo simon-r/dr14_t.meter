@@ -24,7 +24,7 @@ class AudioDecoder:
         # Attention!!! do not modify the order of this list!!!!
         # It is used for computing the sha1 of the track
         self.formats = ['.flac', '.mp3', '.ogg', '.opus', '.mp4',
-                        '.m4a', '.wav', '.ape', '.ac3', '.wma']
+                        '.m4a', '.wav', '.wv', '.ape', '.ac3', '.wma']
 
         self._ext = -1
 
@@ -53,7 +53,9 @@ class AudioDecoder:
             af = Mp4FileReader()
         elif ext == '.wav':
             af = WavFileReader()
-        elif ext == '.ape':
+        elif ext == '.wav':
+            af = WavPackFileReader()
+        elif ext == '.wv':
             af = ApeFileReader()
         elif ext == '.ac3':
             af = Ac3FileReader()
