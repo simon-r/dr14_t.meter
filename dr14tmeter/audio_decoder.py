@@ -24,7 +24,7 @@ class AudioDecoder:
         # Attention!!! do not modify the order of this list!!!!
         # It is used for computing the sha1 of the track
         self.formats = ['.flac', '.mp3', '.ogg', '.opus', '.mp4',
-                        '.m4a', '.wav', '.wv', '.ape', '.ac3', '.wma']
+                        '.m4a', '.wav', '.wv', '.ape', '.ac3', '.wma', '.dsf', '.dff']
 
         self._ext = -1
 
@@ -61,6 +61,10 @@ class AudioDecoder:
             af = Ac3FileReader()
         elif ext == '.wma':
             af = WmaFileReader()
+        elif ext == '.dsf':
+            af = DsfFileReader()
+        elif ext == '.dff':
+            af = DffFileReader()
         else:
             return False
 
