@@ -66,5 +66,4 @@ setup(name = "dr14_tmeter",
         'Programming Language :: Python',
         'Topic :: Multimedia'] ,
     cmdclass={"install": dr14_install },
-    install_requires=['numpy'],
 ) 
