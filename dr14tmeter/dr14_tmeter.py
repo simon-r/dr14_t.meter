@@ -76,7 +76,7 @@ def main():
     if options.query != None:
 
         if not database_exists():
-            print_err("Error: The database does not exists")
+            print_err("Error: The database does not exist")
             print_err("Error: type dr14_tmeter -q for more info.")
             return
 
@@ -105,12 +105,12 @@ def main():
         path_name = os.path.abspath('.')
 
     if not(os.path.exists(path_name)):
-        print_msg("Error: The input directory \"%s\"  does not exists!" % path_name)
+        print_msg("Error: The input directory \"%s\"  does not exist!" % path_name)
         return
 
     if options.out_dir and not(os.path.exists(options.out_dir)):
         print_msg(
-            "Error (-o): The target directory \"%s\"  does not exists! " % options.out_dir)
+            "Error (-o): The target directory \"%s\"  does not exist! " % options.out_dir)
         return
 
     if options.quiet:
