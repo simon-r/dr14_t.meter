@@ -159,6 +159,11 @@ def parse_args():
                         dest="version",
                         help="print the current version and exit")
 
+    parser.add_argument("--tag", 
+                        action="store_true",
+                        dest="tag",
+                        help="Write the DR to the tag of the input files")
+
     parser.add_argument(
         dest="path_name",
         nargs='?',

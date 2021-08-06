@@ -15,6 +15,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
+from dr14tmeter.tagger import Tagger
 import multiprocessing
 import os
 import tempfile
@@ -54,6 +55,11 @@ def scan_files_list(input_file, options, out_dir):
         success = False
     else:
         write_results(dr, options, out_dir, "")
+
+    if options.tag:
+        tagger = Tagger()
+        tagger.write_dr_tags(dr)
+
         success = True
 
     clock = time.time() - a
@@ -78,6 +84,10 @@ def scan_dir_list(subdirlist, options, out_dir):
         else:
             cpu = get_thread_cnt()
             r = dr.scan_mp(cur_dir, cpu)
+
+        if options.tag:
+            tagger = Tagger()
+            tagger.write_dr_tags(dr)
 
         if r == 0:
             continue

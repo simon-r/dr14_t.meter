@@ -175,6 +175,15 @@ def test_matplotlib_modules(fun_name):
 
     return True
 
+def test_mutagen(fun_name):
+    try:
+        import mutagen
+    except ImportError:
+        print_msg(
+            "The %s function require the installation of MatPlotLib: http://matplotlib.sourceforge.net" % fun_name)
+        return False
+
+    return True
 
 def test_hist_modules():
     try:
