@@ -244,3 +244,30 @@ class WavFileReader(AudioFileReader):
 
     def get_cmd_options(self, file_name, tmp_file):
         return ""
+
+class WavpackFileReader(AudioFileReader):
+
+    def read_audio_file_new(self, file_name, target):
+        return self.read_wavpack(file_name, target)
+
+    def get_cmd(self):
+        return ""
+
+    def get_cmd_options(self, file_name, tmp_file):
+        return ""
+
+class DsfFileReader(AudioFileReader):
+
+    def get_cmd(self):
+        return self.get_ffmpeg_cmd()
+
+    def get_cmd_options(self, file_name, tmp_file):
+        return self.get_generic_ffmpeg_options(file_name, tmp_file)
+
+class DffFileReader(AudioFileReader):
+
+    def get_cmd(self):
+        return self.get_ffmpeg_cmd()
+
+    def get_cmd_options(self, file_name, tmp_file):
+        return self.get_generic_ffmpeg_options(file_name, tmp_file)
