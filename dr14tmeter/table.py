@@ -80,10 +80,10 @@ class Table:
         return self.__ini_txt + self._get_txt()
 
     def nl(self):
-        if sys.platform.startswith('linux') or sys.platform.startswith('darwin') or sys.platform.startswith('freebsd'):
-            return '\n'
-        elif sys.platform.startswith('win'):
+        if sys.platform.startswith('win'):
             return '\n\r'
+        else:
+            return '\n'
 
     def add_formatter(self, _type, formatter):
         self.__formatter[_type] = formatter
