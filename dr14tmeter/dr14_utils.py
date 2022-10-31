@@ -156,7 +156,7 @@ def write_results(dr, options, out_dir, cur_dir):
 
     tables_list = {
         'b': ["dr14_bbcode.txt", BBcodeTable()],
-        't': ["dr14.txt", TextTable()],
+        't': ["dr14-DR"+str(dr.dr14)+".txt",TextTable()],
         'h': ["dr14.html", HtmlTable()],
         'w': ["dr14_mediawiki.txt", MediaWikiTable()]
     }
