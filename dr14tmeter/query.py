@@ -52,7 +52,7 @@ class query:
 
     def get_query(self):
         NotImplementedError(
-            "%s : is virutal and must be overridden." % sys._getframe().f_code.co_name)
+            "%s : is virtual and must be overridden." % sys._getframe().f_code.co_name)
 
     def exec_query(self):
         db = dr_database_singletone().get()
