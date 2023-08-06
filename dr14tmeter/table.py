@@ -70,11 +70,11 @@ class Table:
 
     def new_table(self):
         NotImplementedError(
-            " %s : is virutal and must be overridden." % sys._getframe().f_code.co_name)
+            " %s : is virtual and must be overridden." % sys._getframe().f_code.co_name)
 
     def end_table(self):
         NotImplementedError(
-            " %s : is virutal and must be overridden." % sys._getframe().f_code.co_name)
+            " %s : is virtual and must be overridden." % sys._getframe().f_code.co_name)
 
     def write_table(self):
         return self.__ini_txt + self._get_txt()
@@ -128,7 +128,7 @@ class Table:
 
     def add_title(self, title):
         NotImplementedError(
-            " %s : is virutal and must be overridden." % sys._getframe().f_code.co_name)
+            " %s : is virtual and must be overridden." % sys._getframe().f_code.co_name)
 
     def add_value(self, val):
         self._append_txt(self.format_element(val))
@@ -153,19 +153,19 @@ class Table:
 
     def new_row(self):
         NotImplementedError(
-            " %s : is virutal and must be overridden." % sys._getframe().f_code.co_name)
+            " %s : is virtual and must be overridden." % sys._getframe().f_code.co_name)
 
     def end_row(self):
         NotImplementedError(
-            " %s : is virutal and must be overridden." % sys._getframe().f_code.co_name)
+            " %s : is virtual and must be overridden." % sys._getframe().f_code.co_name)
 
     def new_cell(self):
         NotImplementedError(
-            " %s : is virutal and must be overridden." % sys._getframe().f_code.co_name)
+            " %s : is virtual and must be overridden." % sys._getframe().f_code.co_name)
 
     def end_cell(self):
         NotImplementedError(
-            " %s : is virutal and must be overridden." % sys._getframe().f_code.co_name)
+            " %s : is virtual and must be overridden." % sys._getframe().f_code.co_name)
 
     def new_hcell(self):
         return self.new_cell()
@@ -175,11 +175,11 @@ class Table:
 
     def new_bold(self):
         NotImplementedError(
-            " %s : is virutal and must be overridden." % sys._getframe().f_code.co_name)
+            " %s : is virtual and must be overridden." % sys._getframe().f_code.co_name)
 
     def end_bold(self):
         NotImplementedError(
-            " %s : is virutal and must be overridden." % sys._getframe().f_code.co_name)
+            " %s : is virtual and must be overridden." % sys._getframe().f_code.co_name)
 
 
 class TextTable (Table):
