@@ -57,6 +57,8 @@ class AudioDecoder:
             af = WavPackFileReader()
         elif ext == '.wv':
             af = ApeFileReader()
+        elif ext == '.ape':
+            af = ApeFileReader()
         elif ext == '.ac3':
             af = Ac3FileReader()
         elif ext == '.wma':
