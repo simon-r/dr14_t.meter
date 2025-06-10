@@ -85,8 +85,8 @@ class AudioFileReader:
         tmp_dir = tempfile.gettempdir()
         tmp_file = os.path.join(tmp_dir, file) + ".wav"
 
-        file_name = re.sub("(\"|`|\$)", r"\\\1", file_name)
-        tmp_file = re.sub("(\"|`|\$)", r"_xyz_", tmp_file)
+        file_name = re.sub("(\"|`|\\$)", r"\\\1", file_name)
+        tmp_file = re.sub("(\"|`|\\$)", r"_xyz_", tmp_file)
 
         full_command = full_command + " " + \
             self.get_cmd_options(file_name, tmp_file)
@@ -133,7 +133,7 @@ class AudioFileReader:
 
             sample_type = "int%d" % (target.sample_width * 8)
 
-            target.Y = numpy.fromstring(X, dtype=sample_type).reshape(
+            target.Y = numpy.frombuffer(X, dtype=sample_type).reshape(
                 nframes, target.channels)
 
             wave_read.close()
