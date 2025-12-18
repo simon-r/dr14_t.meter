@@ -133,7 +133,7 @@ class AudioFileReader:
 
             sample_type = "int%d" % (target.sample_width * 8)
 
-            target.Y = numpy.fromstring(X, dtype=sample_type).reshape(
+            target.Y = numpy.frombuffer(X, dtype=sample_type).reshape(
                 nframes, target.channels)
 
             wave_read.close()
