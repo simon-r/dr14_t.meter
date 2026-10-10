@@ -21,6 +21,10 @@ import dr14tmeter.table as table
 from dr14tmeter.database import dr_database_singletone
 
 
+def join_distinct_values(values):
+    return ", ".join(sorted(values, key=int))
+
+
 class WriteDr:
 
     def __init__(self):
@@ -263,10 +267,10 @@ class WriteDrExtended(WriteDr):
                     sum_kbs += int(kbs)
                     cnt = cnt + 1
 
-                if bit not in list_bit:
+                if bit is not None and bit not in list_bit:
                     list_bit.append(bit)
 
-                if s_rate not in sampl_rate:
+                if s_rate is not None and s_rate not in sampl_rate:
                     sampl_rate.append(s_rate)
 
                 tm.append_row(row)
@@ -281,14 +285,18 @@ class WriteDrExtended(WriteDr):
 
         tm.append_empty_line()
 
-        tm.add_title(" Sampling rate: \t\t %s Hz" % sampl_rate[0])
+        # the files may have different specs: list all the distinct values
+        if len(sampl_rate) > 0:
+            tm.add_title(" Sampling rate: \t\t %s Hz" %
+                         join_distinct_values(sampl_rate))
 
         if cnt > 0:
             tm.add_title(" Average bitrate: \t\t %d kbs " %
                          ((sum_kbs / 1000) / cnt))
 
-        mf_bit = max(set(list_bit), key=list_bit.count)
-        tm.add_title(" Bits per sample: \t\t %s bit" % (mf_bit))
+        if len(list_bit) > 0:
+            tm.add_title(" Bits per sample: \t\t %s bit" %
+                         join_distinct_values(list_bit))
 
         tm.append_empty_line()
         tm.add_title("Dr14 T.meter %s " % dr14.dr14_version())
