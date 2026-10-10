@@ -1,3 +1,10 @@
+dr14tmeter (2.1.0) stable; urgency=medium
+
+  * New release 2.1.0.
+  * Honour --dr_database when printing the results with -p.
+
+ -- Simone Riva <simone.rva@gmail.com>  Sat, 10 Oct 2026 23:05:22 +0200
+
 dr14tmeter (2.0.0) stable; urgency=medium
 
   * Build with dh-python and pybuild for Python 3, replacing cdbs and
