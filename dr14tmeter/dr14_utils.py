@@ -176,7 +176,8 @@ def write_results(dr, options, out_dir, cur_dir):
             "--------------------------------------------------------------- ")
 
     if options.print_std_out:
-        dr.fwrite_dr("", TextTable(), table_format, True)
+        dr.fwrite_dr("", TextTable(), table_format, True,
+                     dr_database=options.dr_database)
 
     if options.turn_off_out:
         return
