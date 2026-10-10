@@ -24,6 +24,15 @@ import math
 import time
 
 
+# Reducing along axis 0 of the interleaved (samples, channels) array is
+# about 10x slower in numpy than reducing along a contiguous axis, so the
+# block is copied to channel-major layout first.
+# Returns the per-channel sum of squares and peak of Y[a:b, :]
+def block_stats(Y, a, b):
+    blk = np.ascontiguousarray(Y[a:b, :].T)
+    return (np.sum(blk**2.0, 1), np.max(np.abs(blk), 1))
+
+
 def compute_dr14(Y, Fs, duration=None, Dr_lr=None):
 
     s = Y.shape
@@ -55,19 +64,23 @@ def compute_dr14(Y, Fs, duration=None, Dr_lr=None):
     curr_sam = 0
     rms = np.zeros((seg_cnt, ch))
     peaks = np.zeros((seg_cnt, ch))
+    # whole track sum of squares, accumulated block by block
+    sum_sq = np.zeros(ch)
 
     for i in range(seg_cnt - 1):
-        rms[i, :] = np.sqrt(2.0 * np.sum(Y[curr_sam:curr_sam + block_samples, :]**2.0, 0) /
-                            float(block_samples))
-        peaks[i, :] = np.max(
-            np.abs(Y[curr_sam:curr_sam + block_samples, :]), 0)
+        (blk_sq, peaks[i, :]) = block_stats(Y, curr_sam,
+                                            curr_sam + block_samples)
+        rms[i, :] = np.sqrt(2.0 * blk_sq / float(block_samples))
+        sum_sq += blk_sq
         curr_sam = curr_sam + block_samples
 
     i = seg_cnt - 1
 
     if curr_sam < s[0]:
-        rms[i, :] = dr_rms(Y[curr_sam:s[0] - 1, :])
-        peaks[i, :] = np.max(np.abs(Y[curr_sam:s[0] - 1, :]), 0)
+        # the last block leaves out the last sample
+        (blk_sq, peaks[i, :]) = block_stats(Y, curr_sam, s[0] - 1)
+        rms[i, :] = np.sqrt(2.0 * blk_sq / float(s[0] - 1 - curr_sam))
+        sum_sq += blk_sq + Y[s[0] - 1, :]**2.0
 
     peaks = np.sort(peaks, 0)
     rms = np.sort(rms, 0)
@@ -93,7 +106,7 @@ def compute_dr14(Y, Fs, duration=None, Dr_lr=None):
 
     #y_rms = np.sqrt(np.sum(((np.sum(Y, 1) / 2)**2)) / Y.shape[0])
 
-    y_rms = dr_rms(Y)
+    y_rms = np.sqrt(2.0 * sum_sq / float(s[0]))
     y_rms = np.mean(y_rms)
 
     db_rms = decibel_u(y_rms, 1.0)

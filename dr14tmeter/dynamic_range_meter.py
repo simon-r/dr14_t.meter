@@ -211,6 +211,9 @@ class DynamicRangeMeter:
         for t in threads:
             job_queue_sh.put(None)
 
+        # read the metadata while the workers are busy
+        self.meta_data.scan_dir(dir_name, files_list)
+
         # every job produces exactly one result
         results = [res_queue_sh.get() for job in jobs]
 
@@ -245,8 +248,6 @@ class DynamicRangeMeter:
             if d['dr14'] > dr14.min_dr():
                 self.dr14 = self.dr14 + d['dr14']
                 succ = succ + 1
-
-        self.meta_data.scan_dir(dir_name, files_list)
 
         if len(self.res_list) > 0 and succ > 0:
             self.dr14 = int(round(self.dr14 / succ))
