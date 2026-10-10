@@ -168,13 +168,18 @@ def main():
     if success:
         print_msg("Success! ")
         print_msg("Elapsed time: %2.2f sec" % clock)
-    else:
-        print_msg("No audio files found\n")
-        print_msg(" Usage: %s [options] path_name \n\nfor more details type \n%s --help\n" %
-                  (get_exe_name(), get_exe_name()))
 
     if sys.platform.startswith('linux') or sys.platform.startswith('darwin'):
         subprocess.call("stty sane", shell=True)
+
+    if not success:
+        if options.files_list:
+            print_err("no valid audio files found in the list")
+        else:
+            print_err("no valid audio files found in \"%s\"" % path_name)
+        print_msg("Usage: %s [options] path_name  (type %s --help for more details)" %
+                  (get_exe_name(), get_exe_name()))
+        sys.exit(1)
 
     if test_new_version():
         print_msg(

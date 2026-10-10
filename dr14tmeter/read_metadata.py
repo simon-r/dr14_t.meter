@@ -120,7 +120,7 @@ class RetirveMetadata:
 
         re_flags = (re.MULTILINE | re.IGNORECASE | re.UNICODE)
 
-        pattern = "[ \t\f\v]*([\S \t\f\v]+\S).*$"
+        pattern = r"[ \t\f\v]*([\S \t\f\v]+\S).*$"
 
         m = re.search(r"^\s*track\s*\:\s*(\d+).*$", data_txt, re_flags)
         if m != None:
@@ -201,7 +201,7 @@ class RetirveMetadata:
             self._tracks[f_key] = None
             raise UnreadableAudioFileException("problematic file: file_name")
 
-        pattern = "[ \t\f\v]*([\S \t\f\v]+\S).*$"
+        pattern = r"[ \t\f\v]*([\S \t\f\v]+\S).*$"
 
         m = re.search(r"^TAG:track=\s*(\d+).*$", format_tags, re_flags)
         if m != None:
@@ -294,7 +294,7 @@ class RetirveMetadata:
         try:
             track['disk_nr'] = config.get("format.tags", "disc")
             track['disk_nr'] = int(
-                re.search("(\d+)", track['disk_nr']).group(1))
+                re.search(r"(\d+)", track['disk_nr']).group(1))
             self._disk_nr.append(track['disk'])
         except ConfigParser.NoOptionError:
             pass
@@ -356,17 +356,17 @@ class RetirveMetadata:
         fmt = re.split(",", fmt)
 
         #print( fmt )
-        track['codec'] = re.search("\s*(\w+)", fmt[0], re_flags).group(1)
+        track['codec'] = re.search(r"\s*(\w+)", fmt[0], re_flags).group(1)
         track['sampling_rate'] = re.search(
-            "\s*(\d+)", fmt[1], re_flags).group(1)
+            r"\s*(\d+)", fmt[1], re_flags).group(1)
         track['channel'] = re.search(
-            "^\s*([\S][\s|\S]*[\S])\s*$", fmt[2], re_flags).group(1)
+            r"^\s*([\S][\s|\S]*[\S])\s*$", fmt[2], re_flags).group(1)
 
-        m = re.search("\((\d+) bit\)", fmt[3], re_flags)
+        m = re.search(r"\((\d+) bit\)", fmt[3], re_flags)
         if m != None:
             track['bit'] = m.group(1)
         else:
-            m = re.search("(\d+)", fmt[3], re_flags)
+            m = re.search(r"(\d+)", fmt[3], re_flags)
             if m != None:
                 track['bit'] = m.group(1)
             else:

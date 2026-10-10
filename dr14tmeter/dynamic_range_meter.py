@@ -172,9 +172,6 @@ class DynamicRangeMeter:
 
         self.dr14 = 0
 
-        job_queue_sh = mp.JoinableQueue(2000)
-        res_queue_sh = mp.Queue(2000)
-
         if files_list == []:
             if not os.path.isdir(dir_name):
                 return 0
@@ -186,26 +183,41 @@ class DynamicRangeMeter:
 
         ad = AudioDecoder()
 
+        jobs = []
         for file_name in dir_list:
             (fn, ext) = os.path.splitext(file_name)
             if ext in ad.formats:
                 job = SharedDrResObj()
                 job.file_name = file_name
                 job.dir_name = dir_name
-                job_queue_sh.put(job)
+                jobs.append(job)
 
-        threads = [1 for i in range(thread_cnt)]
+        if len(jobs) == 0:
+            return 0
 
-        job_free = mp.Value('i', 0)
+        job_queue_sh = mp.Queue()
+        res_queue_sh = mp.Queue()
 
-        for t in range(thread_cnt):
-            threads[t] = mp.Process(
-                target=self.run_mp, args=(job_queue_sh, res_queue_sh))
+        threads = [mp.Process(target=self.run_mp, args=(job_queue_sh, res_queue_sh))
+                   for t in range(min(thread_cnt, len(jobs)))]
 
-        for t in range(thread_cnt):
-            threads[t].start()
+        for t in threads:
+            t.start()
 
-        job_queue_sh.join()
+        for job in jobs:
+            job_queue_sh.put(job)
+
+        # one stop marker for each worker
+        for t in threads:
+            job_queue_sh.put(None)
+
+        # every job produces exactly one result
+        results = [res_queue_sh.get() for job in jobs]
+
+        # the workers must be joined before the queues are released,
+        # otherwise a slow-starting worker can't attach to them
+        for t in threads:
+            t.join()
 
         succ = 0
 
@@ -215,8 +227,7 @@ class DynamicRangeMeter:
 
         dur = StructDuration()
 
-        while not res_queue_sh.empty():
-            res = res_queue_sh.get()
+        for res in results:
             if res.fail:
                 continue
             self.res_list.append({'file_name':   res.file_name,
@@ -252,10 +263,10 @@ class DynamicRangeMeter:
 
         while True:
 
-            if job_queue_sh.empty():
-                return
-
             job = job_queue_sh.get()
+
+            if job is None:
+                return
 
             full_file = os.path.join(job.dir_name, job.file_name)
             #print ( full_file )
@@ -278,4 +289,3 @@ class DynamicRangeMeter:
                 print_msg("- fail - " + full_file)
 
             res_queue_sh.put(job)
-            job_queue_sh.task_done()

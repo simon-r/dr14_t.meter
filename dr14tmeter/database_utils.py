@@ -62,7 +62,7 @@ def local_dr_database_configure():
         db_path = os.path.expanduser(db_path)
         db_path = os.path.expandvars(db_path)
 
-        if re.sub("\s+", "", db_path) == "":
+        if re.sub(r"\s+", "", db_path) == "":
             flag = False
             db_path = os.path.split(get_db_path())[0]
             continue
@@ -98,7 +98,7 @@ def local_dr_database_configure():
         coll_path = os.path.expanduser(coll_path)
         coll_path = os.path.expandvars(coll_path)
 
-        if re.sub("(\s+)", "", coll_path) in ["", "any"]:
+        if re.sub(r"(\s+)", "", coll_path) in ["", "any"]:
             flag = False
             coll_path = "/"
             continue
