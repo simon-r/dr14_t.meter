@@ -12,7 +12,25 @@ I have tested this application extensively, and it has always returned results i
 
 **Requirements:** Python 3 with NumPy, and `ffmpeg` (or `avconv`) for decoding. MP3 files are decoded with `lame` and Ogg Vorbis files with `oggdec` (from vorbis-tools). Matplotlib, SciPy and Mutagen are only needed for the plotting, `--compress` and `--tag` options.
 
-You can run the tool directly from the cloned repository as `./dr14_tmeter`, or install it with `sudo python3 setup.py install` (on Python 3.12 and later this needs setuptools).
+You can run the tool directly from the cloned repository as `./dr14_tmeter`, or install it with [pipx](https://pipx.pypa.io), which also installs NumPy and the man page:
+
+```sh
+git clone https://github.com/simon-r/dr14_t.meter.git
+cd dr14_t.meter
+pipx install .
+```
+
+Use `pipx install '.[plot,compress,tag]'` to also install the optional dependencies, or `pip install .` inside a virtual environment instead of pipx.
+
+On Debian and Ubuntu you can build and install a `.deb` package instead:
+
+```sh
+sudo apt build-dep .
+dpkg-buildpackage -us -uc -b
+sudo apt install ../dr14tmeter_*_all.deb
+```
+
+Avoid `sudo python setup.py install --prefix=usr`: on Debian and Ubuntu it puts the package in a directory that Python does not search, and `dr14_tmeter` then fails with `ImportError: No module named dr14tmeter.dr14_tmeter`.
 
 ```sh
 # Measure all the audio files in an album directory

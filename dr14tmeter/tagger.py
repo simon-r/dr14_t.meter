@@ -16,14 +16,18 @@
 
 from dr14tmeter import dr14_global
 import os
-from mutagen.mp3 import MP3
-from mutagen.flac import FLAC
-from mutagen.oggvorbis import OggVorbis
-from mutagen.oggopus import OggOpus
-from mutagen.monkeysaudio import MonkeysAudio
-from mutagen.mp4 import MP4
-from mutagen.id3 import ID3, TXXX
 from dr14tmeter.audio_file_reader import *
+
+try:
+    from mutagen.mp3 import MP3
+    from mutagen.flac import FLAC
+    from mutagen.oggvorbis import OggVorbis
+    from mutagen.oggopus import OggOpus
+    from mutagen.monkeysaudio import MonkeysAudio
+    from mutagen.mp4 import MP4
+    from mutagen.id3 import ID3, TXXX
+except ImportError:
+    pass
 
 
 class Tagger:

@@ -180,7 +180,7 @@ def test_mutagen(fun_name):
         import mutagen
     except ImportError:
         print_msg(
-            "The %s function require the installation of MatPlotLib: http://matplotlib.sourceforge.net" % fun_name)
+            "The %s function require the installation of Mutagen: https://mutagen.readthedocs.io" % fun_name)
         return False
 
     return True

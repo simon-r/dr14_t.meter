@@ -1,3 +1,13 @@
+dr14tmeter (2.0.0) stable; urgency=medium
+
+  * Build with dh-python and pybuild for Python 3, replacing cdbs and
+    python-support.
+  * Use debhelper compat level 13 and the 3.0 (native) source format.
+  * Drop the Python 2, libav-tools, flac and faad dependencies, and depend
+    on vorbis-tools for oggdec.
+
+ -- Simone Riva <simone.rva@gmail.com>  Sat, 10 Oct 2026 22:41:42 +0200
+
 dr14tmeter (1.0.15-1) stable; urgency=medium
 
   * News: Added support for avconv, added ac3 support
