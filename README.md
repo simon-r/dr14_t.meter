@@ -1,12 +1,53 @@
-### Introduction to DR14 T.meter ###
+# DR14 T.meter
 
-DR14 T.meter is a free and open source command line tool for computing the Dynamic Range of your music according to the procedure used in the off-line meter released by the Pleasurize Music Foundation. [Link to the procedure's definition in PDF article](http://www.dynamicrange.de/sites/default/files/Measuring%20DR%20ENv3.pdf)
+DR14 T.meter is a free and open-source command-line tool for computing the dynamic range of your music, following the procedure used by the offline meter released by the [Pleasurize Music Foundation](https://web.archive.org/web/20130111082140/http://www.pleasurizemusic.com/) (archived site).
 
-This tool is very useful to measure how is loud your music and for understanding that a good quality album always has also a good dynamic, and it's also useful for understanding the effects of the so called loudness war.
+This tool is useful for measuring how loud your music is, for seeing that a good-quality album always has good dynamics too, and for understanding the effects of the so-called loudness war.
 
-Dr14 t.meter is released under the terms of the  GNU GPLv3 license and  is intended for the Linux users that can not use the Windows application released by the Pleasurize Music Foundation or the plugin for Foobar2000.
+DR14 T.meter is released under the terms of the GNU GPLv3 license. It is intended for Linux users who cannot use the Windows application released by the Pleasurize Music Foundation or the foobar2000 plugin.
 
-I've largely tested this application and it has always returned results identical to those of the official off-line meter. 
+I have tested this application extensively, and it has always returned results identical to those of the official offline meter.
 
+## How to use
 
-For more info visit: http://dr14tmeter.sourceforge.net
+**Requirements:** Python 3 with NumPy, and `ffmpeg` (or `avconv`) for decoding. MP3 files are decoded with `lame` and Ogg Vorbis files with `oggdec` (from vorbis-tools). Matplotlib, SciPy and Mutagen are only needed for the plotting, `--compress` and `--tag` options.
+
+You can run the tool directly from the cloned repository as `./dr14_tmeter`, or install it with `sudo python3 setup.py install` (on Python 3.12 and later this needs setuptools).
+
+```sh
+# Measure all the audio files in an album directory
+dr14_tmeter /path/to/album
+
+# Measure a whole music collection, one result per directory
+dr14_tmeter -r /path/to/music
+
+# Measure a single file and print its DR, peak and RMS values
+dr14_tmeter -f /path/to/track.flac
+```
+
+When measuring a directory, the results are written to a text table named after the DR value (for example `dr14-DR12.txt`) in that directory. Useful options:
+
+- `-t a` also writes the results as HTML, BBCode and MediaWiki tables,
+- `-o DIR` writes the result files to `DIR` instead,
+- `-p` prints the full table to the terminal, and `-n` skips writing files.
+
+Run `dr14_tmeter --help` for the full list of options.
+
+## How the DR value is computed
+
+> 📐 **The full mathematical description of the algorithm, with every quantity defined, is in [dr14_algorithm.md](dr14_algorithm.md).**
+
+In short, each channel of the track is split into blocks of about 3 seconds, and the RMS level and the peak level of every block are measured. Then, for each channel $c$ out of the $C$ channels of the track:
+
+- $\bar{R}_c$ is the quadratic mean of the RMS levels of the loudest 20% of the blocks,
+- $\hat{P}_c$ is the second-highest block peak.
+
+The DR value is the ratio between the two in decibels, averaged over the channels and rounded to an integer:
+
+$$
+\mathrm{DR} = \operatorname{round}\left( \frac{1}{C} \sum_{c=1}^{C} 20 \log_{10} \frac{\hat{P}_c}{\bar{R}_c} \right)
+$$
+
+## More information
+
+Visit <https://dr14tmeter.sourceforge.net>.
