@@ -20,6 +20,7 @@ import multiprocessing
 import os
 import tempfile
 import fileinput
+import glob
 import time
 import sys
 
@@ -73,6 +74,15 @@ def scan_dir_list(subdirlist, options, out_dir):
     r = 0
 
     for cur_dir in subdirlist:
+        if options.no_overwrite:
+            existing = existing_results(cur_dir, options)
+            if existing:
+                print_msg("\n------------------------------------------------------------ ")
+                print_msg("> Skip Dir: %s " % cur_dir)
+                print_msg("  already analyzed: %s" % " ".join(existing))
+                success = True
+                continue
+
         dr = DynamicRangeMeter()
         dr.write_to_local_db(config.db_is_enabled())
 
@@ -120,6 +130,27 @@ def list_rec_dirs(basedir, subdirlist=None):
             list_rec_dirs(item, subdirlist)
 
     return subdirlist
+
+
+def existing_results(dir_name, options):
+    # the text table is named after the DR value (dr14-DR12.txt), older versions wrote dr14.txt
+    out_files = {
+        'b': ["dr14_bbcode.txt"],
+        't': ["dr14.txt", "dr14-DR*.txt"],
+        'h': ["dr14.html"],
+        'w': ["dr14_mediawiki.txt"]
+    }
+
+    all_tables = 'a' in options.out_tables
+
+    existing = []
+    for code in out_files.keys():
+        if code in options.out_tables or all_tables:
+            for pattern in out_files[code]:
+                for f in glob.glob(os.path.join(glob.escape(dir_name), pattern)):
+                    existing.append(os.path.basename(f))
+
+    return existing
 
 
 def write_results(dr, options, out_dir, cur_dir):
