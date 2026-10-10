@@ -18,6 +18,7 @@ import time
 import os
 import sys
 import tempfile
+import shutil
 import subprocess
 import re
 import wave
@@ -81,30 +82,27 @@ class AudioFileReader:
 
         full_command = self.__cmd
 
-        (head, file) = os.path.split(file_name)
-        tmp_dir = tempfile.gettempdir()
-        tmp_file = os.path.join(tmp_dir, file) + ".wav"
+        # unique temp dir: avoids collisions between same-named files/processes
+        tmp_dir = tempfile.mkdtemp(prefix="dr14_")
+        tmp_file = os.path.join(tmp_dir, "track.wav")
 
         file_name = re.sub(r"(\"|`|\$)", r"\\\1", file_name)
-        tmp_file = re.sub(r"(\"|`|\$)", r"_xyz_", tmp_file)
 
         full_command = full_command + " " + \
             self.get_cmd_options(file_name, tmp_file)
 
-        #print_msg( full_command )
-
         r = subprocess.Popen(full_command, shell=True,
-                            stderr=subprocess.PIPE, stdout=subprocess.PIPE)
+                             stdin=subprocess.DEVNULL,
+                             stderr=subprocess.PIPE, stdout=subprocess.PIPE)
         stdout_data, stderr_data = r.communicate()
 
-        #read_wav.read_wav( tmp_file )
-
-        ret_f = self.read_wav(tmp_file, target)
-
         if os.path.exists(tmp_file):
-            os.remove(tmp_file)
+            ret_f = self.read_wav(tmp_file, target)
         else:
             print_msg(file_name + ": unsupported encoder")
+            ret_f = False
+
+        shutil.rmtree(tmp_dir, ignore_errors=True)
 
         time_b = time.time()
         dr14_log_info(
@@ -159,7 +157,7 @@ class AudioFileReader:
         return True
 
     def get_generic_ffmpeg_options(self, file_name, tmp_file):
-        return " -i \"%s\" -b:a 16 -ar 44100 -y \"%s\" -loglevel quiet " % (file_name, tmp_file)
+        return " -nostdin -i \"%s\" -vn -b:a 16 -ar 44100 -y \"%s\" -loglevel quiet " % (file_name, tmp_file)
 
 
 class Mp3FileReader(AudioFileReader):
