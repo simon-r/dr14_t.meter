@@ -55,7 +55,7 @@ This document describes the computation performed by `compute_dr14()` in
 | $\lvert x \rvert$ | Absolute value of a number; for a set, its number of elements |
 | $\max_{n \in B} f(n)$ | Largest value of $f(n)$ over all $n$ in the set $B$ |
 | $\log_{10}$ | Base-10 logarithm |
-| $\operatorname{round}(x)$ | Nearest integer to $x$; exact halves go to the even integer |
+| $\mathrm{round}(x)$ | Nearest integer to $x$; exact halves go to the even integer |
 | $\lor$ | Logical "or" |
 | dB | Decibel. For two amplitudes $a$ and $b$, $a$ is $20\log_{10}(a/b)$ dB relative to $b$ |
 | dBFS | Decibel relative to full scale, i.e. relative to amplitude $1$ |
@@ -266,7 +266,7 @@ The final score $\mathrm{DR}$ is the mean of $\mathrm{DR}_c$ over the $C$
 channels, rounded to the nearest integer:
 
 $$
-\mathrm{DR} = \operatorname{round}\!\left( \frac{1}{C} \sum_{c=1}^{C} \mathrm{DR}_c \right).
+\mathrm{DR} = \mathrm{round}\!\left( \frac{1}{C} \sum_{c=1}^{C} \mathrm{DR}_c \right).
 $$
 
 Python's `round()` rounds exact halves to the nearest even integer

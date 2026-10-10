@@ -45,7 +45,7 @@ In short, each channel of the track is split into blocks of about 3 seconds, and
 The DR value is the ratio between the two in decibels, averaged over the channels and rounded to an integer:
 
 $$
-\mathrm{DR} = \operatorname{round}\left( \frac{1}{C} \sum_{c=1}^{C} 20 \log_{10} \frac{\hat{P}_c}{\bar{R}_c} \right)
+\mathrm{DR} = \mathrm{round}\left( \frac{1}{C} \sum_{c=1}^{C} 20 \log_{10} \frac{\hat{P}_c}{\bar{R}_c} \right)
 $$
 
 ## More information
