@@ -98,6 +98,11 @@ class AudioFileReader:
 
         if os.path.exists(tmp_file):
             ret_f = self.read_wav(tmp_file, target)
+        elif r.returncode == 127:
+            # shell: command not found (e.g. ffmpeg is not installed)
+            print_msg(file_name + ": decoder not found, please install %s" %
+                      (self.get_cmd() or "ffmpeg"))
+            ret_f = False
         else:
             print_msg(file_name + ": unsupported encoder")
             ret_f = False
