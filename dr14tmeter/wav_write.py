@@ -43,7 +43,7 @@ def wav_write(filename, Fs, Y):
                         nframes, comptype, compname))
 
     Y_s = numpy.int16((amplitude / 2.0) * Y)
-    Y_s = Y_s.tostring()
+    Y_s = Y_s.tobytes()
 
     wav_file.writeframes(Y_s)
 
