@@ -46,12 +46,12 @@ class Tagger:
         self.dir_name = dr.dir_name
         
         for item in dr.res_list:
-            self.read_track_new(item)
+            self.read_track_new(item,dr)
 
     def get_file_ext_code(self):
         return self._ext
 
-    def read_track_new(self, item):
+    def read_track_new(self, item, dr):
 
         (f, ext) = os.path.splitext(item['file_name'])
         ext = ext.lower()
@@ -88,6 +88,7 @@ class Tagger:
             audio.tags.add(TXXX(encoding=3, desc=u"DR", text=[str(item["dr14"])]))
         else:
             audio["DR"] = [str(item["dr14"])]
+            audio["ALBUM_DR"] = [str(dr.dr14)]
         
         audio.save()
         
