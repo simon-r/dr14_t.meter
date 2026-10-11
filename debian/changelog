@@ -1,3 +1,13 @@
+dr14tmeter (2.1.1) stable; urgency=medium
+
+  * New release 2.1.1.
+  * Fix the check for new versions.
+  * Tag album tracks with the overall album DR score.
+  * Improve the database queries.
+  * Fix a typo in the output of --enable_database.
+
+ -- Simone Riva <simone.rva@gmail.com>  Sun, 11 Oct 2026 22:00:00 +0200
+
 dr14tmeter (2.1.0) stable; urgency=medium
 
   * New release 2.1.0.
