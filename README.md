@@ -10,6 +10,8 @@ I have tested this application extensively, and it has always returned results i
 
 ## How to use
 
+> 📖 **A short guide to every feature, including the local DR database and its queries, is in [how_to_use.md](how_to_use.md).**
+
 **Requirements:** Python 3 with NumPy, and `ffmpeg` (or `avconv`) for decoding. MP3 files are decoded with `lame` and Ogg Vorbis files with `oggdec` (from vorbis-tools). Matplotlib, SciPy and Mutagen are only needed for the plotting, `--compress` and `--tag` options.
 
 You can run the tool directly from the cloned repository as `./dr14_tmeter`, or install it with [pipx](https://pipx.pypa.io), which also installs NumPy and the man page:
@@ -49,7 +51,7 @@ When measuring a directory, the results are written to a text table named after 
 - `-o DIR` writes the result files to `DIR` instead,
 - `-p` prints the full table to the terminal, and `-n` skips writing files.
 
-Run `dr14_tmeter --help` for the full list of options.
+See [how_to_use.md](how_to_use.md) for all the other features, or run `dr14_tmeter --help` for the full list of options.
 
 ## How the DR value is computed
 
