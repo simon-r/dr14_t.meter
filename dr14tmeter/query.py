@@ -21,7 +21,7 @@ import sys
 
 from dr14tmeter.console_plot import line_plot
 from dr14tmeter.database import dr_database_singletone
-from dr14tmeter.table import histogram_bar
+from dr14tmeter.table import histogram_bar, wrap_text
 
 
 def my_dict_factory(cursor, row):
@@ -235,6 +235,9 @@ class query_dr_histogram(query):
 
 class query_date_dr_evolution(query):
 
+    # the dates before this year are considered invalid and are not plotted
+    min_year = 1950
+
     def __init__(self):
         query.__init__(self)
         self.keys = ["Date", "Mean"]
@@ -258,10 +261,10 @@ class query_date_dr_evolution(query):
         return q
 
     def get_plot(self, res):
-        # the dates that are not real years (broken tags) would squeeze
+        # the invalid dates (broken tags, or before min_year) would squeeze
         # the time axis, so they are not plotted
         last_year = datetime.date.today().year + 1
-        years = [r for r in res if 1000 <= r["Date"] <= last_year]
+        years = [r for r in res if self.min_year <= r["Date"] <= last_year]
         skipped = [str(r["Date"]) for r in res if r not in years]
 
         if len(years) == 0:
@@ -276,7 +279,11 @@ class query_date_dr_evolution(query):
                          console.columns, height)
 
         if len(skipped) > 0:
-            txt += "\n Not plotted, invalid years: %s\n" % ", ".join(skipped)
+            note = "Not plotted, invalid years (valid: %d-%d): %s" % (
+                self.min_year, last_year, ", ".join(skipped))
+            txt += "\n"
+            for line in wrap_text(note, max(console.columns - 2, 20)):
+                txt += " " + line + "\n"
 
         return txt
 
