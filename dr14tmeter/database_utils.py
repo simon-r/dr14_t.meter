@@ -88,7 +88,7 @@ def local_dr_database_configure():
     flag = True
     while flag:
         print_out(
-            "  2. Insert your collection directory: Dafault [%s] " % "any")
+            "  2. Insert your collection directory: Default [%s] " % "any")
 
         if sys.version_info[0] == 2:
             coll_path = raw_input("     > ")
