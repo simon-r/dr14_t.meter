@@ -380,8 +380,12 @@ def database_exec_query(options, tm=ExtendedTextTable()):
 
     q.limit = limit
 
+    res = q.exec_query()
+
     wr = WriteDr()
     table_code = wr.write_query_result(
-        q.exec_query(), tm, table_title, q.get_col_keys())
+        res, tm, table_title, q.get_col_keys())
+
+    table_code += q.get_plot(res)
 
     return table_code

@@ -15,7 +15,83 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
+import shutil
 import sys
+import unicodedata
+
+
+def char_width(ch):
+    # number of console columns used by ch: CJK chars (e.g. Japanese) take 2
+    # columns, combining marks and format chars take none
+    if unicodedata.category(ch) in ("Mn", "Me", "Cf"):
+        return 0
+    if unicodedata.east_asian_width(ch) in ("W", "F"):
+        return 2
+    return 1
+
+
+def text_width(txt):
+    return sum(char_width(ch) for ch in txt)
+
+
+def wrap_text(txt, width):
+    # split txt on lines no wider than width console columns: words are kept
+    # whole when possible, longer words (e.g. Japanese text, that has no
+    # spaces) are broken between chars
+    lines = []
+    line = ""
+    line_w = 0
+
+    for word in txt.split():
+        word_w = text_width(word)
+        sep_w = 1 if line else 0
+
+        if line_w + sep_w + word_w <= width:
+            line += " " * sep_w + word
+            line_w += sep_w + word_w
+            continue
+
+        if word_w <= width:
+            lines.append(line)
+            line = word
+            line_w = word_w
+            continue
+
+        if line:
+            line += " "
+            line_w += 1
+
+        for ch in word:
+            ch_w = char_width(ch)
+            if line_w + ch_w > width and line.strip():
+                lines.append(line.rstrip())
+                line = ""
+                line_w = 0
+            line += ch
+            line_w += ch_w
+
+    if line:
+        lines.append(line)
+
+    return lines
+
+
+def ljust_text(txt, width):
+    return txt + " " * (width - text_width(txt))
+
+
+def histogram_bar(value, max_value, width):
+    # the bar of max_value is width chars long, the bars are drawn with a
+    # resolution of 1/8 of char
+    if max_value <= 0:
+        return ""
+
+    eighths = int(round(8.0 * width * value / max_value))
+    if value > 0:
+        eighths = max(eighths, 1)
+
+    full, part = divmod(eighths, 8)
+    return "█" * full + ("", "▏", "▎", "▍", "▌", "▋", "▊", "▉")[part]
 
 
 def float_formatter(el):
@@ -452,6 +528,10 @@ class row:
 
 class ExtendedTextTable (Table):
 
+    # a column that has to be wrapped is never made narrower than this
+    # (or than its header)
+    min_wrap_sz = 8
+
     def __init__(self):
         Table.__init__(self)
         self._cols_sz = [0] * Table.get_col_cnt(self)
@@ -465,11 +545,10 @@ class ExtendedTextTable (Table):
     def set_col_cnt(self, col_cnt):
         Table.set_col_cnt(self, col_cnt)
 
-        if len(self._cols_sz) < col_cnt:
-            self._cols_sz = self.col_sz[:col_cnt]
-        elif len(self._cols_sz) > col_cnt:
-            for n in range(len(self._cols_sz), col_cnt):
-                self._cols_sz.append(0)
+        if len(self._cols_sz) > col_cnt:
+            self._cols_sz = self._cols_sz[:col_cnt]
+        else:
+            self._cols_sz += [0] * (col_cnt - len(self._cols_sz))
 
     col_cnt = property(get_col_cnt, set_col_cnt)
 
@@ -478,15 +557,56 @@ class ExtendedTextTable (Table):
         l = l + len(self._cols_sz) * 3
         return l
 
+    def _line_len(self, cols_sz):
+        # " " + ( " " + cell + " " ) for each column
+        return 1 + sum(cols_sz) + 2 * len(cols_sz)
+
+    def _console_width(self):
+        # 0 when the output is not a terminal: the table is not wrapped
+        return shutil.get_terminal_size(fallback=(0, 0)).columns
+
+    def _fit_cols_sz(self, width):
+        cols_sz = list(self._cols_sz)
+
+        if width <= 0:
+            return cols_sz
+
+        heads_sz = [0] * len(cols_sz)
+        for r in self._rows:
+            if r.is_row:
+                for i, (cell, ct) in enumerate(zip(r.row, r.cell_type)):
+                    if ct == "h":
+                        heads_sz[i] = max(heads_sz[i], text_width(cell))
+
+        min_sz = [min(sz, max(h_sz, self.min_wrap_sz))
+                  for sz, h_sz in zip(cols_sz, heads_sz)]
+
+        # keep the lines one char shorter than the console, some terminals
+        # add an empty line when a line fills the whole width
+        excess = self._line_len(cols_sz) - (width - 1)
+
+        # shrink the widest column first, so short columns (DR, counters)
+        # keep their natural size
+        while excess > 0:
+            shrinkable = [i for i in range(len(cols_sz))
+                          if cols_sz[i] > min_sz[i]]
+            if not shrinkable:
+                break
+            i = max(shrinkable, key=lambda c: cols_sz[c])
+            cols_sz[i] -= 1
+            excess -= 1
+
+        return cols_sz
+
     def _update_col_sz(self):
         r = self._rows[-1]
 
         if r.is_row and len(r.row) == self.col_cnt:
             for c, i in zip(r.row, range(self.col_cnt)):
-                if len(c) > self._cols_sz[i]:
-                    self._cols_sz[i] = len(c)
+                if text_width(c) > self._cols_sz[i]:
+                    self._cols_sz[i] = text_width(c)
         elif r.is_title:
-            d = self._eval_row_len() - len(r.row[0])
+            d = self._eval_row_len() - text_width(r.row[0])
             if d > 0:
                 c = 0
                 while d > 0:
@@ -507,41 +627,45 @@ class ExtendedTextTable (Table):
         txt += self.nl()
         self._append_txt(txt)
 
-    def _write_row(self, r):
-        txt = " "
-        for cell, i in zip(r.row, range(len(r.row))):
-            t_txt = " "
-            t_txt += cell
-            a = self._cols_sz[i] - len(cell)
-            if a < 0:
-                a = 0
-            t_txt += " " * (a + 1)
-            txt += t_txt
+    def _write_row(self, r, cols_sz):
+        # a cell longer than its column is split on multiple lines
+        cells = []
+        for cell, sz in zip(r.row, cols_sz):
+            if text_width(cell) <= sz:
+                cells.append([cell])
+            else:
+                cells.append(wrap_text(cell, sz) or [""])
 
+        for l in range(max(len(c) for c in cells)):
+            txt = " "
+            for c, sz in zip(cells, cols_sz):
+                t_txt = c[l] if l < len(c) else ""
+                txt += " " + ljust_text(t_txt, sz) + " "
+
+            self._append_txt(txt.rstrip() + self.nl())
+
+    def _write_separator_line(self, cols_sz):
+        txt = " "
+        txt += "=" * (self._line_len(cols_sz) - 1)
         txt += self.nl()
         self._append_txt(txt)
 
-    def _write_separator_line(self, r):
-        l = self._eval_row_len()
-        txt = " "
-        txt += "=" * (l - 2)
-        txt += self.nl()
-        self._append_txt(txt)
-
-    def _write_closing_line(self, r):
-        self._write_separator_line(r)
+    def _write_closing_line(self, cols_sz):
+        self._write_separator_line(cols_sz)
 
     def write_table(self):
+
+        cols_sz = self._fit_cols_sz(self._console_width())
 
         for r in self._rows:
             if r.is_title:
                 self._write_title(r)
             elif r.is_row:
-                self._write_row(r)
+                self._write_row(r, cols_sz)
             elif r.is_separator_line:
-                self._write_separator_line(r)
+                self._write_separator_line(cols_sz)
             elif r.is_closing_line:
-                self._write_closing_line(r)
+                self._write_closing_line(cols_sz)
             else:
                 raise Exception("%s : Row model: Not Allowed " %
                                 sys._getframe().f_code.co_name)
