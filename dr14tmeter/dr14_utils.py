@@ -56,12 +56,11 @@ def scan_files_list(input_file, options, out_dir):
         success = False
     else:
         write_results(dr, options, out_dir, "")
+        success = True
 
     if options.tag:
         tagger = Tagger()
         tagger.write_dr_tags(dr)
-
-        success = True
 
     clock = time.time() - a
     return success, clock, r
