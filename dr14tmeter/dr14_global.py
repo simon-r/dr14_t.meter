@@ -86,7 +86,7 @@ def _dr14_get_latest_version():
     global l_revision
     global lock_ver
 
-    ver_url = "http://simon-r.github.com/dr14_t.meter/ver.html"
+    ver_url = "https://raw.githubusercontent.com/simon-r/dr14_t.meter/refs/heads/gh-pages/ver.html"
     #print_msg ( ver_url )
 
     try:
