@@ -192,6 +192,79 @@ class query_top_artists(query):
         return q
 
 
+def find_artists(name):
+    # the ( Id , Name ) of the artists whose name contains the given one,
+    # ignoring the case: "pink" finds both "Pink" and "Pink Floyd"
+    db = dr_database_singletone().get()
+    q = "select Id , Name from Artist where Name like ? order by Name collate nocase ;"
+    return db.query(q, ("%" + name + "%",))
+
+
+class query_artist(query):
+
+    def __init__(self, artist_ids=()):
+        query.__init__(self)
+        self.append_parameter(list(artist_ids))
+
+    def set_artist_ids(self, artist_ids):
+        self.set_parameter(1, list(artist_ids))
+
+    def get_artist_ids(self):
+        return self.get_parameter(1)
+
+    artist_ids = property(get_artist_ids, set_artist_ids)
+
+    def get_ids_list(self):
+        # the ids are written in the query, so that any number of artists can
+        # be selected without hitting the sqlite limit on the parameters
+        return " , ".join("%d" % int(i) for i in self.artist_ids)
+
+
+class query_artist_albums(query_artist):
+
+    def __init__(self, artist_ids=()):
+        query_artist.__init__(self, artist_ids)
+        self.keys = ["DR", "Album_Title", "Artist"]
+
+    def get_query(self):
+        q = """
+        select album.title as Album_Title , dr.dr as DR , album.id as id , Artist.name as Artist
+           from album inner join DR_Album on DR_Album.idalbum = album.id
+                inner join dr on dr.id = DR_Album.iddr
+                inner join Artist_Album on album.id = Artist_Album.IdAlbum
+                inner join Artist on Artist.Id = Artist_Album.IdArtist
+                where Artist.Id in ( %s )
+                order by dr desc , Album_Title
+                limit ? ;
+        """ % self.get_ids_list()
+
+        return q
+
+
+class query_artist_tracks(query_artist):
+
+    def __init__(self, artist_ids=()):
+        query_artist.__init__(self, artist_ids)
+        self.keys = ["DR", "Title", "Album", "Artist"]
+
+    def get_query(self):
+        # the tracks without an album are shown too
+        q = """
+        select track.id as id , track.title as Title , dr.dr as DR , Album.title as Album , Artist.name as Artist
+           from track inner join DR_Track on DR_Track.idtrack = track.id
+                inner join dr on dr.id = DR_Track.iddr
+                inner join Artist_Track on Artist_Track.idtrack = track.id
+                inner join Artist on Artist.id = Artist_Track.IdArtist
+                left join Album_Track on Album_Track.idtrack = track.id
+                left join Album on Album.id = Album_Track.idalbum
+                where Artist.Id in ( %s )
+                order by dr desc , Album , track.track_nr
+                limit ? ;
+        """ % self.get_ids_list()
+
+        return q
+
+
 class query_dr_histogram(query):
 
     def __init__(self):

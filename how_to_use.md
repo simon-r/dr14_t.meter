@@ -67,6 +67,7 @@ Once enabled, the results of every directory scan, including `-r`, are stored au
 | `dr14_tmeter -q top_alb [N]` | The `N` albums with the highest DR. |
 | `dr14_tmeter -q worst_alb [N]` | The `N` albums with the lowest DR. |
 | `dr14_tmeter -q top_art [N] [MIN]` | The `N` artists with the highest mean DR, counting only artists with at least `MIN` tracks (default 10). |
+| `dr14_tmeter -q artist NAME [N]` | The `N` albums and the `N` tracks of the artist `NAME` with the highest DR. Quote names containing spaces, for example `-q artist "Pink Floyd"`. The search finds all the artists whose name contains `NAME`, ignoring the case: `-q artist pink` finds both Pink and Pink Floyd. When more than one artist is found, a menu lets you choose one or more of them (press Enter for all). |
 | `dr14_tmeter -q hist` | A histogram of how many tracks have each DR value. |
 | `dr14_tmeter -q evol` | The mean DR per release year, as a table and a plot in the terminal. |
 | `dr14_tmeter -q codec` | The number of tracks and the mean DR for each codec. |

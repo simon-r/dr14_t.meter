@@ -27,6 +27,7 @@ from dr14tmeter.write_dr import WriteDr, WriteDrExtended
 from dr14tmeter.query import *
 from dr14tmeter.out_messages import *
 
+import shlex
 import subprocess
 import sys
 import re
@@ -233,7 +234,7 @@ def extended_options(opt_nr):
     qa = False
     qb = False
 
-    if opt_nr in [1, 2, 3, 5, 6]:
+    if opt_nr in [1, 2, 3, 5, 6, 9]:
         question_a = "Insert the number of desired results: "
         qa = True
 
@@ -268,6 +269,7 @@ def query_helper():
     print_out(" 6. The list of the worst DR albums ")
     print_out(" 7. The DR histogram ")
     print_out(" 8. Used audio CODEC and mean DR ")
+    print_out(" 9. The best DR albums and tracks of an artist ")
     print_out(" 0. Exit ")
     print_out("  ")
 
@@ -278,7 +280,16 @@ def query_helper():
 
     ext_opt = []
 
-    if nr in [1, 2, 3, 5, 6]:
+    if nr == 9:
+        artist = ""
+        while artist == "":
+            print_out(" Insert the artist name: ")
+            if sys.version_info[0] == 2:
+                artist = raw_input(" > ").strip()
+            else:
+                artist = input(" > ").strip()
+
+    if nr in [1, 2, 3, 5, 6, 9]:
         print_out(
             " Do you want to set the query extended options? [N/y] (default: No)")
         if sys.version_info[0] == 2:
@@ -307,13 +318,15 @@ def query_helper():
         options.query = ["hist"]
     elif nr == 8:
         options.query = ["codec"]
+    elif nr == 9:
+        options.query = ["artist", artist]
 
     for e in ext_opt:
         options.query.append(e)
 
     eq_cmd = "%s -q " % get_exe_name()
     for o in options.query:
-        eq_cmd += "%s " % o
+        eq_cmd += "%s " % shlex.quote(str(o))
 
     print_out("")
     print_out("equivalent command line:\n>    %s " % eq_cmd)
@@ -325,15 +338,72 @@ def query_helper():
     print_out(res)
 
 
+def select_artists(artists, name):
+    # more than one artist matches the name: the user chooses which ones are
+    # shown, all of them by default. artists is a list of ( Id , Name )
+
+    # no menu when the query is run from a script or the output is redirected
+    if not (sys.stdin.isatty() and sys.stdout.isatty()):
+        return artists
+
+    print_out("  ")
+    print_out(" \"%s\" matches more than one artist: " % name)
+    print_out("  ")
+    for i, a in enumerate(artists):
+        print_out(" %d. %s " % (i + 1, a[1]))
+    print_out("  ")
+    print_out(
+        " Select one or more artists, separated by spaces or commas (default: all) ")
+
+    while True:
+        if sys.version_info[0] == 2:
+            an = raw_input(" > ")
+        else:
+            an = input(" > ")
+
+        nrs = an.replace(",", " ").split()
+
+        if len(nrs) == 0:
+            return artists
+
+        try:
+            nrs = [int(n) for n in nrs]
+        except ValueError:
+            print_out(" !! Please insert valid numbers ")
+            continue
+
+        # numpy, imported with *, shadows the builtin any()
+        out_of_range = [n for n in nrs if n < 1 or n > len(artists)]
+        if len(out_of_range) > 0:
+            print_out(" !! Please insert numbers in the [1 .. %d]" % len(artists))
+            continue
+
+        return [a for i, a in enumerate(artists) if i + 1 in nrs]
+
+
+def found_artists_title(names, max_names=3):
+    # a short search can match many artists, only the first names are listed
+    # so that the title fits in the console
+    if len(names) <= max_names:
+        return ", ".join(names)
+
+    return "%s and %d more" % (", ".join(names[:max_names]), len(names) - max_names)
+
+
 def database_exec_query(options, tm=ExtendedTextTable()):
 
-    if len(options.query) >= 2:
-        limit = int(options.query[1])
+    # the artist query takes the artist name before the other options
+    opts = list(options.query[1:])
+    if options.query[0] == "artist":
+        artist = opts.pop(0)
+
+    if len(opts) >= 1:
+        limit = int(opts[0])
     else:
         limit = 30
 
-    if len(options.query) >= 3:
-        second_opt = options.query[2]
+    if len(opts) >= 2:
+        second_opt = opts[1]
     else:
         second_opt = None
 
@@ -342,50 +412,64 @@ def database_exec_query(options, tm=ExtendedTextTable()):
         return
 
     elif options.query[0] == "top":
-        table_title = "Top DR tracks"
-        q = query_top_dr()
+        tables = [("Top DR tracks", query_top_dr())]
 
     elif options.query[0] == "top_alb":
-        table_title = "Top DR Albums"
-        q = query_top_albums_dr()
+        tables = [("Top DR Albums", query_top_albums_dr())]
 
     elif options.query[0] == "worst":
-        table_title = "Worst DR Tracks"
-        q = query_worst_dr()
+        tables = [("Worst DR Tracks", query_worst_dr())]
 
     elif options.query[0] == "worst_alb":
-        table_title = "Worst DR Albums"
-        q = query_worst_albums_dr()
+        tables = [("Worst DR Albums", query_worst_albums_dr())]
 
     elif options.query[0] == "top_art":
-        table_title = "Top Artists"
         q = query_top_artists()
         if second_opt is not None:
             q.min_track = int(second_opt)
+        tables = [("Top Artists", q)]
+
+    elif options.query[0] == "artist":
+        found = find_artists(artist)
+
+        if len(found) == 0:
+            return " No artist matching \"%s\" in the database " % artist
+
+        if len(found) > 1:
+            found = select_artists(found, artist)
+
+        ids = [a[0] for a in found]
+        names = found_artists_title([a[1] for a in found])
+
+        tables = [("Top DR Albums of: %s" % names, query_artist_albums(ids)),
+                  ("Top DR Tracks of: %s" % names, query_artist_tracks(ids))]
 
     elif options.query[0] == "hist":
-        table_title = "DR histogram"
-        q = query_dr_histogram()
+        tables = [("DR histogram", query_dr_histogram())]
 
     elif options.query[0] == "evol":
-        table_title = "DR evolution"
-        q = query_date_dr_evolution()
+        tables = [("DR evolution", query_date_dr_evolution())]
 
     elif options.query[0] == "codec":
-        table_title = "Codec Info"
-        q = query_dr_codec()
+        tables = [("Codec Info", query_dr_codec())]
 
     else:
         raise Exception("Option not allowed")
 
-    q.limit = limit
-
-    res = q.exec_query()
-
     wr = WriteDr()
-    table_code = wr.write_query_result(
-        res, tm, table_title, q.get_col_keys())
+    codes = []
 
-    table_code += q.get_plot(res)
+    for (table_title, q) in tables:
+        q.limit = limit
 
-    return table_code
+        res = q.exec_query()
+
+        code = wr.write_query_result(
+            res, tm, table_title, q.get_col_keys())
+
+        code += q.get_plot(res)
+
+        if code != "":
+            codes.append(code)
+
+    return "\n".join(codes)

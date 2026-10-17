@@ -97,8 +97,8 @@ def parse_args():
                         nargs="*",
                         dest="query",
                         help="""query the database. Options: [-q] [-q top #nr] [-q worst #nr] \n 
-                                             [-q top_alb #nr] [-q worst_alb #nr] [-q top_art #nr #mt] 
-                                             [-q hist] [-q evol] [-q codec] \n 
+                                             [-q top_alb #nr] [-q worst_alb #nr] [-q top_art #nr #mt]
+                                             [-q artist "name" #nr] [-q hist] [-q evol] [-q codec] \n
                                              [-q help] """ )
 
     parser.add_argument("-d", "--dr_database",

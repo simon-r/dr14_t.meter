@@ -673,6 +673,7 @@ class ExtendedTextTable (Table):
         return self.get_init_txt() + self._get_txt()
 
     def new_table(self):
+        self._set_txt("")
         self._cols_sz = [0] * self.col_cnt
         self._rows = []
 

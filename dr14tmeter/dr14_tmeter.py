@@ -86,10 +86,18 @@ def main():
 
         if options.query[0] not in ["help", "top", "top_alb",
                                     "worst", "worst_alb", "top_art",
-                                    "hist", "evol", "codec"]:
+                                    "artist", "hist", "evol", "codec"]:
 
             print_err("Error: -q invalid parameter .")
             print_err("Error: type dr14_tmeter -q for more info.")
+            return
+
+        if options.query[0] == "artist" and (
+                len(options.query) not in [2, 3] or
+                (len(options.query) == 3 and not options.query[2].isdigit())):
+
+            print_err("usage: -q artist \"ARTIST NAME\" [#nr] .")
+            print_err("names containing spaces must be quoted.")
             return
 
         table_code = database_exec_query(options)
