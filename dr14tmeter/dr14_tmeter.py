@@ -86,17 +86,18 @@ def main():
 
         if options.query[0] not in ["help", "top", "top_alb",
                                     "worst", "worst_alb", "top_art",
-                                    "artist", "hist", "evol", "codec"]:
+                                    "artist", "album", "hist", "evol", "codec"]:
 
             print_err("Error: -q invalid parameter .")
             print_err("Error: type dr14_tmeter -q for more info.")
             return
 
-        if options.query[0] == "artist" and (
+        if options.query[0] in ["artist", "album"] and (
                 len(options.query) not in [2, 3] or
                 (len(options.query) == 3 and not options.query[2].isdigit())):
 
-            print_err("usage: -q artist \"ARTIST NAME\" [#nr] .")
+            print_err("usage: -q %s \"%s NAME\" [#nr] ." %
+                      (options.query[0], options.query[0].upper()))
             print_err("names containing spaces must be quoted.")
             return
 

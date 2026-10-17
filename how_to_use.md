@@ -67,10 +67,20 @@ Once enabled, the results of every directory scan, including `-r`, are stored au
 | `dr14_tmeter -q top_alb [N]` | The `N` albums with the highest DR. |
 | `dr14_tmeter -q worst_alb [N]` | The `N` albums with the lowest DR. |
 | `dr14_tmeter -q top_art [N] [MIN]` | The `N` artists with the highest mean DR, counting only artists with at least `MIN` tracks (default 10). |
-| `dr14_tmeter -q artist NAME [N]` | The `N` albums and the `N` tracks of the artist `NAME` with the highest DR. Quote names containing spaces, for example `-q artist "Pink Floyd"`. The search finds all the artists whose name contains `NAME`, ignoring the case: `-q artist pink` finds both Pink and Pink Floyd. When more than one artist is found, a menu lets you choose one or more of them (press Enter for all). |
+| `dr14_tmeter -q artist NAME [N]` | The `N` albums and the `N` tracks of the artist `NAME` with the highest DR. Quote names containing spaces, for example `-q artist "Pink Floyd"`. See [how names are searched](#how-names-are-searched). |
+| `dr14_tmeter -q album NAME [N]` | The DR of the album `NAME` and of its tracks, in album order (at most `N` tracks). Names are searched as for `-q artist`. |
 | `dr14_tmeter -q hist` | A histogram of how many tracks have each DR value. |
 | `dr14_tmeter -q evol` | The mean DR per release year, as a table and a plot in the terminal. |
 | `dr14_tmeter -q codec` | The number of tracks and the mean DR for each codec. |
+
+#### How names are searched
+
+`-q artist` and `-q album` ignore case, accents and extra spaces, and they tolerate typos:
+
+- Every name that contains `NAME` is found: `-q artist pink` finds both Pink and Pink Floyd.
+- Names a few typos away from `NAME` are found too, so `-q artist metalica` finds Metallica and `-q album "dark side of the mon"` finds The Dark Side of the Moon. A typo is a missing, extra, wrong, or swapped character. One typo is allowed for every 5 characters of `NAME`, so names shorter than 5 characters have to match exactly.
+- When more than one name is found, a menu lists them with the closest first. All the names that contain `NAME` are listed, followed by the names with typos until the list holds 10 names. Choose one or more numbers, or press Enter to take the closest ones; the menu shows which those are.
+- When the output is not a terminal, for example in a script or when piped, there is no menu and the closest names are used.
 
 ### Maintenance
 

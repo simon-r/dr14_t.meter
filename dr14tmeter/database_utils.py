@@ -234,7 +234,7 @@ def extended_options(opt_nr):
     qa = False
     qb = False
 
-    if opt_nr in [1, 2, 3, 5, 6, 9]:
+    if opt_nr in [1, 2, 3, 5, 6, 9, 10]:
         question_a = "Insert the number of desired results: "
         qa = True
 
@@ -270,26 +270,27 @@ def query_helper():
     print_out(" 7. The DR histogram ")
     print_out(" 8. Used audio CODEC and mean DR ")
     print_out(" 9. The best DR albums and tracks of an artist ")
+    print_out(" 10. The DR of an album and of its tracks ")
     print_out(" 0. Exit ")
     print_out("  ")
 
-    nr = input_number(rng=(0, 9))
+    nr = input_number(rng=(0, 10))
 
     class options:
         pass
 
     ext_opt = []
 
-    if nr == 9:
-        artist = ""
-        while artist == "":
-            print_out(" Insert the artist name: ")
+    if nr in [9, 10]:
+        name = ""
+        while name == "":
+            print_out(" Insert the %s name: " % ("artist" if nr == 9 else "album"))
             if sys.version_info[0] == 2:
-                artist = raw_input(" > ").strip()
+                name = raw_input(" > ").strip()
             else:
-                artist = input(" > ").strip()
+                name = input(" > ").strip()
 
-    if nr in [1, 2, 3, 5, 6, 9]:
+    if nr in [1, 2, 3, 5, 6, 9, 10]:
         print_out(
             " Do you want to set the query extended options? [N/y] (default: No)")
         if sys.version_info[0] == 2:
@@ -319,7 +320,9 @@ def query_helper():
     elif nr == 8:
         options.query = ["codec"]
     elif nr == 9:
-        options.query = ["artist", artist]
+        options.query = ["artist", name]
+    elif nr == 10:
+        options.query = ["album", name]
 
     for e in ext_opt:
         options.query.append(e)
@@ -338,22 +341,44 @@ def query_helper():
     print_out(res)
 
 
-def select_artists(artists, name):
-    # more than one artist matches the name: the user chooses which ones are
-    # shown, all of them by default. artists is a list of ( Id , Name )
+def album_label(album):
+    # album is ( Id , Title , Artist ), the same title can belong to more artists
+    if album[2] is None:
+        return album[1]
 
-    # no menu when the query is run from a script or the output is redirected
-    if not (sys.stdin.isatty() and sys.stdout.isatty()):
-        return artists
+    return "%s - %s" % (album[1], album[2])
+
+
+def select_found(found, name, what, label=lambda row: row[1]):
+    # more than one artist or album ( what ) is close to the name: the user
+    # chooses which ones are shown, by default the closest ones. found is a
+    # list of ( distance , row ), the closest first, as given by closest_names
+    rows = [f[1] for f in found]
+    closest = [f[1] for f in found if f[0] == found[0][0]]
+
+    # no menu when there is nothing to choose, or the query is run from a
+    # script or the output is redirected
+    if len(rows) == 1 or not (sys.stdin.isatty() and sys.stdout.isatty()):
+        return closest
+
+    if len(closest) == len(rows):
+        default = "all"
+    elif len(closest) == 1:
+        default = "1"
+    else:
+        default = "1-%d" % len(closest)
 
     print_out("  ")
-    print_out(" \"%s\" matches more than one artist: " % name)
+    if found[0][0] == 0:
+        print_out(" \"%s\" matches more than one %s: " % (name, what))
+    else:
+        print_out(" No %s matches \"%s\", the closest ones are: " % (what, name))
     print_out("  ")
-    for i, a in enumerate(artists):
-        print_out(" %d. %s " % (i + 1, a[1]))
+    for i, r in enumerate(rows):
+        print_out(" %d. %s " % (i + 1, label(r)))
     print_out("  ")
     print_out(
-        " Select one or more artists, separated by spaces or commas (default: all) ")
+        " Select one or more %ss, separated by spaces or commas (default: %s) " % (what, default))
 
     while True:
         if sys.version_info[0] == 2:
@@ -364,7 +389,7 @@ def select_artists(artists, name):
         nrs = an.replace(",", " ").split()
 
         if len(nrs) == 0:
-            return artists
+            return closest
 
         try:
             nrs = [int(n) for n in nrs]
@@ -373,17 +398,20 @@ def select_artists(artists, name):
             continue
 
         # numpy, imported with *, shadows the builtin any()
-        out_of_range = [n for n in nrs if n < 1 or n > len(artists)]
+        out_of_range = [n for n in nrs if n < 1 or n > len(rows)]
         if len(out_of_range) > 0:
-            print_out(" !! Please insert numbers in the [1 .. %d]" % len(artists))
+            print_out(" !! Please insert numbers in the [1 .. %d]" % len(rows))
             continue
 
-        return [a for i, a in enumerate(artists) if i + 1 in nrs]
+        return [r for i, r in enumerate(rows) if i + 1 in nrs]
 
 
-def found_artists_title(names, max_names=3):
-    # a short search can match many artists, only the first names are listed
-    # so that the title fits in the console
+def found_names_title(names, max_names=3):
+    # a short search can match many artists or albums, only the first names
+    # are listed so that the title fits in the console. The discs of an album
+    # have the same name, which is listed once
+    names = [n for i, n in enumerate(names) if n not in names[:i]]
+
     if len(names) <= max_names:
         return ", ".join(names)
 
@@ -392,10 +420,10 @@ def found_artists_title(names, max_names=3):
 
 def database_exec_query(options, tm=ExtendedTextTable()):
 
-    # the artist query takes the artist name before the other options
+    # the artist and album queries take the name before the other options
     opts = list(options.query[1:])
-    if options.query[0] == "artist":
-        artist = opts.pop(0)
+    if options.query[0] in ["artist", "album"]:
+        name = opts.pop(0)
 
     if len(opts) >= 1:
         limit = int(opts[0])
@@ -430,19 +458,32 @@ def database_exec_query(options, tm=ExtendedTextTable()):
         tables = [("Top Artists", q)]
 
     elif options.query[0] == "artist":
-        found = find_artists(artist)
+        found = find_artists(name)
 
         if len(found) == 0:
-            return " No artist matching \"%s\" in the database " % artist
+            return " No artist close to \"%s\" in the database " % name
 
-        if len(found) > 1:
-            found = select_artists(found, artist)
+        found = select_found(found, name, "artist")
 
         ids = [a[0] for a in found]
-        names = found_artists_title([a[1] for a in found])
+        names = found_names_title([a[1] for a in found])
 
         tables = [("Top DR Albums of: %s" % names, query_artist_albums(ids)),
                   ("Top DR Tracks of: %s" % names, query_artist_tracks(ids))]
+
+    elif options.query[0] == "album":
+        found = find_albums(name)
+
+        if len(found) == 0:
+            return " No album close to \"%s\" in the database " % name
+
+        found = select_found(found, name, "album", label=album_label)
+
+        ids = [a[0] for a in found]
+        names = found_names_title([album_label(a) for a in found])
+
+        tables = [("DR of the Album: %s" % names, query_albums(ids)),
+                  ("DR of the Tracks of: %s" % names, query_album_tracks(ids))]
 
     elif options.query[0] == "hist":
         tables = [("DR histogram", query_dr_histogram())]

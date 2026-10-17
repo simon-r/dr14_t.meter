@@ -18,6 +18,7 @@
 import datetime
 import shutil
 import sys
+import unicodedata
 
 from dr14tmeter.console_plot import line_plot
 from dr14tmeter.database import dr_database_singletone
@@ -192,38 +193,127 @@ class query_top_artists(query):
         return q
 
 
+def normalize_name(name):
+    # names are compared ignoring the case, the accents and the extra spaces:
+    # "bjork" is the same as "Björk"
+    name = unicodedata.normalize("NFKD", name.casefold())
+    name = "".join(c for c in name if not unicodedata.combining(c))
+    return " ".join(name.split())
+
+
+def edit_distance(a, b, substring=False):
+    # the minimal number of inserted, deleted, replaced or swapped (adjacent)
+    # characters that turn a into b. With substring=True it is the distance
+    # between a and the closest substring of b, so the characters of b before
+    # and after the match are free: "floid" is at distance 1 from "Pink Floyd"
+    m = len(a)
+    prev2 = None
+    prev = list(range(m + 1))
+    best = m
+
+    for j in range(1, len(b) + 1):
+        col = [0 if substring else j] + [0] * m
+        for i in range(1, m + 1):
+            d = prev[i - 1] + (a[i - 1] != b[j - 1])
+            if prev[i] + 1 < d:
+                d = prev[i] + 1
+            if col[i - 1] + 1 < d:
+                d = col[i - 1] + 1
+            if (i > 1 and j > 1 and a[i - 1] == b[j - 2] and
+                    a[i - 2] == b[j - 1] and prev2[i - 2] + 1 < d):
+                d = prev2[i - 2] + 1
+            col[i] = d
+
+        if col[m] < best:
+            best = col[m]
+        prev2, prev = prev, col
+
+    return best if substring else prev[m]
+
+
+def closest_names(name, rows, max_names=10):
+    # rows are ( Id , Name , ... ), the result are the rows whose name is close
+    # to the given one, as ( distance , row ), the closest first. The names
+    # containing the given one have distance 0 and are all returned, the other
+    # ones fill the list up to max_names
+    key = normalize_name(name)
+
+    # one typo every 5 characters: a short name with typos would be close to
+    # too many names ( "moon" to "Paul Simon" , "Ramones" , ... )
+    max_dist = len(key) // 5
+
+    found = []
+    for row in rows:
+        if row[1] is None:
+            continue
+
+        n = normalize_name(row[1])
+        if key in n:
+            d = 0
+        elif max_dist > 0:
+            d = edit_distance(key, n, substring=True)
+        else:
+            continue
+
+        if d <= max_dist:
+            # equally close names: the one closest as a whole comes first
+            found.append((d, edit_distance(key, n), n, row))
+
+    found.sort(key=lambda f: f[:3])
+
+    exact = [f for f in found if f[0] == 0]
+    found = exact + found[len(exact):max(max_names, len(exact))]
+
+    return [(f[0], f[3]) for f in found]
+
+
 def find_artists(name):
-    # the ( Id , Name ) of the artists whose name contains the given one,
-    # ignoring the case: "pink" finds both "Pink" and "Pink Floyd"
+    # the ( distance , ( Id , Name ) ) of the artists whose name is close to
+    # the given one: "pink" finds both "Pink" and "Pink Floyd", "metalica"
+    # finds "Metallica"
     db = dr_database_singletone().get()
-    q = "select Id , Name from Artist where Name like ? order by Name collate nocase ;"
-    return db.query(q, ("%" + name + "%",))
+    q = "select Id , Name from Artist ;"
+    return closest_names(name, db.query(q))
 
 
-class query_artist(query):
+def find_albums(title):
+    # the ( distance , ( Id , Title , Artist ) ) of the albums whose title is
+    # close to the given one
+    db = dr_database_singletone().get()
+    q = """
+    select Album.Id , Album.Title , Artist.Name
+        from Album left join Artist_Album on Artist_Album.IdAlbum = Album.Id
+             left join Artist on Artist.Id = Artist_Album.IdArtist ;
+    """
+    return closest_names(title, db.query(q))
 
-    def __init__(self, artist_ids=()):
+
+class query_selection(query):
+    # a query restricted to the selected artists or albums
+
+    def __init__(self, ids=()):
         query.__init__(self)
-        self.append_parameter(list(artist_ids))
+        self.append_parameter(list(ids))
 
-    def set_artist_ids(self, artist_ids):
-        self.set_parameter(1, list(artist_ids))
+    def set_ids(self, ids):
+        self.set_parameter(1, list(ids))
 
-    def get_artist_ids(self):
+    def get_ids(self):
         return self.get_parameter(1)
 
-    artist_ids = property(get_artist_ids, set_artist_ids)
+    ids = property(get_ids, set_ids)
 
     def get_ids_list(self):
-        # the ids are written in the query, so that any number of artists can
-        # be selected without hitting the sqlite limit on the parameters
-        return " , ".join("%d" % int(i) for i in self.artist_ids)
+        # the ids are written in the query, so that any number of artists or
+        # albums can be selected without hitting the sqlite limit on the
+        # parameters
+        return " , ".join("%d" % int(i) for i in self.ids)
 
 
-class query_artist_albums(query_artist):
+class query_artist_albums(query_selection):
 
     def __init__(self, artist_ids=()):
-        query_artist.__init__(self, artist_ids)
+        query_selection.__init__(self, artist_ids)
         self.keys = ["DR", "Album_Title", "Artist"]
 
     def get_query(self):
@@ -241,10 +331,10 @@ class query_artist_albums(query_artist):
         return q
 
 
-class query_artist_tracks(query_artist):
+class query_artist_tracks(query_selection):
 
     def __init__(self, artist_ids=()):
-        query_artist.__init__(self, artist_ids)
+        query_selection.__init__(self, artist_ids)
         self.keys = ["DR", "Title", "Album", "Artist"]
 
     def get_query(self):
@@ -259,6 +349,53 @@ class query_artist_tracks(query_artist):
                 left join Album on Album.id = Album_Track.idalbum
                 where Artist.Id in ( %s )
                 order by dr desc , Album , track.track_nr
+                limit ? ;
+        """ % self.get_ids_list()
+
+        return q
+
+
+class query_albums(query_selection):
+
+    def __init__(self, album_ids=()):
+        query_selection.__init__(self, album_ids)
+        self.keys = ["DR", "Album_Title", "Artist"]
+
+    def get_query(self):
+        # the albums without an artist are shown too
+        q = """
+        select album.title as Album_Title , dr.dr as DR , album.id as id , Artist.name as Artist
+           from album inner join DR_Album on DR_Album.idalbum = album.id
+                inner join dr on dr.id = DR_Album.iddr
+                left join Artist_Album on album.id = Artist_Album.IdAlbum
+                left join Artist on Artist.Id = Artist_Album.IdArtist
+                where album.Id in ( %s )
+                order by dr desc , Album_Title
+                limit ? ;
+        """ % self.get_ids_list()
+
+        return q
+
+
+class query_album_tracks(query_selection):
+
+    def __init__(self, album_ids=()):
+        query_selection.__init__(self, album_ids)
+        self.keys = ["Track_Nr", "DR", "Title", "Album", "Artist"]
+
+    def get_query(self):
+        # the tracks are in the order of the album
+        q = """
+        select track.id as id , track.track_nr as Track_Nr , track.title as Title , dr.dr as DR ,
+               Album.title as Album , Artist.name as Artist
+           from track inner join DR_Track on DR_Track.idtrack = track.id
+                inner join dr on dr.id = DR_Track.iddr
+                inner join Album_Track on Album_Track.idtrack = track.id
+                inner join Album on Album.id = Album_Track.idalbum
+                left join Artist_Track on Artist_Track.idtrack = track.id
+                left join Artist on Artist.id = Artist_Track.IdArtist
+                where Album.Id in ( %s )
+                order by Album , Album.Id , track.track_nr , Title
                 limit ? ;
         """ % self.get_ids_list()
 
