@@ -370,7 +370,13 @@ class RetirveMetadata:
             if m != None:
                 track['bit'] = m.group(1)
             else:
-                track['bit'] = "16"
+                # float sample formats (flt, dbl) carry no size, but the
+                # float PCM codec name does (e.g. pcm_f32le)
+                m = re.search(r"^pcm_f(\d+)", track['codec'], re_flags)
+                if m != None:
+                    track['bit'] = m.group(1)
+                else:
+                    track['bit'] = "16"
 
     def album_len(self):
         return len(self._tracks)

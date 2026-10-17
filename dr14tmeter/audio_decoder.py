@@ -31,7 +31,7 @@ class AudioDecoder:
     def get_file_ext_code(self):
         return self._ext
 
-    def read_track_new(self, file_name, target):
+    def read_track_new(self, file_name, target, native_rate=False):
 
         (f, ext) = os.path.splitext(file_name)
         ext = ext.lower()
@@ -69,6 +69,8 @@ class AudioDecoder:
             return False
 
         #af = PipeFileReader()
+
+        af.native_rate = native_rate
 
         self._ext = self.formats.index(ext)
         ret_f = af.read_audio_file_new(file_name, target)

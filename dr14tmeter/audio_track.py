@@ -35,7 +35,7 @@ class AudioTrack:
     def get_file_ext_code(self):
         return self._ext
 
-    def open(self, file_name):
+    def open(self, file_name, native_rate=False):
 
         self.Y = numpy.array([])
         self.Fs = 0
@@ -44,7 +44,7 @@ class AudioTrack:
         if not (os.path.exists(file_name)):
             return False
 
-        res_f = self._de.read_track_new(file_name, self)
+        res_f = self._de.read_track_new(file_name, self, native_rate)
         self._ext = self._de.get_file_ext_code()
 
         return res_f

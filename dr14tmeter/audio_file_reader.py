@@ -39,6 +39,10 @@ class AudioFileReader:
 
         self.__ffmpeg_cmd = get_ffmpeg_cmd()
 
+        # False: resample to 44.1 kHz / 16 bit as the DR measurement expects
+        # True: keep the source sample rate and resolution (analysis plots)
+        self.native_rate = False
+
         if sys.platform.startswith('win'):
             self.__cmd = ".\\decoder\\%s " % self.get_cmd()
         else:
@@ -97,6 +101,7 @@ class AudioFileReader:
         stdout_data, stderr_data = r.communicate()
 
         if os.path.exists(tmp_file):
+            self.set_pcm_format_tag(tmp_file)
             ret_f = self.read_wav(tmp_file, target)
         elif r.returncode == 127:
             # shell: command not found (e.g. ffmpeg is not installed)
@@ -161,8 +166,22 @@ class AudioFileReader:
 
         return True
 
+    # ffmpeg writes a WAVE_FORMAT_EXTENSIBLE header above 48 kHz or 16 bit,
+    # which the wave module reads only from Python 3.12. When the sub-format
+    # is integer PCM, the plain WAVE_FORMAT_PCM tag describes the same data.
+    def set_pcm_format_tag(self, file_name):
+        with open(file_name, 'r+b') as f:
+            h = f.read(46)
+            if h[12:16] == b'fmt ' and h[20:22] == b'\xfe\xff' and h[44:46] == b'\x01\x00':
+                f.seek(20)
+                f.write(b'\x01\x00')
+
     def get_generic_ffmpeg_options(self, file_name, tmp_file):
-        return " -nostdin -i \"%s\" -vn -b:a 16 -ar 44100 -y \"%s\" -loglevel quiet " % (file_name, tmp_file)
+        if self.native_rate:
+            out_fmt = "-c:a pcm_s32le"
+        else:
+            out_fmt = "-b:a 16 -ar 44100"
+        return " -nostdin -i \"%s\" -vn %s -y \"%s\" -loglevel quiet " % (file_name, out_fmt, tmp_file)
 
 
 class Mp3FileReader(AudioFileReader):
@@ -239,14 +258,24 @@ class WmaFileReader(AudioFileReader):
 
 class WavFileReader(AudioFileReader):
 
+    # read_wav handles only 16 and 32 bit integer PCM: decode any other
+    # wav (24 bit, float) through ffmpeg like the other formats
     def read_audio_file_new(self, file_name, target):
-        return self.read_wav(file_name, target)
+        try:
+            with wave.open(file_name, 'r') as wave_read:
+                direct = wave_read.getsampwidth() in (2, 4)
+        except Exception:
+            direct = False
+
+        if direct:
+            return self.read_wav(file_name, target)
+        return AudioFileReader.read_audio_file_new(self, file_name, target)
 
     def get_cmd(self):
-        return ""
+        return self.get_ffmpeg_cmd()
 
     def get_cmd_options(self, file_name, tmp_file):
-        return ""
+        return self.get_generic_ffmpeg_options(file_name, tmp_file)
 
 class WavpackFileReader(AudioFileReader):
 

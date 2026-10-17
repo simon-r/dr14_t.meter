@@ -36,12 +36,15 @@ from dr14tmeter.out_messages import print_msg
 
 class AudioAnalysis:
 
+    # decode at the source sample rate instead of 44.1 kHz
+    native_rate = False
+
     def compute_track(self, file_name):
         self.at = AudioTrack()
 
         (head,  file_n) = os.path.split(file_name)
 
-        if not self.at.open(file_name):
+        if not self.at.open(file_name, self.native_rate):
             return False
 
         self.file_name = file_name
@@ -114,6 +117,9 @@ class AudioLevelHistogram(AudioAnalysis):
 
 
 class AudioSpectrogram(AudioAnalysis):
+
+    # show the full band of high resolution sources
+    native_rate = True
 
     def virt_compute(self):
 
