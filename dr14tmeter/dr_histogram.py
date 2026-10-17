@@ -21,6 +21,7 @@ from dr14tmeter.audio_math import *
 try:
     import matplotlib.pyplot as pyplot
     import matplotlib.mlab as mlab
+    from matplotlib.lines import Line2D
 except:
     pass
 
@@ -68,29 +69,37 @@ def compute_hist(Y, Fs, duration=None, bins=100, block_duration=0.2, plot=True, 
     abs_peak = decibel_u(numpy.max(numpy.abs(Y)), 1.0)
 
     if plot == True:
-        (hist, bin_edges, patches) = pyplot.hist(rms, 100, normed=True)
+        (hist, bin_edges, patches) = pyplot.hist(rms, 100, density=True)
 
         mean_x = numpy.array([rms_mean, rms_mean])
         mean_y = numpy.array([0.0, numpy.max(hist) * 1.01])
 
-        std_x = numpy.array([rms_mean - rms_std, rms_mean + rms_std])
-        std_y = numpy.array([numpy.max(hist) * 0.7, numpy.max(hist) * 0.7])
+        (mean_line,) = pyplot.plot(mean_x, mean_y, linewidth=2, color='g')
 
-        pyplot.plot(mean_x, mean_y, linewidth=2, color='g')
-        pyplot.plot(std_x, std_y, linewidth=2, ls='--', color='c')
-        #print( hist )
+        # std dev: shaded +/- 1 sigma band plus a capped bar centred on the mean
+        std_color = '#d95f02'
+        std_y = numpy.max(hist) * 0.7
+
+        std_band = pyplot.axvspan(rms_mean - rms_std, rms_mean + rms_std,
+                                  color=std_color, alpha=0.12, linewidth=0, zorder=0)
+        std_bar = pyplot.errorbar(rms_mean, std_y, xerr=rms_std, fmt='none', ecolor=std_color,
+                                  elinewidth=2, capsize=8, capthick=2, zorder=3)
+        pyplot.annotate(r'$\pm 1\sigma$', xy=(rms_mean + rms_std, std_y),
+                        xytext=(8, 0), textcoords='offset points',
+                        ha='left', va='center', fontsize=12, color='#333333',
+                        bbox=dict(boxstyle='round,pad=0.2', fc='white', ec='none', alpha=0.8))
 
         pyplot.axis([-92, 0, 0, numpy.max(hist) * 1.05])
 
-        text_rel_pos = 0.9
-        pyplot.text(-85, numpy.max(hist) * text_rel_pos,
-                    "mean:    %.3f dB" % rms_mean, fontsize=15,)
-        pyplot.text(-85, numpy.max(hist) * (text_rel_pos - 0.05),
-                    "std dev:  %.3f dB" % rms_std, fontsize=15,)
-        pyplot.text(-85, numpy.max(hist) * (text_rel_pos - 0.10),
-                    "peak:     %.3f dB" % abs_peak, fontsize=15,)
-        pyplot.text(-85, numpy.max(hist) * (text_rel_pos - 0.15),
-                    "max rms:  %.3f dB" % rms_max, fontsize=15,)
+        # peak and max rms have no mark on the plot: list them as text-only rows
+        no_mark = Line2D([], [], linestyle='none')
+
+        pyplot.legend([mean_line, (std_band, std_bar), no_mark, no_mark],
+                      [r'mean  $\mu$ = %.2f dB' % rms_mean,
+                       r'std dev  $\sigma$ = %.2f dB' % rms_std,
+                       'peak = %.2f dB' % abs_peak,
+                       'max RMS = %.2f dB' % rms_max],
+                      loc='best', fontsize=11, handlelength=1.6, framealpha=0.9)
 
         pyplot.xlabel('RMS dB')
         pyplot.ylabel('Relative frequency')
@@ -102,12 +111,10 @@ def compute_hist(Y, Fs, duration=None, bins=100, block_duration=0.2, plot=True, 
 
         pyplot.title(r'%s' % hist_title)
 
-        pyplot.plot(mean_x, mean_y)
-
         pyplot.grid(True)
         pyplot.show()
 
     else:
-        (hist, bin_edges) = numpy.histogram(rms, bins=bins, normed=True)
+        (hist, bin_edges) = numpy.histogram(rms, bins=bins, density=True)
 
     return (hist, bin_edges)
