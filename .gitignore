@@ -10,6 +10,7 @@ build/
 *.json
 .pydevproject
 .project
+dist/*
 archlinux/src/
 archlinux/pkg/
 archlinux/*.tar.*
