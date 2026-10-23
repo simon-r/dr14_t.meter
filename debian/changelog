@@ -1,3 +1,11 @@
+dr14tmeter (2.1.2) stable; urgency=medium
+
+  * New release 2.1.2.
+  * Fix the PyPI metadata: valid classifiers, GitHub project links and
+    a Markdown long description.
+
+ -- Simone Riva <simone.rva@gmail.com>  Fri, 23 Oct 2026 12:00:00 +0200
+
 dr14tmeter (2.1.1) stable; urgency=medium
 
   * New release 2.1.1.
