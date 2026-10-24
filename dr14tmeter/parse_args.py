@@ -105,7 +105,7 @@ def parse_args():
     parser.add_argument("-d", "--dr_database",
                         action="store_true",
                         dest="dr_database",
-                        help="Output file compatible with the DR database at http://www.dr.loudness-war.info")
+                        help="Output file compatible with the DR database at https://dr.loudness-war.info/")
 
     parser.add_argument("--hist",
                         action="store_true",

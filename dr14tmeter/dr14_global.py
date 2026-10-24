@@ -162,7 +162,7 @@ def get_new_version():
 
 
 def get_home_url():
-    return "http://simon-r.github.com/dr14_t.meter"
+    return "https://simon-r.github.io/dr14_t.meter"
 
 
 def test_matplotlib_modules(fun_name):
@@ -170,7 +170,7 @@ def test_matplotlib_modules(fun_name):
         import matplotlib
     except ImportError:
         print_msg(
-            "The %s function require the installation of MatPlotLib: http://matplotlib.sourceforge.net" % fun_name)
+            "The %s function require the installation of MatPlotLib: https://matplotlib.org" % fun_name)
         return False
 
     return True
@@ -190,7 +190,7 @@ def test_hist_modules():
         import matplotlib
     except ImportError:
         print_msg(
-            "The histogram function require the installation of MatPlotLib: http://matplotlib.sourceforge.net")
+            "The histogram function require the installation of MatPlotLib: https://matplotlib.org")
         return False
 
     return True
@@ -201,7 +201,7 @@ def test_compress_modules():
         import scipy
     except:
         print_msg(
-            "The compression function require the installation of SciPy: http://www.scipy.org/")
+            "The compression function require the installation of SciPy: https://scipy.org/")
         return False
 
     return True

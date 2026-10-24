@@ -209,7 +209,7 @@ def main():
         print_msg("  > %s --enable_database " % get_exe_name())
         print_msg("")
         print_msg(
-            " for more details visit: http://dr14tmeter.sourceforge.net/index.php/DR_Database ")
+            " for more details visit: https://github.com/simon-r/dr14_t.meter/blob/master/how_to_use.md ")
 
     return r
 

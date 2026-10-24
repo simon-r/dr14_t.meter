@@ -70,4 +70,4 @@ $$
 
 ## More information
 
-Visit <https://dr14tmeter.sourceforge.net>.
+Visit <https://github.com/simon-r/dr14_t.meter>.

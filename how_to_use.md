@@ -28,7 +28,7 @@ By default, a text table named after the album DR (for example `dr14-DR12.txt`) 
 | `-o DIR` | Writes the files to `DIR` instead of the analysed directory. |
 | `-a` | Appends the results of all directories to the files in the top directory. Use it with `-r`. |
 | `-b` | Writes the basic table, which lists file names and leaves out the track titles, codec, bitrate, sample rate and bit depth. |
-| `-d` | Writes the text table in the format accepted by the [DR database](http://www.dr.loudness-war.info). |
+| `-d` | Writes the text table in the format accepted by the [DR database](https://dr.loudness-war.info/). |
 | `-p` | Also prints the full table in the terminal. |
 | `-n` | Writes no files. Note that this also skips the local database. |
 
