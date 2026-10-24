@@ -72,21 +72,31 @@ def scan_dir_list(subdirlist, options, out_dir):
     success = False
     r = 0
 
-    for cur_dir in subdirlist:
+    dir_cnt = len(subdirlist)
+
+    for dir_idx, cur_dir in enumerate(subdirlist, 1):
+        if dir_cnt > 1:
+            dir_tag = "[%d/%d]" % (dir_idx, dir_cnt)
+        else:
+            dir_tag = ""
+
         if options.no_overwrite:
             existing = existing_results(cur_dir, options)
             if existing:
-                print_msg("\n------------------------------------------------------------ ")
-                print_msg("> Skip Dir: %s " % cur_dir)
-                print_msg("  already analyzed: %s" % " ".join(existing))
+                print_msg("\n" + "=" * 60)
+                print_msg("%s Skipped directory (already analyzed):" % dir_tag)
+                print_msg("    %s" % cur_dir)
+                print_msg("    found: %s" % " ".join(existing))
                 success = True
                 continue
 
         dr = DynamicRangeMeter()
         dr.write_to_local_db(config.db_is_enabled())
 
-        print_msg("\n------------------------------------------------------------ ")
-        print_msg("> Scan Dir: %s \n" % cur_dir)
+        print_msg("\n" + "=" * 60)
+        print_msg("%s Scanning directory:" % dir_tag)
+        print_msg("    %s" % cur_dir)
+        print_msg("=" * 60)
 
         if options.disable_multithread:
             r = dr.scan_dir(cur_dir)
@@ -99,6 +109,7 @@ def scan_dir_list(subdirlist, options, out_dir):
             tagger.write_dr_tags(dr)
 
         if r == 0:
+            print_msg("  (no audio files)")
             continue
         else:
             success = True

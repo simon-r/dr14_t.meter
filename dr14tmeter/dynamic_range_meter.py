@@ -39,6 +39,11 @@ import dr14tmeter.dr14_global as dr14
 from dr14tmeter.out_messages import print_msg, print_out
 
 
+def progress_line(cur, tot, file_name, status):
+    width = len(str(tot))
+    return "  [%*d/%d] %-50s %s" % (width, cur, tot, file_name, status)
+
+
 class SharedDrResObj:
 
     def __init__(self):
@@ -59,6 +64,8 @@ class DynamicRangeMeter:
         self.res_list = []
         self.dir_name = ''
         self.dr14 = 0
+        self.__scanned_cnt = 0
+        self.__tot_cnt = 1
         self.meta_data = RetirveMetadata()
         self.compute_dr = ComputeDR14()
         self.__write_to_local_db = False
@@ -90,6 +97,11 @@ class DynamicRangeMeter:
         self.dr14 = 0
 
         duration = StructDuration()
+
+        ad = AudioDecoder()
+        self.__scanned_cnt = 0
+        self.__tot_cnt = len([f for f in dir_list
+                              if os.path.splitext(f)[1] in ad.formats])
 
         at = AudioTrack()
         for file_name in dir_list:
@@ -125,7 +137,9 @@ class DynamicRangeMeter:
 
         self.res_list.append(res)
 
-        print_msg(file_name + ": \t DR " + str(int(dr14)))
+        self.__scanned_cnt += 1
+        print_msg(progress_line(self.__scanned_cnt, self.__tot_cnt, file_name,
+                                "DR %d" % int(dr14)))
 
     def write_to_local_database(self):
 
@@ -215,7 +229,16 @@ class DynamicRangeMeter:
         self.meta_data.scan_dir(dir_name, files_list)
 
         # every job produces exactly one result
-        results = [res_queue_sh.get() for job in jobs]
+        results = []
+        for i in range(len(jobs)):
+            res = res_queue_sh.get()
+            results.append(res)
+            if res.fail:
+                print_msg(progress_line(i + 1, len(jobs), res.file_name, "- fail -"))
+            else:
+                print_msg(progress_line(i + 1, len(jobs), res.file_name,
+                                        "DR %d" % int(res.dr14)))
+            flush_msg()
 
         # the workers must be joined before the queues are released,
         # otherwise a slow-starting worker can't attach to them
@@ -276,9 +299,6 @@ class DynamicRangeMeter:
                 (dr14, dB_peak, dB_rms) = compute_dr14(at.Y, at.Fs, duration)
                 sha1 = sha1_track_v1(at.Y, at.get_file_ext_code())
 
-                print_msg(job.file_name + ": \t DR " + str(int(dr14)))
-                flush_msg()
-
                 job.dr14 = dr14
                 job.dB_peak = dB_peak
                 job.dB_rms = dB_rms
@@ -287,6 +307,5 @@ class DynamicRangeMeter:
 
             else:
                 job.fail = True
-                print_msg("- fail - " + full_file)
 
             res_queue_sh.put(job)
