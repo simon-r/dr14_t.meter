@@ -236,7 +236,7 @@ def extended_options(opt_nr):
     qa = False
     qb = False
 
-    if opt_nr in [1, 2, 3, 5, 6, 9, 10]:
+    if opt_nr in [1, 2, 3, 5, 6, 9, 10, 11]:
         question_a = "Insert the number of desired results: "
         qa = True
 
@@ -268,6 +268,7 @@ QUERY_MENU = [
     ("Used audio CODEC and mean DR", "codec"),
     ("The best DR albums and tracks of an artist", "artist"),
     ("The DR of an album and of its tracks", "album"),
+    ("The collection summary: tracks, albums, genres, length and DR", "info"),
 ]
 
 
@@ -307,7 +308,7 @@ def query_helper_tui():
                 continue
             query.append(name)
 
-        if kind in ["top", "top_alb", "top_art", "worst", "worst_alb", "artist", "album"]:
+        if kind in ["top", "top_alb", "top_art", "worst", "worst_alb", "artist", "album", "info"]:
             nr = tui.prompt("Number of desired results", 30)
             if nr is None:
                 continue
@@ -365,7 +366,7 @@ def query_helper_text():
             else:
                 name = input(" > ").strip()
 
-    if nr in [1, 2, 3, 5, 6, 9, 10]:
+    if nr in [1, 2, 3, 5, 6, 9, 10, 11]:
         print_out(
             " Do you want to set the query extended options? [N/y] (default: No)")
         if sys.version_info[0] == 2:
@@ -562,6 +563,10 @@ def database_exec_query(options, tm=None):
     elif options.query[0] == "codec":
         tables = [("Codec Info", query_dr_codec())]
 
+    elif options.query[0] == "info":
+        tables = [("Collection", query_collection_info()),
+                  ("Genres", query_genres())]
+
     else:
         raise Exception("Option not allowed")
 
@@ -572,6 +577,7 @@ def database_exec_query(options, tm=None):
         q.limit = limit
 
         res = q.exec_query()
+        tm.highlight = q.get_highlight(res)
 
         code = wr.write_query_result(
             res, tm, table_title, q.get_col_keys())

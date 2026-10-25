@@ -138,7 +138,7 @@ def parse_args():
                       help="""Query the database. Options: [-q] [-q top #nr] [-q worst #nr]
                               [-q top_alb #nr] [-q worst_alb #nr] [-q top_art #nr #mt]
                               [-q artist "name" #nr] [-q album "name" #nr]
-                              [-q hist] [-q evol] [-q codec] [-q help]""")
+                              [-q hist] [-q evol] [-q codec] [-q info #nr] [-q help]""")
 
     # Single-file analysis and plots
     g_an = parser.add_argument_group("single-file analysis and plots",

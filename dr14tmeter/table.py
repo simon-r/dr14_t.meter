@@ -540,6 +540,11 @@ class ExtendedTextTable (Table):
     bad_dr = 7
     dr_cols = ["DR", "Mean", "Mean_DR"]
 
+    # with color on, the cells in the columns "cols" of the rows whose "key"
+    # column holds one of the texts in "rows" are written in bold with the
+    # color of that text: {"key": head, "cols": [heads], "rows": {text: color}}
+    highlight = {}
+
     def __init__(self):
         Table.__init__(self)
         self._cols_sz = [0] * Table.get_col_cnt(self)
@@ -634,13 +639,16 @@ class ExtendedTextTable (Table):
     def _style(self, txt, *names):
         return ansi.style(txt, *names) if self.color else txt
 
-    def _cell_style(self, cell, head, ct):
+    def _cell_style(self, cell, head, ct, row_color=None):
         # the colored version of an already padded cell
         if not self.color:
             return cell
 
         if ct == "h":
             return ansi.style(cell, "bold")
+
+        if row_color is not None and head in self.highlight["cols"]:
+            return ansi.style(cell, "bold", row_color)
 
         if head == "Histogram":
             return ansi.style(cell, "blue")
@@ -678,6 +686,11 @@ class ExtendedTextTable (Table):
 
         heads = self._heads + [""] * len(cols_sz)
 
+        row_color = None
+        if self.highlight and not is_head and self.highlight["key"] in heads:
+            key = r.row[heads.index(self.highlight["key"])].strip()
+            row_color = self.highlight["rows"].get(key)
+
         for l in range(max(len(c) for c in cells)):
             txt = " "
             last = len(cells) - 1
@@ -685,7 +698,7 @@ class ExtendedTextTable (Table):
                 t_txt = c[l] if l < len(c) else ""
                 # the padding of the last column is not written
                 t_txt = ljust_text(t_txt, sz) if i < last else t_txt
-                txt += " " + self._cell_style(t_txt, heads[i], ct) + " "
+                txt += " " + self._cell_style(t_txt, heads[i], ct, row_color) + " "
 
             self._append_txt(txt.rstrip() + self.nl())
 

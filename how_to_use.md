@@ -72,6 +72,7 @@ Once enabled, the results of every directory scan, including `-r`, are stored au
 | `dr14_tmeter -q hist` | A histogram of how many tracks have each DR value. |
 | `dr14_tmeter -q evol` | The mean DR per release year, as a table and a plot in the terminal. |
 | `dr14_tmeter -q codec` | The number of tracks and the mean DR for each codec. |
+| `dr14_tmeter -q info [N]` | A summary of the collection: number of tracks, albums, artists and genres, total and mean track length, and the mean, median, minimum and maximum DR. Followed by the `N` most common genres (default 30) with their mean length and DR. |
 
 #### How names are searched
 

@@ -71,6 +71,10 @@ class query:
         # console plot shown after the table of the results, if any
         return ""
 
+    def get_highlight(self, res):
+        # {column: cell texts} to show in green in the table, if any
+        return {}
+
 
 class query_top_dr(query):
 
@@ -524,3 +528,118 @@ class query_dr_codec(query):
         """
 
         return q
+
+
+def seconds_to_str(s):
+    s = int(round(s))
+    if s >= 3600:
+        return "%d:%02d:%02d" % (s // 3600, (s % 3600) // 60, s % 60)
+    return "%d:%02d" % (s // 60, s % 60)
+
+
+def tracks_info():
+    # one row per track: genre, length in seconds and DR (None if missing)
+    db = dr_database_singletone().get()
+    q = """
+    select Track.duration as Duration, Genre.Name as Genre, dr.dr as DR
+        from Track
+            left join DR_Track on DR_Track.IdTrack = Track.Id
+            left join DR on DR.Id = DR_Track.IdDR
+            left join Genre_Track on Genre_Track.IdTrack = Track.Id
+            left join Genre on Genre.Id = Genre_Track.IdGenre ;
+    """
+    rows = db.query(q, (), dict_factory_arg=my_dict_factory)
+
+    for r in rows:
+        r["Seconds"] = r["Duration"] or 0
+        if r["DR"] is not None and r["DR"] < 0:
+            r["DR"] = None
+
+    return rows
+
+
+class query_collection_info(query):
+
+    good_dr = 14
+    bad_dr = 7
+
+    def __init__(self):
+        query.__init__(self)
+        self.keys = ["Property", "Value"]
+
+    def exec_query(self):
+        db = dr_database_singletone().get()
+        rows = tracks_info()
+
+        if len(rows) == 0:
+            return []
+
+        def count(table, where=""):
+            return db.query("select count(*) as n from %s %s ;" % (table, where),
+                            (), dict_factory_arg=my_dict_factory)[0]["n"]
+
+        seconds = [r["Seconds"] for r in rows]
+        genres = set(r["Genre"] for r in rows if r["Genre"])
+        dr = sorted(r["DR"] for r in rows if r["DR"] is not None)
+
+        info = [("Tracks", count("Track")),
+                ("Albums", count("Album", "where Id > 0")),
+                ("Artists", count("Artist")),
+                ("Genres", len(genres)),
+                ("Total length", seconds_to_str(sum(seconds))),
+                ("Mean track length", seconds_to_str(sum(seconds) / len(seconds)))]
+
+        if len(dr) > 0:
+            mid = len(dr) // 2
+            median = dr[mid] if len(dr) % 2 else (dr[mid - 1] + dr[mid]) / 2.0
+            info += [("Mean DR", "%.2f" % (sum(dr) / float(len(dr)))),
+                     ("Median DR", "%.1f" % median),
+                     ("Min DR", dr[0]),
+                     ("Max DR", dr[-1]),
+                     ("Tracks with DR >= %d" % self.good_dr,
+                      "%.1f%%" % (100.0 * len([d for d in dr if d >= self.good_dr]) / len(dr))),
+                     ("Tracks with DR <= %d" % self.bad_dr,
+                      "%.1f%%" % (100.0 * len([d for d in dr if d <= self.bad_dr]) / len(dr)))]
+
+        return [{"Property": p, "Value": v} for (p, v) in info]
+
+
+class query_genres(query):
+
+    # genres highlighted as the best and the worst ones: the first and the
+    # last n_best by mean DR, among the genres with at least min_track tracks
+    n_best = 3
+    min_track = 5
+
+    def __init__(self):
+        query.__init__(self)
+        self.keys = ["Genre", "Tracks", "Mean_Length", "Mean_DR"]
+
+    def exec_query(self):
+        per_genre = {}
+        for r in tracks_info():
+            per_genre.setdefault(r["Genre"] or "(none)", []).append(r)
+
+        res = []
+        for genre, rows in per_genre.items():
+            dr = [r["DR"] for r in rows if r["DR"] is not None]
+            res.append({"Genre": genre,
+                        "Tracks": len(rows),
+                        "Mean_Length": seconds_to_str(
+                            sum(r["Seconds"] for r in rows) / len(rows)),
+                        "Mean_DR": sum(dr) / float(len(dr)) if dr else ""})
+
+        res.sort(key=lambda r: (-r["Tracks"], r["Genre"]))
+        return res[:self.limit]
+
+    def get_highlight(self, res):
+        # the genres with the best (green) and the worst (red) mean DR,
+        # ignoring the ones with few tracks
+        ranked = [r for r in res
+                  if r["Mean_DR"] != "" and r["Tracks"] >= self.min_track]
+        ranked.sort(key=lambda r: -r["Mean_DR"])
+
+        rows = dict((r["Genre"], "red") for r in ranked[-self.n_best:])
+        rows.update((r["Genre"], "green") for r in ranked[:self.n_best])
+
+        return {"key": "Genre", "cols": ["Genre", "Mean_DR"], "rows": rows}
