@@ -19,6 +19,8 @@ import shutil
 import sys
 import unicodedata
 
+from dr14tmeter import ansi
+
 
 def char_width(ch):
     # number of console columns used by ch: CJK chars (e.g. Japanese) take 2
@@ -532,12 +534,20 @@ class ExtendedTextTable (Table):
     # (or than its header)
     min_wrap_sz = 8
 
+    # with color on, the DR values are green when they are at least good_dr
+    # and red when they are at most bad_dr
+    good_dr = 14
+    bad_dr = 7
+    dr_cols = ["DR", "Mean", "Mean_DR"]
+
     def __init__(self):
         Table.__init__(self)
         self._cols_sz = [0] * Table.get_col_cnt(self)
         self._rows = []
         self._bold_state = False
         self._rclass_state = "b"
+        self.color = False
+        self._heads = []
 
     def get_col_cnt(self):
         return Table.get_col_cnt(self)
@@ -621,9 +631,35 @@ class ExtendedTextTable (Table):
             raise Exception("%s : Row model: Not Allowed " %
                             sys._getframe().f_code.co_name)
 
+    def _style(self, txt, *names):
+        return ansi.style(txt, *names) if self.color else txt
+
+    def _cell_style(self, cell, head, ct):
+        # the colored version of an already padded cell
+        if not self.color:
+            return cell
+
+        if ct == "h":
+            return ansi.style(cell, "bold")
+
+        if head == "Histogram":
+            return ansi.style(cell, "blue")
+
+        if head in self.dr_cols:
+            try:
+                v = float(cell)
+            except ValueError:
+                return cell
+            if v >= self.good_dr:
+                return ansi.style(cell, "bold", "green")
+            if v <= self.bad_dr:
+                return ansi.style(cell, "red")
+
+        return cell
+
     def _write_title(self, r):
         txt = " "
-        txt += r.row[0]
+        txt += self._style(r.row[0], "bold", "magenta")
         txt += self.nl()
         self._append_txt(txt)
 
@@ -636,11 +672,20 @@ class ExtendedTextTable (Table):
             else:
                 cells.append(wrap_text(cell, sz) or [""])
 
+        is_head = "h" in r.cell_type
+        if is_head:
+            self._heads = [c.strip() for c in r.row]
+
+        heads = self._heads + [""] * len(cols_sz)
+
         for l in range(max(len(c) for c in cells)):
             txt = " "
-            for c, sz in zip(cells, cols_sz):
+            last = len(cells) - 1
+            for i, (c, sz, ct) in enumerate(zip(cells, cols_sz, r.cell_type)):
                 t_txt = c[l] if l < len(c) else ""
-                txt += " " + ljust_text(t_txt, sz) + " "
+                # the padding of the last column is not written
+                t_txt = ljust_text(t_txt, sz) if i < last else t_txt
+                txt += " " + self._cell_style(t_txt, heads[i], ct) + " "
 
             self._append_txt(txt.rstrip() + self.nl())
 

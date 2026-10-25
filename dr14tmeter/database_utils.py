@@ -26,6 +26,8 @@ from dr14tmeter.dr14_config import *
 from dr14tmeter.write_dr import WriteDr, WriteDrExtended
 from dr14tmeter.query import *
 from dr14tmeter.out_messages import *
+from dr14tmeter import tui
+from dr14tmeter import ansi
 
 import shlex
 import subprocess
@@ -255,36 +257,109 @@ def extended_options(opt_nr):
     return res
 
 
+QUERY_MENU = [
+    ("The list of the best DR tracks", "top"),
+    ("The list of the best DR Albums", "top_alb"),
+    ("The list of the best DR Artists", "top_art"),
+    ("The DR time evolution, according with your collection", "evol"),
+    ("The list of the worst DR tracks", "worst"),
+    ("The list of the worst DR albums", "worst_alb"),
+    ("The DR histogram", "hist"),
+    ("Used audio CODEC and mean DR", "codec"),
+    ("The best DR albums and tracks of an artist", "artist"),
+    ("The DR of an album and of its tracks", "album"),
+]
+
+
 def query_helper():
+    if tui.available():
+        return query_helper_tui()
+
+    return query_helper_text()
+
+
+def query_command_line(query):
+    eq_cmd = "%s -q " % get_exe_name()
+    for o in query:
+        eq_cmd += "%s " % shlex.quote(str(o))
+    return eq_cmd
+
+
+def query_helper_tui():
+    # menu selectable with the arrow keys, the results are shown in a pager
+    labels = ["%d. %s" % (i + 1, m[0]) for i, m in enumerate(QUERY_MENU)]
+    pos = 0
+
+    while True:
+        pos = tui.menu("DR14 T.meter - QUERY HELPER", labels, pos)
+
+        if pos is None:
+            return query_helper_text()
+        if pos < 0:
+            return
+
+        kind = QUERY_MENU[pos][1]
+        query = [kind]
+
+        if kind in ["artist", "album"]:
+            name = tui.prompt("Insert the %s name" % kind)
+            if name is None or name == "":
+                continue
+            query.append(name)
+
+        if kind in ["top", "top_alb", "top_art", "worst", "worst_alb", "artist", "album"]:
+            nr = tui.prompt("Number of desired results", 30)
+            if nr is None:
+                continue
+            if not nr.isdigit():
+                nr = "30"
+            query.append(nr)
+
+        if kind == "top_art":
+            nr = tui.prompt(
+                "Minimal number of tracks required for inserting an artist in the result", 10)
+            if nr is None:
+                continue
+            query.append(nr if nr.isdigit() else "10")
+
+        class options:
+            pass
+
+        options.query = query
+
+        res = database_exec_query(options)
+
+        header = "%s\n>    %s\n\n" % (
+            ansi.style("equivalent command line:", "bold"), query_command_line(query))
+        tui.pager(header + (res or ""), QUERY_MENU[pos][0])
+
+
+def query_helper_text():
     subprocess.call("clear", shell=True)
     print_out("----- QUERY HELPER -----")
     print_out("  ")
     print_out(" Choose one of the following query: ")
     print_out("  ")
-    print_out(" 1. The list of the best DR tracks ")
-    print_out(" 2. The list of the best DR Albums ")
-    print_out(" 3. The list of the best DR Artists ")
-    print_out(" 4. The DR time evolution, according with your collection")
-    print_out(" 5. The list of the worst DR tracks  ")
-    print_out(" 6. The list of the worst DR albums ")
-    print_out(" 7. The DR histogram ")
-    print_out(" 8. Used audio CODEC and mean DR ")
-    print_out(" 9. The best DR albums and tracks of an artist ")
-    print_out(" 10. The DR of an album and of its tracks ")
+    for i, m in enumerate(QUERY_MENU):
+        print_out(" %d. %s " % (i + 1, m[0]))
     print_out(" 0. Exit ")
     print_out("  ")
 
-    nr = input_number(rng=(0, 10))
+    nr = input_number(rng=(0, len(QUERY_MENU)))
+
+    if nr == 0:
+        return
 
     class options:
         pass
 
     ext_opt = []
+    kind = QUERY_MENU[nr - 1][1]
 
-    if nr in [9, 10]:
+    if kind in ["artist", "album"]:
         name = ""
         while name == "":
-            print_out(" Insert the %s name: " % ("artist" if nr == 9 else "album"))
+            print_out(" Insert the %s name: " % kind)
             if sys.version_info[0] == 2:
                 name = raw_input(" > ").strip()
             else:
@@ -301,41 +376,19 @@ def query_helper():
         if an.lower() in ["y", "yes"]:
             ext_opt = extended_options(nr)
 
-    if nr == 0:
-        return
-    elif nr == 1:
-        options.query = ["top"]
-    elif nr == 2:
-        options.query = ["top_alb"]
-    elif nr == 3:
-        options.query = ["top_art"]
-    elif nr == 4:
-        options.query = ["evol"]
-    elif nr == 5:
-        options.query = ["worst"]
-    elif nr == 6:
-        options.query = ["worst_alb"]
-    elif nr == 7:
-        options.query = ["hist"]
-    elif nr == 8:
-        options.query = ["codec"]
-    elif nr == 9:
-        options.query = ["artist", name]
-    elif nr == 10:
-        options.query = ["album", name]
+    options.query = [kind]
+    if kind in ["artist", "album"]:
+        options.query.append(name)
 
     for e in ext_opt:
         options.query.append(e)
 
-    eq_cmd = "%s -q " % get_exe_name()
-    for o in options.query:
-        eq_cmd += "%s " % shlex.quote(str(o))
-
     print_out("")
-    print_out("equivalent command line:\n>    %s " % eq_cmd)
+    print_out("equivalent command line:\n>    %s " %
+              query_command_line(options.query))
     print_out("")
 
-    res = database_exec_query(options, tm=ExtendedTextTable())
+    res = database_exec_query(options)
 
     print_out("")
     print_out(res)
@@ -368,11 +421,21 @@ def select_found(found, name, what, label=lambda row: row[1]):
     else:
         default = "1-%d" % len(closest)
 
-    print_out("  ")
     if found[0][0] == 0:
-        print_out(" \"%s\" matches more than one %s: " % (name, what))
+        title = "\"%s\" matches more than one %s" % (name, what)
     else:
-        print_out(" No %s matches \"%s\", the closest ones are: " % (what, name))
+        title = "No %s matches \"%s\", the closest ones are" % (what, name)
+
+    if tui.available():
+        labels = [label(r) for r in rows]
+        chosen = tui.multi_select(
+            title, labels, [i for i, f in enumerate(found) if f[0] == found[0][0]])
+        if chosen:
+            return [rows[i] for i in chosen]
+        return closest
+
+    print_out("  ")
+    print_out(" %s: " % title)
     print_out("  ")
     for i, r in enumerate(rows):
         print_out(" %d. %s " % (i + 1, label(r)))
@@ -418,7 +481,12 @@ def found_names_title(names, max_names=3):
     return "%s and %d more" % (", ".join(names[:max_names]), len(names) - max_names)
 
 
-def database_exec_query(options, tm=ExtendedTextTable()):
+def database_exec_query(options, tm=None):
+
+    if tm is None:
+        tm = ExtendedTextTable()
+
+    tm.color = ansi.enabled()
 
     # the artist and album queries take the name before the other options
     opts = list(options.query[1:])
@@ -508,7 +576,10 @@ def database_exec_query(options, tm=ExtendedTextTable()):
         code = wr.write_query_result(
             res, tm, table_title, q.get_col_keys())
 
-        code += q.get_plot(res)
+        # the plot, when there is one, comes before the list
+        plot = q.get_plot(res)
+        if plot != "":
+            code = plot + "\n" + code
 
         if code != "":
             codes.append(code)

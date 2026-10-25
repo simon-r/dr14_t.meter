@@ -61,7 +61,7 @@ Once enabled, the results of every directory scan, including `-r`, are stored au
 
 | Command | Result |
 | --- | --- |
-| `dr14_tmeter -q` | Opens an interactive menu with all the queries below. |
+| `dr14_tmeter -q` | Opens an interactive menu with all the queries below. Choose with the arrow keys and Enter; the result opens in a scrollable view (arrow keys, PgUp/PgDn, Home/End, Left/Right to pan, `q` to go back to the menu). |
 | `dr14_tmeter -q top [N]` | The `N` tracks with the highest DR (default 30). |
 | `dr14_tmeter -q worst [N]` | The `N` tracks with the lowest DR. |
 | `dr14_tmeter -q top_alb [N]` | The `N` albums with the highest DR. |
@@ -79,8 +79,8 @@ Once enabled, the results of every directory scan, including `-r`, are stored au
 
 - Every name that contains `NAME` is found: `-q artist pink` finds both Pink and Pink Floyd.
 - Names a few typos away from `NAME` are found too, so `-q artist metalica` finds Metallica and `-q album "dark side of the mon"` finds The Dark Side of the Moon. A typo is a missing, extra, wrong, or swapped character. One typo is allowed for every 5 characters of `NAME`, so names shorter than 5 characters have to match exactly.
-- When more than one name is found, a menu lists them with the closest first. All the names that contain `NAME` are listed, followed by the names with typos until the list holds 10 names. Choose one or more numbers, or press Enter to take the closest ones; the menu shows which those are.
-- When the output is not a terminal, for example in a script or when piped, there is no menu and the closest names are used.
+- When more than one name is found, a menu lists them with the closest first. All the names that contain `NAME` are listed, followed by the names with typos until the list holds 10 names. Move with the arrow keys, check the names with Space (`a` checks all) and confirm with Enter; the closest ones are already checked.
+- When the output is not a terminal, for example in a script or when piped, there is no menu and the closest names are used. The menus need Python's `curses` module (on Windows, `pip install windows-curses`); without it a numbered text menu is used.
 
 ### Maintenance
 

@@ -25,6 +25,7 @@ from dr14tmeter.database import dr_database_singletone
 from dr14tmeter.dr14_global import dr14_version, TestVer, test_new_version, get_home_url, get_new_version, get_exe_name
 from dr14tmeter.dr14_utils import *
 from dr14tmeter.out_messages import *
+from dr14tmeter import ansi
 from dr14tmeter.dr14_config import *
 from dr14tmeter.database_utils import *
 
@@ -33,6 +34,28 @@ import subprocess
 import sys
 import logging
 import numpy
+
+
+def invite_database():
+    # a hint about the local DR database, printed before the analysis
+    color = ansi.enabled(sys.stderr)
+
+    def st(txt, *names):
+        return ansi.style(txt, *names) if color else txt
+
+    exe = get_exe_name()
+
+    if not database_exists() or not db_is_enabled():
+        print_msg(st(" Use the local DR database!", "bold", "magenta"))
+        print_msg(" Store every result and query it later: the best and worst tracks,")
+        print_msg(" albums and artists, the DR histogram, the DR evolution ...")
+        print_msg(" To enable it run:  %s" % st("%s --enable_database" % exe, "bold"))
+        print_msg(" More details: https://github.com/simon-r/dr14_t.meter/blob/master/how_to_use.md")
+    else:
+        print_msg(" %s the local DR database is enabled, run %s to query it" % (
+            st("Tip:", "bold", "magenta"), st("%s -q" % exe, "bold")))
+
+    print_msg("")
 
 
 def main():
@@ -132,6 +155,8 @@ def main():
     print_msg(path_name)
     print_msg("")
 
+    invite_database()
+
     if options.recursive:
         subdirlist = list_rec_dirs(path_name)
     else:
@@ -199,17 +224,6 @@ def main():
 
         print_msg(
             "----------------------------------------------------------------------\n")
-
-    if not database_exists():
-        print_msg(" ")
-        print_msg(" News ... News ... News ... News ... News  !!! ")
-        print_msg(
-            " With the version 2.0.0 there is the possibility to store all results in a database")
-        print_msg(" If you want to enable this database execute the command:")
-        print_msg("  > %s --enable_database " % get_exe_name())
-        print_msg("")
-        print_msg(
-            " for more details visit: https://github.com/simon-r/dr14_t.meter/blob/master/how_to_use.md ")
 
     return r
 

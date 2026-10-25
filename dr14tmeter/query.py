@@ -20,6 +20,7 @@ import shutil
 import sys
 import unicodedata
 
+from dr14tmeter import ansi
 from dr14tmeter.console_plot import line_plot
 from dr14tmeter.database import dr_database_singletone
 from dr14tmeter.table import histogram_bar, wrap_text
@@ -483,7 +484,10 @@ class query_date_dr_evolution(query):
         console = shutil.get_terminal_size()
         height = min(max(console.lines // 2, 8), 20)
 
-        txt = "\n Mean DR per year\n\n"
+        color = ansi.enabled()
+
+        txt = "\n %s\n\n" % (
+            ansi.style("Mean DR per year", "bold", "magenta") if color else "Mean DR per year")
         txt += line_plot([r["Date"] for r in years],
                          [r["Mean"] for r in years],
                          console.columns, height)
@@ -493,7 +497,7 @@ class query_date_dr_evolution(query):
                 self.min_year, last_year, ", ".join(skipped))
             txt += "\n"
             for line in wrap_text(note, max(console.columns - 2, 20)):
-                txt += " " + line + "\n"
+                txt += " " + (ansi.style(line, "red") if color else line) + "\n"
 
         return txt
 
