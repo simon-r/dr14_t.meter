@@ -32,6 +32,10 @@ from dr14tmeter.out_messages import *
 unique_db_object = 0
 lock_db = threading.Lock()
 
+# Schema version produced by the latest migration. Bump it together with a
+# new entry in dr_database._migrations.
+DB_SCHEMA_VERSION = 1
+
 
 def my_dict_factory(cursor, row):
     d = {}
@@ -74,7 +78,10 @@ class dr_database:
         self._id_dr = 0
         self._id_date = 0
 
-        self._current_schema_db_version = 1
+        # {from_version: method}: each method returns the SQL script that
+        # migrates the db from from_version to from_version + 1 and ends
+        # with the matching insert into Db_Version.
+        self._migrations = {}
 
     def build_database(self):
         global lock_db
@@ -90,7 +97,7 @@ class dr_database:
         conn.executescript(db)
         conn.commit()
 
-        self.ungrade_db()
+        self.upgrade_db()
 
         lock_db.release()
 
@@ -567,15 +574,37 @@ class dr_database:
 
         return db
 
-    def ungrade_db(self):
-        if self._current_schema_db_version == self.db_version:
-            return
+    def upgrade_db(self):
+        cur = self.db_version
 
-        #
-        # upgrade db here.
-        #
+        if cur > DB_SCHEMA_VERSION:
+            raise Exception("Error: database.upgrade_db the database version "
+                            "(%d) is newer than the supported one (%d)" %
+                            (cur, DB_SCHEMA_VERSION))
 
-        return
+        while cur < DB_SCHEMA_VERSION:
+            if cur not in self._migrations:
+                raise Exception("Error: database.upgrade_db no migration "
+                                "from version %d to %d" % (cur, cur + 1))
+
+            script = self._migrations[cur]()
+
+            conn = sqlite3.connect(get_db_path())
+            try:
+                conn.executescript("begin; " + script + " commit;")
+            except Exception as e:
+                conn.rollback()
+                raise Exception("Error: database.upgrade_db migration "
+                                "%d -> %d failed: %s" % (cur, cur + 1, e))
+            finally:
+                conn.close()
+
+            new = self.db_version
+            if new != cur + 1:
+                raise Exception("Error: database.upgrade_db migration "
+                                "%d -> %d left the database at version %d" %
+                                (cur, cur + 1, new))
+            cur = new
 
     def dump(self):
         global lock_db

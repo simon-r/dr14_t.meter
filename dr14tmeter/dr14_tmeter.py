@@ -96,6 +96,12 @@ def main():
             fix_problematic_database()
             return
 
+        try:
+            db.upgrade_db()
+        except Exception as e:
+            print_err(str(e))
+            return
+
     if options.query != None:
 
         if not database_exists():

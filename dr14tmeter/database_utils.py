@@ -171,7 +171,12 @@ def enable_database(prompt=True):
             dest_file = dbp + ".de_save"
             os.rename(dbp, dest_file)
         else:
-            f = True
+            try:
+                db.upgrade_db()
+                f = True
+            except Exception as e:
+                print_err(str(e))
+                f = False
 
     if not database_exists():
 
