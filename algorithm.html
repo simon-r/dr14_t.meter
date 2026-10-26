@@ -1,0 +1,497 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<link rel="shortcut icon" href="favicon.ico" />
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>DR14 T.meter - The DR14 algorithm</title>
+<meta name="keywords" content="dynamic, range, DR, dr14, meter, audio, music, loudness war, python, off-line, Pleasurize Music Foundation, linux, open source"/>
+<meta name="description" content="DR14 T.meter is a free and open source command line tool for computing the DR - Dynamic Range of your music according to the procedure used in the off-line meter released by the Pleasurize Music Foundation" />
+<link href="layout.css" rel="stylesheet" type="text/css">
+<script src="js/scripts.js"></script>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.min.js"></script>
+</head>
+<body style="background-color: rgb(255, 255, 255);" link="#1e2580" marginheight="0" marginwidth="0">
+<br>
+<table class="top_table">
+<tbody>
+<tr>
+<td><img src="logo-2.png" alt="DR14 T.meter" border="0"></td>
+</tr>
+</tbody>
+</table>
+<br>
+<table border="0" cellpadding="0" cellspacing="10" width="100%">
+<tbody>
+<tr valign="top">
+<td>
+<table class="main_table">
+<tbody>
+<tr>
+<td>
+<!-- BEGIN BODY -->
+<div class="chapter">
+<h1 id="dr14-algorithm-mathematical-description">DR14 algorithm: mathematical description</h1>
+<p>This document describes the computation performed by <code>compute_dr14()</code> in <code>dr14tmeter/compute_dr14.py</code>. Given a track, it returns three values:</p>
+<ul>
+<li><span class="math inline">\(\mathrm{DR}\)</span>: the integer dynamic range score,</li>
+<li><span class="math inline">\(\mathrm{Peak}_{\mathrm{dB}}\)</span>: the peak level in dBFS,</li>
+<li><span class="math inline">\(\mathrm{RMS}_{\mathrm{dB}}\)</span>: the overall RMS level in dBFS.</li>
+</ul>
+<h2 id="0-notation">0. Notation</h2>
+<h3 id="symbols">Symbols</h3>
+<table>
+<thead>
+<tr>
+<th>Symbol</th>
+<th>Meaning</th>
+<th>Unit</th>
+<th>Code</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><span class="math inline">\(N\)</span></td>
+<td>Track length: number of samples in each channel</td>
+<td>samples</td>
+<td><code>s[0]</code> = <code>Y.shape[0]</code></td>
+</tr>
+<tr>
+<td><span class="math inline">\(C\)</span></td>
+<td>Number of audio channels (1 = mono, 2 = stereo, …)</td>
+<td>–</td>
+<td><code>ch</code></td>
+</tr>
+<tr>
+<td><span class="math inline">\(n\)</span></td>
+<td>Sample index (time position), <span class="math inline">\(0 \le n \le N-1\)</span></td>
+<td>–</td>
+<td>row of <code>Y</code></td>
+</tr>
+<tr>
+<td><span class="math inline">\(c\)</span></td>
+<td>Channel index, <span class="math inline">\(1 \le c \le C\)</span></td>
+<td>–</td>
+<td>column of <code>Y</code> (0-based in code)</td>
+</tr>
+<tr>
+<td><span class="math inline">\(y_c[n]\)</span></td>
+<td>Value of sample <span class="math inline">\(n\)</span> in channel <span class="math inline">\(c\)</span>, normalized to full scale</td>
+<td>–</td>
+<td><code>Y[n, c-1]</code></td>
+</tr>
+<tr>
+<td><span class="math inline">\(F_s\)</span></td>
+<td>Sampling rate</td>
+<td>Hz (samples/s)</td>
+<td><code>Fs</code></td>
+</tr>
+<tr>
+<td><span class="math inline">\(T\)</span></td>
+<td>Nominal block duration, <span class="math inline">\(T = 3\)</span></td>
+<td>s</td>
+<td><code>block_time</code></td>
+</tr>
+<tr>
+<td><span class="math inline">\(q\)</span></td>
+<td>Fraction of loudest blocks used, <span class="math inline">\(q = 0.2\)</span></td>
+<td>–</td>
+<td><code>cut_best_bins</code></td>
+</tr>
+<tr>
+<td><span class="math inline">\(\Delta\)</span></td>
+<td>Sampling-rate correction (60 at 44.1 kHz, otherwise 0)</td>
+<td>samples/s</td>
+<td><code>delta_fs</code></td>
+</tr>
+<tr>
+<td><span class="math inline">\(L\)</span></td>
+<td>Block length</td>
+<td>samples</td>
+<td><code>block_samples</code></td>
+</tr>
+<tr>
+<td><span class="math inline">\(M\)</span></td>
+<td>Number of blocks</td>
+<td>–</td>
+<td><code>seg_cnt</code></td>
+</tr>
+<tr>
+<td><span class="math inline">\(k\)</span></td>
+<td>Block index, <span class="math inline">\(0 \le k \le M-1\)</span></td>
+<td>–</td>
+<td><code>i</code></td>
+</tr>
+<tr>
+<td><span class="math inline">\(N_{\mathrm{rem}}\)</span></td>
+<td>Samples left over after the last full block</td>
+<td>samples</td>
+<td><code>s[0] - curr_sam</code></td>
+</tr>
+<tr>
+<td><span class="math inline">\(B_k\)</span></td>
+<td>Set of sample indices that belong to block <span class="math inline">\(k\)</span></td>
+<td>–</td>
+<td>slice of <code>Y</code></td>
+</tr>
+<tr>
+<td><span class="math inline">\(\lvert B_k \rvert\)</span></td>
+<td>Number of samples in block <span class="math inline">\(k\)</span></td>
+<td>samples</td>
+<td>slice length</td>
+</tr>
+<tr>
+<td><span class="math inline">\(R_{k,c}\)</span></td>
+<td>RMS level of block <span class="math inline">\(k\)</span>, channel <span class="math inline">\(c\)</span></td>
+<td>linear, full scale = 1</td>
+<td><code>rms[k, c-1]</code> (before sort)</td>
+</tr>
+<tr>
+<td><span class="math inline">\(P_{k,c}\)</span></td>
+<td>Peak level of block <span class="math inline">\(k\)</span>, channel <span class="math inline">\(c\)</span></td>
+<td>linear, full scale = 1</td>
+<td><code>peaks[k, c-1]</code> (before sort)</td>
+</tr>
+<tr>
+<td><span class="math inline">\(j\)</span></td>
+<td>Rank after sorting, <span class="math inline">\(1 \le j \le M\)</span> (1 = smallest)</td>
+<td>–</td>
+<td>row of sorted array</td>
+</tr>
+<tr>
+<td><span class="math inline">\(R_{(j),c}\)</span></td>
+<td><span class="math inline">\(j\)</span>-th smallest block RMS of channel <span class="math inline">\(c\)</span></td>
+<td>linear</td>
+<td><code>rms[j-1, c-1]</code> (after sort)</td>
+</tr>
+<tr>
+<td><span class="math inline">\(P_{(j),c}\)</span></td>
+<td><span class="math inline">\(j\)</span>-th smallest block peak of channel <span class="math inline">\(c\)</span></td>
+<td>linear</td>
+<td><code>peaks[j-1, c-1]</code> (after sort)</td>
+</tr>
+<tr>
+<td><span class="math inline">\(K\)</span></td>
+<td>Number of loudest blocks used for the RMS average</td>
+<td>–</td>
+<td><code>n_blk</code></td>
+</tr>
+<tr>
+<td><span class="math inline">\(S_c\)</span></td>
+<td>Sum of the squared RMS of the <span class="math inline">\(K\)</span> loudest blocks</td>
+<td>linear²</td>
+<td><code>rms_sum[c-1]</code></td>
+</tr>
+<tr>
+<td><span class="math inline">\(\bar{R}_c\)</span></td>
+<td>Quadratic mean of the <span class="math inline">\(K\)</span> loudest block RMS values</td>
+<td>linear</td>
+<td><code>np.sqrt(rms_sum / n_blk)</code></td>
+</tr>
+<tr>
+<td><span class="math inline">\(\hat{P}_c\)</span></td>
+<td>Reference peak: second-highest block peak</td>
+<td>linear</td>
+<td><code>peaks[seg_cnt - 2, c-1]</code></td>
+</tr>
+<tr>
+<td><span class="math inline">\(\mathrm{DR}_c\)</span></td>
+<td>Dynamic range of channel <span class="math inline">\(c\)</span></td>
+<td>dB</td>
+<td><code>ch_dr14[c-1]</code></td>
+</tr>
+<tr>
+<td><span class="math inline">\(\varepsilon\)</span></td>
+<td>Silence threshold, <span class="math inline">\(\varepsilon = 2^{-24}\)</span></td>
+<td>linear²</td>
+<td><code>audio_min()</code></td>
+</tr>
+<tr>
+<td><span class="math inline">\(D_{\max}\)</span></td>
+<td>Largest accepted DR, <span class="math inline">\(D_{\max} = 20\log_{10}(2^{24})\)</span></td>
+<td>dB</td>
+<td><code>max_dynamic(24)</code></td>
+</tr>
+<tr>
+<td><span class="math inline">\(\mathrm{DR}\)</span></td>
+<td>Final dynamic range score</td>
+<td>dB (integer)</td>
+<td><code>dr14</code></td>
+</tr>
+<tr>
+<td><span class="math inline">\(\mathrm{Peak}_{\mathrm{dB}}\)</span></td>
+<td>Peak level of the track</td>
+<td>dBFS</td>
+<td><code>db_peak</code></td>
+</tr>
+<tr>
+<td><span class="math inline">\(\mathrm{RMS}_c\)</span></td>
+<td>RMS of channel <span class="math inline">\(c\)</span> over the whole track</td>
+<td>linear</td>
+<td><code>dr_rms(Y)[c-1]</code></td>
+</tr>
+<tr>
+<td><span class="math inline">\(\overline{\mathrm{RMS}}\)</span></td>
+<td>Mean of <span class="math inline">\(\mathrm{RMS}_c\)</span> over channels</td>
+<td>linear</td>
+<td><code>y_rms</code></td>
+</tr>
+<tr>
+<td><span class="math inline">\(\mathrm{RMS}_{\mathrm{dB}}\)</span></td>
+<td>Overall RMS level of the track</td>
+<td>dBFS</td>
+<td><code>db_rms</code></td>
+</tr>
+</tbody>
+</table>
+<h3 id="operators-and-units">Operators and units</h3>
+<table>
+<thead>
+<tr>
+<th>Notation</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><span class="math inline">\(\lfloor x \rfloor\)</span></td>
+<td>Floor: largest integer <span class="math inline">\(\le x\)</span></td>
+</tr>
+<tr>
+<td><span class="math inline">\(a \bmod b\)</span></td>
+<td>Remainder of the integer division of <span class="math inline">\(a\)</span> by <span class="math inline">\(b\)</span></td>
+</tr>
+<tr>
+<td><span class="math inline">\(\lvert x \rvert\)</span></td>
+<td>Absolute value of a number; for a set, its number of elements</td>
+</tr>
+<tr>
+<td><span class="math inline">\(\max_{n \in B} f(n)\)</span></td>
+<td>Largest value of <span class="math inline">\(f(n)\)</span> over all <span class="math inline">\(n\)</span> in the set <span class="math inline">\(B\)</span></td>
+</tr>
+<tr>
+<td><span class="math inline">\(\log_{10}\)</span></td>
+<td>Base-10 logarithm</td>
+</tr>
+<tr>
+<td><span class="math inline">\(\mathrm{round}(x)\)</span></td>
+<td>Nearest integer to <span class="math inline">\(x\)</span>; exact halves go to the even integer</td>
+</tr>
+<tr>
+<td><span class="math inline">\(\lor\)</span></td>
+<td>Logical "or"</td>
+</tr>
+<tr>
+<td>dB</td>
+<td>Decibel. For two amplitudes <span class="math inline">\(a\)</span> and <span class="math inline">\(b\)</span>, <span class="math inline">\(a\)</span> is <span class="math inline">\(20\log_{10}(a/b)\)</span> dB relative to <span class="math inline">\(b\)</span></td>
+</tr>
+<tr>
+<td>dBFS</td>
+<td>Decibel relative to full scale, i.e. relative to amplitude <span class="math inline">\(1\)</span></td>
+</tr>
+<tr>
+<td>linear</td>
+<td>A plain amplitude value on the scale where full scale is <span class="math inline">\(1\)</span></td>
+</tr>
+</tbody>
+</table>
+<h2 id="1-input">1. Input</h2>
+<p>The input is a track with <span class="math inline">\(C\)</span> channels, each holding <span class="math inline">\(N\)</span> samples taken at sampling rate <span class="math inline">\(F_s\)</span>. The value of sample <span class="math inline">\(n\)</span> of channel <span class="math inline">\(c\)</span> is</p>
+<p><span class="math display">\[
+y_c[n] \in [-1, 1], \qquad n = 0, 1, \dots, N-1, \qquad c = 1, 2, \dots, C .
+\]</span></p>
+<p>The value <span class="math inline">\(\pm 1\)</span> is digital full scale (the largest amplitude the format can store). Its duration in seconds is <span class="math inline">\(N / F_s\)</span>.</p>
+<h2 id="2-block-segmentation">2. Block segmentation</h2>
+<h3 id="constants">Constants</h3>
+<p><span class="math display">\[
+T = 3\ \mathrm{s} \quad \text{(nominal block duration)},
+\qquad\qquad
+q = 0.2 \quad \text{(fraction of loudest blocks used later)}.
+\]</span></p>
+<h3 id="block-length">Block length</h3>
+<p>Define the correction <span class="math inline">\(\Delta\)</span>, in samples per second:</p>
+<p><span class="math display">\[
+\Delta =
+\begin{cases}
+60 &amp; \text{if } F_s = 44100\ \mathrm{Hz} \\
+0  &amp; \text{otherwise}
+\end{cases}
+\]</span></p>
+<p>The block length <span class="math inline">\(L\)</span>, in samples, is</p>
+<p><span class="math display">\[
+L = T\,(F_s + \Delta).
+\]</span></p>
+<p>At <span class="math inline">\(F_s = 44100\)</span> Hz this gives <span class="math inline">\(L = 3 \cdot 44160 = 132480\)</span> samples (<span class="math inline">\(L / F_s \approx 3.0041\)</span> s). At any other rate <span class="math inline">\(L = 3F_s\)</span> samples, exactly 3 s.</p>
+<h3 id="number-of-blocks">Number of blocks</h3>
+<p>The number of complete blocks is <span class="math inline">\(\lfloor N / L \rfloor\)</span>. Leaving them out, the number of samples still left is</p>
+<p><span class="math display">\[
+N_{\mathrm{rem}} = N - L \left\lfloor \frac{N}{L} \right\rfloor = N \bmod L,
+\qquad 0 \le N_{\mathrm{rem}} \le L - 1 .
+\]</span></p>
+<p>One extra block is always reserved for that remainder, so the total number of blocks is</p>
+<p><span class="math display">\[
+M = \left\lfloor \frac{N}{L} \right\rfloor + 1 .
+\]</span></p>
+<p>Since <span class="math inline">\(M \ge 1\)</span> for every <span class="math inline">\(N \ge 0\)</span>, the "too short" early exit in the code is never taken.</p>
+<h3 id="sample-indices-of-each-block">Sample indices of each block</h3>
+<p>For <span class="math inline">\(k = 0, 1, \dots, M-2\)</span>, block <span class="math inline">\(k\)</span> is a complete block containing the samples</p>
+<p><span class="math display">\[
+B_k = \{\, kL,\; kL+1,\; \dots,\; (k+1)L - 1 \,\},
+\qquad \lvert B_k \rvert = L .
+\]</span></p>
+<p>The last block, <span class="math inline">\(k = M-1\)</span>, takes the remainder. Because the code slices <code>Y[curr_sam : N-1]</code>, it stops one sample short of the end of the track (sample <span class="math inline">\(N-1\)</span> is left out):</p>
+<p><span class="math display">\[
+B_{M-1} = \{\, (M-1)L,\; (M-1)L + 1,\; \dots,\; N-2 \,\},
+\qquad \lvert B_{M-1} \rvert = N_{\mathrm{rem}} - 1
+\qquad (\text{when } N_{\mathrm{rem}} \ge 2).
+\]</span></p>
+<p>If <span class="math inline">\(N_{\mathrm{rem}} = 0\)</span>, the last block is not computed at all (see section 3), and if <span class="math inline">\(N_{\mathrm{rem}} = 1\)</span> it is empty (see section 12).</p>
+<h2 id="3-per-block-rms-and-peak">3. Per-block RMS and peak</h2>
+<p>For every block <span class="math inline">\(k = 0, \dots, M-1\)</span> and channel <span class="math inline">\(c = 1, \dots, C\)</span>, the block RMS level <span class="math inline">\(R_{k,c}\)</span> and block peak level <span class="math inline">\(P_{k,c}\)</span> are</p>
+<p><span class="math display">\[
+R_{k,c} = \sqrt{\frac{2}{\lvert B_k \rvert} \sum_{n \in B_k} y_c[n]^2}
+\qquad\qquad
+P_{k,c} = \max_{n \in B_k} \bigl| y_c[n] \bigr| .
+\]</span></p>
+<p>Here <span class="math inline">\(\sum_{n \in B_k}\)</span> is the sum over all sample indices in block <span class="math inline">\(k\)</span>.</p>
+<p>The factor <span class="math inline">\(2\)</span> inside the square root scales the ordinary RMS by <span class="math inline">\(\sqrt{2}\)</span>. For example, take a sine wave <span class="math inline">\(y[n] = A\sin(\omega n)\)</span>, where <span class="math inline">\(A\)</span> is its amplitude and <span class="math inline">\(\omega\)</span> its angular frequency in radians per sample. Its ordinary RMS is <span class="math inline">\(A/\sqrt{2}\)</span>, so it gets <span class="math inline">\(R = A\)</span>, the same value as its peak. A full-scale sine (<span class="math inline">\(A = 1\)</span>) therefore reads <span class="math inline">\(0\)</span> dBFS on both.</p>
+<p>If <span class="math inline">\(N_{\mathrm{rem}} = 0\)</span> (the track length is an exact multiple of <span class="math inline">\(L\)</span>), the last block keeps its initial values: <span class="math inline">\(R_{M-1,c} = P_{M-1,c} = 0\)</span>.</p>
+<h2 id="4-sorting">4. Sorting</h2>
+<p>For each channel <span class="math inline">\(c\)</span>, the <span class="math inline">\(M\)</span> RMS values <span class="math inline">\(R_{0,c}, \dots, R_{M-1,c}\)</span> are sorted in ascending order, and so are the <span class="math inline">\(M\)</span> peak values <span class="math inline">\(P_{0,c}, \dots, P_{M-1,c}\)</span>. The sorted values are written with the rank <span class="math inline">\(j\)</span> in parentheses, with <span class="math inline">\(j = 1\)</span> for the smallest and <span class="math inline">\(j = M\)</span> for the largest:</p>
+<p><span class="math display">\[
+R_{(1),c} \le R_{(2),c} \le \dots \le R_{(M),c},
+\qquad
+P_{(1),c} \le P_{(2),c} \le \dots \le P_{(M),c}.
+\]</span></p>
+<p>The two lists are sorted <strong>independently</strong>, so <span class="math inline">\(R_{(j),c}\)</span> and <span class="math inline">\(P_{(j),c}\)</span> generally come from different blocks.</p>
+<h2 id="5-loudest-20-of-blocks">5. Loudest 20% of blocks</h2>
+<p>The number of blocks kept, <span class="math inline">\(K\)</span>, is the fraction <span class="math inline">\(q = 0.2\)</span> of <span class="math inline">\(M\)</span>, rounded down, but at least 1:</p>
+<p><span class="math display">\[
+K = \max\bigl(1,\; \lfloor q M \rfloor\bigr).
+\]</span></p>
+<p>The <span class="math inline">\(K\)</span> loudest blocks are the ranks <span class="math inline">\(j = M-K+1, \dots, M\)</span>. The sum of their squared RMS values, <span class="math inline">\(S_c\)</span>, and their quadratic mean, <span class="math inline">\(\bar{R}_c\)</span>, are</p>
+<p><span class="math display">\[
+S_c = \sum_{j = M-K+1}^{M} R_{(j),c}^{\,2},
+\qquad\qquad
+\bar{R}_c = \sqrt{\frac{S_c}{K}} .
+\]</span></p>
+<p><span class="math inline">\(\bar{R}_c\)</span> averages power (squared RMS), not RMS values directly.</p>
+<h2 id="6-reference-peak">6. Reference peak</h2>
+<p>The reference peak <span class="math inline">\(\hat{P}_c\)</span> is the <strong>second-highest</strong> block peak of channel <span class="math inline">\(c\)</span>. Skipping the highest one makes the measure robust against a single isolated transient:</p>
+<p><span class="math display">\[
+\hat{P}_c =
+\begin{cases}
+P_{(M-1),c} &amp; \text{if } M \ge 2 \\
+P_{(1),c}   &amp; \text{if } M = 1
+\end{cases}
+\]</span></p>
+<p>The case <span class="math inline">\(M = 1\)</span> comes from the code index <code>seg_cnt - 2</code> evaluating to <span class="math inline">\(-1\)</span>, which in Python selects the last (here, the only) element.</p>
+<h2 id="7-per-channel-dynamic-range">7. Per-channel dynamic range</h2>
+<p>The dynamic range of channel <span class="math inline">\(c\)</span>, <span class="math inline">\(\mathrm{DR}_c\)</span>, is the ratio between the reference peak and the loud-block RMS, in decibels:</p>
+<p><span class="math display">\[
+\mathrm{DR}_c = -20 \log_{10}\!\left( \frac{\bar{R}_c}{\hat{P}_c} \right)
+= 20 \log_{10}\!\left( \frac{\hat{P}_c}{\bar{R}_c} \right)
+\quad [\mathrm{dB}].
+\]</span></p>
+<h3 id="validity-check">Validity check</h3>
+<p>Define the silence threshold <span class="math inline">\(\varepsilon\)</span> (the smallest step of 24-bit audio, in squared-amplitude units as used here) and the largest accepted dynamic range <span class="math inline">\(D_{\max}\)</span> (the full range of 24-bit audio):</p>
+<p><span class="math display">\[
+\varepsilon = 2^{-24},
+\qquad\qquad
+D_{\max} = 20 \log_{10}\!\left(2^{24}\right) \approx 144.49\ \mathrm{dB}.
+\]</span></p>
+<p>A channel's value is replaced by zero if the channel is effectively silent or the result is out of range:</p>
+<p><span class="math display">\[
+\mathrm{DR}_c \leftarrow 0
+\quad \text{if} \quad
+S_c &lt; \varepsilon
+\;\;\lor\;\;
+\bigl|\mathrm{DR}_c\bigr| &gt; D_{\max} .
+\]</span></p>
+<p>This also catches the degenerate cases: <span class="math inline">\(\hat{P}_c = 0\)</span> gives <span class="math inline">\(\lvert \mathrm{DR}_c \rvert = \infty\)</span>, and a silent channel (<span class="math inline">\(\hat{P}_c = \bar{R}_c = 0\)</span>) fails the <span class="math inline">\(S_c &lt; \varepsilon\)</span> test.</p>
+<h2 id="8-final-dr-score">8. Final DR score</h2>
+<p>The final score <span class="math inline">\(\mathrm{DR}\)</span> is the mean of <span class="math inline">\(\mathrm{DR}_c\)</span> over the <span class="math inline">\(C\)</span> channels, rounded to the nearest integer:</p>
+<p><span class="math display">\[
+\mathrm{DR} = \mathrm{round}\!\left( \frac{1}{C} \sum_{c=1}^{C} \mathrm{DR}_c \right).
+\]</span></p>
+<p>Python's <code>round()</code> rounds exact halves to the nearest even integer (e.g. <span class="math inline">\(8.5 \to 8\)</span>, <span class="math inline">\(9.5 \to 10\)</span>).</p>
+<h2 id="9-peak-level">9. Peak level</h2>
+<p>The peak level <span class="math inline">\(\mathrm{Peak}_{\mathrm{dB}}\)</span> is the largest block peak over all blocks <span class="math inline">\(k\)</span> and all channels <span class="math inline">\(c\)</span>, in dBFS:</p>
+<p><span class="math display">\[
+\mathrm{Peak}_{\mathrm{dB}} = 20 \log_{10}\!\left( \max_{\substack{0 \le k \le M-1 \\ 1 \le c \le C}} P_{k,c} \right)
+\quad [\mathrm{dBFS}].
+\]</span></p>
+<p>This equals the largest absolute sample value of the track, except that sample <span class="math inline">\(N-1\)</span> is not considered (see section 2).</p>
+<h2 id="10-overall-rms-level">10. Overall RMS level</h2>
+<p>For each channel <span class="math inline">\(c\)</span>, <span class="math inline">\(\mathrm{RMS}_c\)</span> is the RMS over the whole track, with the same <span class="math inline">\(\sqrt{2}\)</span> scaling as in section 3. The values are averaged linearly over channels into <span class="math inline">\(\overline{\mathrm{RMS}}\)</span>, then converted to dBFS:</p>
+<p><span class="math display">\[
+\mathrm{RMS}_c = \sqrt{\frac{2}{N} \sum_{n=0}^{N-1} y_c[n]^2},
+\qquad
+\overline{\mathrm{RMS}} = \frac{1}{C} \sum_{c=1}^{C} \mathrm{RMS}_c,
+\qquad
+\mathrm{RMS}_{\mathrm{dB}} = 20 \log_{10} \overline{\mathrm{RMS}}
+\quad [\mathrm{dBFS}].
+\]</span></p>
+<p>Unlike the block values, this uses all <span class="math inline">\(N\)</span> samples, including sample <span class="math inline">\(N-1\)</span>.</p>
+<h2 id="11-worked-example">11. Worked example</h2>
+<p>A 4-minute stereo track (<span class="math inline">\(C = 2\)</span>) at <span class="math inline">\(F_s = 44100\)</span> Hz:</p>
+<p><span class="math display">\[
+N = 240 \cdot 44100 = 10\,584\,000,
+\qquad
+L = 3 \cdot (44100 + 60) = 132\,480,
+\]</span></p>
+<p><span class="math display">\[
+M = \left\lfloor \tfrac{10\,584\,000}{132\,480} \right\rfloor + 1 = 79 + 1 = 80,
+\qquad
+N_{\mathrm{rem}} = 10\,584\,000 - 79 \cdot 132\,480 = 118\,080,
+\qquad
+K = \lfloor 0.2 \cdot 80 \rfloor = 16 .
+\]</span></p>
+<p>So there are 79 full blocks plus a remainder block of <span class="math inline">\(N_{\mathrm{rem}} - 1 = 118\,079\)</span> samples. For each channel, <span class="math inline">\(\bar{R}_c\)</span> is computed from the 16 largest block RMS values, and <span class="math inline">\(\hat{P}_c = P_{(79),c}\)</span> is the 79th of the 80 sorted block peaks. The two values <span class="math inline">\(\mathrm{DR}_1\)</span> and <span class="math inline">\(\mathrm{DR}_2\)</span> are then averaged and rounded.</p>
+<h2 id="12-edge-cases-in-the-implementation">12. Edge cases in the implementation</h2>
+<ul>
+<li><strong><span class="math inline">\(N_{\mathrm{rem}} = 1\)</span> (one sample of remainder).</strong> The last block <span class="math inline">\(B_{M-1}\)</span> is empty (<span class="math inline">\(\lvert B_{M-1} \rvert = 0\)</span>). Its RMS evaluates to <span class="math inline">\(0/0\)</span> (NaN, with a warning) and the peak computation raises <code>ValueError: zero-size array to reduction operation maximum which has no identity</code>. This happens whenever <span class="math inline">\(N \bmod L = 1\)</span>.</li>
+<li><strong><span class="math inline">\(N_{\mathrm{rem}} = 0\)</span> (exact multiple of <span class="math inline">\(L\)</span>).</strong> The unused remainder block contributes <span class="math inline">\(R_{M-1,c} = P_{M-1,c} = 0\)</span>. It still counts toward <span class="math inline">\(M\)</span> and therefore toward <span class="math inline">\(K = \max(1, \lfloor qM \rfloor)\)</span>.</li>
+<li><strong>Last sample dropped.</strong> Sample <span class="math inline">\(N-1\)</span> never enters any block, so it does not affect <span class="math inline">\(\mathrm{DR}\)</span> or <span class="math inline">\(\mathrm{Peak}_{\mathrm{dB}}\)</span>. It does enter <span class="math inline">\(\mathrm{RMS}_{\mathrm{dB}}\)</span>, which is computed on the full signal.</li>
+</ul>
+
+</div>
+<!-- END BODY -->
+</td>
+</tr>
+</tbody>
+</table></td>
+<td width="170" id="menu_col">
+<script type="text/javascript">print_site_menu()</script>
+<script type="text/javascript">print_link_menu()</script>
+<br>
+<table>
+<tbody>
+<tr>
+<td align="char"><a href="https://github.com/simon-r/dr14_t.meter" target="_parent" title="GitHub"><img src="github-logo.png" width="30" height="30" alt="GitHub" /></a></td>
+</tr>
+</tbody>
+</table>
+<br>
+<table class="menu_table">
+<tbody>
+<tr>
+<td>
+<br>
+<div style="text-align: center;">
+<a href="https://web.archive.org/web/20130111082140/http://www.pleasurizemusic.com/"><img title="DR logo" alt="DR logo" src="dr.png"></a>
+<br>
+</div>
+<br>
+</td>
+</tr>
+</tbody>
+</table>
+</td>
+</tr>
+</tbody>
+</table>
+<br>
+<br>
+</body>
+</html>

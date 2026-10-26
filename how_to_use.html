@@ -1,0 +1,315 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<link rel="shortcut icon" href="favicon.ico" />
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>DR14 T.meter - How to use</title>
+<meta name="keywords" content="dynamic, range, DR, dr14, meter, audio, music, loudness war, python, off-line, Pleasurize Music Foundation, linux, open source"/>
+<meta name="description" content="DR14 T.meter is a free and open source command line tool for computing the DR - Dynamic Range of your music according to the procedure used in the off-line meter released by the Pleasurize Music Foundation" />
+<link href="layout.css" rel="stylesheet" type="text/css">
+<script src="js/scripts.js"></script>
+</head>
+<body style="background-color: rgb(255, 255, 255);" link="#1e2580" marginheight="0" marginwidth="0">
+<br>
+<table class="top_table">
+<tbody>
+<tr>
+<td><img src="logo-2.png" alt="DR14 T.meter" border="0"></td>
+</tr>
+</tbody>
+</table>
+<br>
+<table border="0" cellpadding="0" cellspacing="10" width="100%">
+<tbody>
+<tr valign="top">
+<td>
+<table class="main_table">
+<tbody>
+<tr>
+<td>
+<!-- BEGIN BODY -->
+<div class="chapter">
+<h1 id="how-to-use-dr14-tmeter">How to use DR14 T.meter</h1>
+<p>A short reference of every feature of <code>dr14_tmeter</code>. For installation, see the <a href="index.html">README</a>. Run <code>dr14_tmeter --help</code> for the raw list of options.</p>
+<p>Supported formats: FLAC, MP3, Ogg Vorbis, Opus, MP4/M4A, WAV, WavPack, AC3, WMA, DSF and DFF.</p>
+<h2 id="measuring-the-dr">Measuring the DR</h2>
+<table>
+<thead>
+<tr>
+<th>Command</th>
+<th>What it does</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>dr14_tmeter DIR</code></td>
+<td>Measures every audio file in <code>DIR</code> (the current directory if omitted) and the album DR.</td>
+</tr>
+<tr>
+<td><code>dr14_tmeter -r DIR</code></td>
+<td>Also scans all subdirectories, one result per directory.</td>
+</tr>
+<tr>
+<td><code>dr14_tmeter -f FILE</code></td>
+<td>Measures a single file and prints its DR, peak and RMS.</td>
+</tr>
+<tr>
+<td><code>dr14_tmeter --files_list LIST</code></td>
+<td>Measures the files listed in <code>LIST</code>, one path per line, or read from standard input if <code>LIST</code> is omitted.</td>
+</tr>
+<tr>
+<td><code>--no_overwrite</code></td>
+<td>Skips the directories that already contain result files. With <code>-r</code>, it analyses only new albums.</td>
+</tr>
+<tr>
+<td><code>-1</code></td>
+<td>Uses a single CPU core. By default, half of the cores are used.</td>
+</tr>
+<tr>
+<td><code>--quiet</code></td>
+<td>Hides the progress messages.</td>
+</tr>
+<tr>
+<td><code>--skip_version_check</code></td>
+<td>Skips the online check for a newer version.</td>
+</tr>
+<tr>
+<td><code>-v</code></td>
+<td>Prints the version.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="result-files">Result files</h2>
+<p>By default, a text table named after the album DR (for example <code>dr14-DR12.txt</code>) is written in each analysed directory.</p>
+<table>
+<thead>
+<tr>
+<th>Option</th>
+<th>What it does</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>-t t|h|b|w|a</code></td>
+<td>Chooses the format: <code>t</code> text, <code>h</code> HTML, <code>b</code> BBCode, <code>w</code> MediaWiki, <code>a</code> all of them.</td>
+</tr>
+<tr>
+<td><code>-o DIR</code></td>
+<td>Writes the files to <code>DIR</code> instead of the analysed directory.</td>
+</tr>
+<tr>
+<td><code>-a</code></td>
+<td>Appends the results of all directories to the files in the top directory. Use it with <code>-r</code>.</td>
+</tr>
+<tr>
+<td><code>-b</code></td>
+<td>Writes the basic table, which lists file names and leaves out the track titles, codec, bitrate, sample rate and bit depth.</td>
+</tr>
+<tr>
+<td><code>-d</code></td>
+<td>Writes the text table in the format accepted by the <a href="https://dr.loudness-war.info/">DR database</a>.</td>
+</tr>
+<tr>
+<td><code>-p</code></td>
+<td>Also prints the full table in the terminal.</td>
+</tr>
+<tr>
+<td><code>-n</code></td>
+<td>Writes no files. Note that this also skips the local database.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="local-dr-database">Local DR database</h2>
+<p>DR14 T.meter can keep every result in a local SQLite database, so that you can explore your whole collection: best and worst albums, DR per year, DR per codec, and more. The database is disabled by default.</p>
+<h3 id="enabling-it">Enabling it</h3>
+<div class="sourceCode" id="cb1"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ex">dr14_tmeter</span> <span class="at">--enable_database</span></span></code></pre></div>
+<p>This command asks two questions:</p>
+<ol type="1">
+<li><strong>The database directory.</strong> The default is <code>~/.config/dr14tmeter</code>. The file is named <code>dr14_database.db</code>.</li>
+<li><strong>The collection directory.</strong> Only tracks inside this directory are stored. Answer <code>any</code> (the default) to store everything.</li>
+</ol>
+<p>The settings are saved in <code>~/.config/dr14tmeter/dr14.cfg</code> (or under <code>$XDG_CONFIG_HOME</code>).</p>
+<h3 id="what-is-stored">What is stored</h3>
+<p>Once enabled, the results of every directory scan, including <code>-r</code>, are stored automatically. For each track, the database stores the DR, peak, RMS, title, artist, album, genre, year, codec, duration, bit depth, bitrate, sample rate and file size. It also stores the DR of each album.</p>
+<ul>
+<li>Each track is identified by a hash of its audio data, so measuring an album again does not create duplicates, even if the files were moved or renamed.</li>
+<li>Single-file scans (<code>-f</code>) and runs with <code>-n</code> are <strong>not</strong> stored.</li>
+<li>Directories skipped by <code>--no_overwrite</code> are not stored either. To add an already measured collection to the database, run a plain <code>dr14_tmeter -r</code> on it once.</li>
+</ul>
+<h3 id="querying-it">Querying it</h3>
+<table>
+<thead>
+<tr>
+<th>Command</th>
+<th>Result</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>dr14_tmeter -q</code></td>
+<td>Opens an interactive menu with all the queries below. Choose with the arrow keys and Enter; the result opens in a scrollable view (arrow keys, PgUp/PgDn, Home/End, Left/Right to pan, <code>q</code> to go back to the menu).</td>
+</tr>
+<tr>
+<td><code>dr14_tmeter -q top [N]</code></td>
+<td>The <code>N</code> tracks with the highest DR (default 30).</td>
+</tr>
+<tr>
+<td><code>dr14_tmeter -q worst [N]</code></td>
+<td>The <code>N</code> tracks with the lowest DR.</td>
+</tr>
+<tr>
+<td><code>dr14_tmeter -q top_alb [N]</code></td>
+<td>The <code>N</code> albums with the highest DR.</td>
+</tr>
+<tr>
+<td><code>dr14_tmeter -q worst_alb [N]</code></td>
+<td>The <code>N</code> albums with the lowest DR.</td>
+</tr>
+<tr>
+<td><code>dr14_tmeter -q top_art [N] [MIN]</code></td>
+<td>The <code>N</code> artists with the highest mean DR, counting only artists with at least <code>MIN</code> tracks (default 10).</td>
+</tr>
+<tr>
+<td><code>dr14_tmeter -q artist NAME [N]</code></td>
+<td>The <code>N</code> albums and the <code>N</code> tracks of the artist <code>NAME</code> with the highest DR. Quote names containing spaces, for example <code>-q artist "Pink Floyd"</code>. See <a href="#how-names-are-searched">how names are searched</a>.</td>
+</tr>
+<tr>
+<td><code>dr14_tmeter -q album NAME [N]</code></td>
+<td>The DR of the album <code>NAME</code> and of its tracks, in album order (at most <code>N</code> tracks). Names are searched as for <code>-q artist</code>.</td>
+</tr>
+<tr>
+<td><code>dr14_tmeter -q hist</code></td>
+<td>A histogram of how many tracks have each DR value.</td>
+</tr>
+<tr>
+<td><code>dr14_tmeter -q evol</code></td>
+<td>The mean DR per release year, as a table and a plot in the terminal.</td>
+</tr>
+<tr>
+<td><code>dr14_tmeter -q codec</code></td>
+<td>The number of tracks and the mean DR for each codec.</td>
+</tr>
+<tr>
+<td><code>dr14_tmeter -q info [N]</code></td>
+<td>A summary of the collection: number of tracks, albums, artists and genres, total and mean track length, and the mean, median, minimum and maximum DR. Followed by the <code>N</code> most common genres (default 30) with their mean length and DR.</td>
+</tr>
+</tbody>
+</table>
+<h4 id="how-names-are-searched">How names are searched</h4>
+<p><code>-q artist</code> and <code>-q album</code> ignore case, accents and extra spaces, and they tolerate typos:</p>
+<ul>
+<li>Every name that contains <code>NAME</code> is found: <code>-q artist pink</code> finds both Pink and Pink Floyd.</li>
+<li>Names a few typos away from <code>NAME</code> are found too, so <code>-q artist metalica</code> finds Metallica and <code>-q album "dark side of the mon"</code> finds The Dark Side of the Moon. A typo is a missing, extra, wrong, or swapped character. One typo is allowed for every 5 characters of <code>NAME</code>, so names shorter than 5 characters have to match exactly.</li>
+<li>When more than one name is found, a menu lists them with the closest first. All the names that contain <code>NAME</code> are listed, followed by the names with typos until the list holds 10 names. Move with the arrow keys, check the names with Space (<code>a</code> checks all) and confirm with Enter; the closest ones are already checked.</li>
+<li>When the output is not a terminal, for example in a script or when piped, there is no menu and the closest names are used. The menus need Python's <code>curses</code> module (on Windows, <code>pip install windows-curses</code>); without it a numbered text menu is used.</li>
+</ul>
+<h3 id="maintenance">Maintenance</h3>
+<table>
+<thead>
+<tr>
+<th>Command</th>
+<th>What it does</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>dr14_tmeter --dump_database</code></td>
+<td>Prints the whole database as SQL.</td>
+</tr>
+<tr>
+<td><code>dr14_tmeter --disable_database</code></td>
+<td>Stops storing new results. The file is kept, and <code>--enable_database</code> turns it back on.</td>
+</tr>
+</tbody>
+</table>
+<p>If the database file is damaged, <code>dr14_tmeter</code> offers to rebuild it, keeping a backup of the old file with the extension <code>.d_save</code>, or to disable it.</p>
+<p>The database is a plain SQLite file, so you can also open it with <code>sqlite3</code> or any SQLite browser to run your own queries.</p>
+<h2 id="writing-dr-tags">Writing DR tags</h2>
+<p><code>--tag</code> writes the measured values into the tags of the audio files, during a directory scan or a <code>--files_list</code> scan. It requires <a href="https://mutagen.readthedocs.io">Mutagen</a>.</p>
+<ul>
+<li>FLAC, Ogg Vorbis and Opus files get a <code>DR</code> tag and an <code>ALBUM_DR</code> tag.</li>
+<li>MP3 files get a <code>TXXX:DR</code> frame, and MP4/M4A files a <code>----:com.apple.iTunes:DR</code> atom, with the track DR only.</li>
+<li>WAV, AC3 and WMA files cannot be tagged.</li>
+</ul>
+<h2 id="analysing-a-single-track">Analysing a single track</h2>
+<p>These options take one audio file as <code>path_name</code>, show their result and exit. All of them require Matplotlib, except <code>--compress</code>, which requires SciPy.</p>
+<table>
+<thead>
+<tr>
+<th>Option</th>
+<th>What it shows</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>--hist</code></td>
+<td>The histogram of the RMS levels of the track, measured in 0.2-second blocks, with their mean, standard deviation and the peak.</td>
+</tr>
+<tr>
+<td><code>--lev_hist</code></td>
+<td>The histogram of the sample levels.</td>
+</tr>
+<tr>
+<td><code>--dyn_vivacity</code></td>
+<td>The peak-to-RMS ratio of each second of the track.</td>
+</tr>
+<tr>
+<td><code>--plot_track</code></td>
+<td>The waveform of the track.</td>
+</tr>
+<tr>
+<td><code>--plot_track_dst</code></td>
+<td>The density of the sample values over time.</td>
+</tr>
+<tr>
+<td><code>--spectrogram</code></td>
+<td>The spectrogram of the track (beta).</td>
+</tr>
+<tr>
+<td><code>--compress MODE</code></td>
+<td>Writes a dynamically compressed copy of the track as WAV to the temp directory. <code>MODE</code> is one of <code>very_soft</code>, <code>soft</code>, <code>medium</code>, <code>hard</code> or <code>very_hard</code> (short forms <code>v</code>, <code>s</code>, <code>m</code>, <code>h</code>, <code>vh</code>).</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+<!-- END BODY -->
+</td>
+</tr>
+</tbody>
+</table></td>
+<td width="170" id="menu_col">
+<script type="text/javascript">print_site_menu()</script>
+<script type="text/javascript">print_link_menu()</script>
+<br>
+<table>
+<tbody>
+<tr>
+<td align="char"><a href="https://github.com/simon-r/dr14_t.meter" target="_parent" title="GitHub"><img src="github-logo.png" width="30" height="30" alt="GitHub" /></a></td>
+</tr>
+</tbody>
+</table>
+<br>
+<table class="menu_table">
+<tbody>
+<tr>
+<td>
+<br>
+<div style="text-align: center;">
+<a href="https://web.archive.org/web/20130111082140/http://www.pleasurizemusic.com/"><img title="DR logo" alt="DR logo" src="dr.png"></a>
+<br>
+</div>
+<br>
+</td>
+</tr>
+</tbody>
+</table>
+</td>
+</tr>
+</tbody>
+</table>
+<br>
+<br>
+</body>
+</html>

@@ -1,8 +1,124 @@
 <!DOCTYPE HTML>
-
 <html>
-        <head>
-                <meta http-equiv="Refresh" content="0; url=http://dr14tmeter.sourceforge.net">
-        </head>
-</html>
+<head>
+<link rel="shortcut icon" href="favicon.ico" />
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>DR14 T.meter - Dynamic Range meter</title>
+<meta name="keywords" content="dynamic, range, DR, dr14, meter, audio, music, loudness war, python, off-line, Pleasurize Music Foundation, linux, open source"/>
+<meta name="description" content="DR14 T.meter is a free and open source command line tool for computing the DR - Dynamic Range of your music according to the procedure used in the off-line meter released by the Pleasurize Music Foundation" />
+<link href="layout.css" rel="stylesheet" type="text/css">
+<script src="js/scripts.js"></script>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.min.js"></script>
+</head>
+<body style="background-color: rgb(255, 255, 255);" link="#1e2580" marginheight="0" marginwidth="0">
+<br>
+<table class="top_table">
+<tbody>
+<tr>
+<td><img src="logo-2.png" alt="DR14 T.meter" border="0"></td>
+</tr>
+</tbody>
+</table>
+<br>
+<table border="0" cellpadding="0" cellspacing="10" width="100%">
+<tbody>
+<tr valign="top">
+<td>
+<table class="main_table">
+<tbody>
+<tr>
+<td>
+<!-- BEGIN BODY -->
+<div class="chapter">
+<h2>DR14 T.meter <small>v2.1.2</small></h2>
+<p>DR14 T.meter is a free and open-source command-line tool for computing the dynamic range of your music, following the procedure used by the offline meter released by the <a href="https://web.archive.org/web/20130111082140/http://www.pleasurizemusic.com/">Pleasurize Music Foundation</a> (archived site).</p>
+<p>This tool is useful for measuring how loud your music is, for seeing that a good-quality album always has good dynamics too, and for understanding the effects of the so-called loudness war.</p>
+<p>DR14 T.meter is released under the terms of the GNU GPLv3 license. It is intended for Linux users who cannot use the Windows application released by the Pleasurize Music Foundation or the foobar2000 plugin.</p>
+<p>I have tested this application extensively, and it has always returned results identical to those of the official offline meter.</p>
+<h2 id="how-to-use">How to use</h2>
+<blockquote>
+<p>📖 <strong>A short guide to every feature, including the local DR database and its queries, is in <a href="how_to_use.html">how_to_use.html</a>.</strong></p>
+</blockquote>
+<p><strong>Requirements:</strong> Python 3 with NumPy, and <code>ffmpeg</code> (or <code>avconv</code>) for decoding. MP3 files are decoded with <code>lame</code> and Ogg Vorbis files with <code>oggdec</code> (from vorbis-tools). Matplotlib, SciPy and Mutagen are only needed for the plotting, <code>--compress</code> and <code>--tag</code> options.</p>
+<p>You can run the tool directly from the cloned repository as <code>./dr14_tmeter</code>, or install it with <a href="https://pipx.pypa.io">pipx</a>, which also installs NumPy and the man page:</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> clone https://github.com/simon-r/dr14_t.meter.git</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> dr14_t.meter</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="ex">pipx</span> install .</span></code></pre></div>
+<p>Use <code>pipx install '.[plot,compress,tag]'</code> to also install the optional dependencies, or <code>pip install .</code> inside a virtual environment instead of pipx.</p>
+<p>On Debian and Ubuntu you can build and install a <code>.deb</code> package instead:</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> apt build-dep .</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="ex">dpkg-buildpackage</span> <span class="at">-us</span> <span class="at">-uc</span> <span class="at">-b</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> apt install ../dr14tmeter_<span class="pp">*</span>_all.deb</span></code></pre></div>
+<p>Avoid <code>sudo python setup.py install --prefix=usr</code>: on Debian and Ubuntu it puts the package in a directory that Python does not search, and <code>dr14_tmeter</code> then fails with <code>ImportError: No module named dr14tmeter.dr14_tmeter</code>.</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Measure all the audio files in an album directory</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="ex">dr14_tmeter</span> /path/to/album</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Measure a whole music collection, one result per directory</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="ex">dr14_tmeter</span> <span class="at">-r</span> /path/to/music</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Measure a single file and print its DR, peak and RMS values</span></span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a><span class="ex">dr14_tmeter</span> <span class="at">-f</span> /path/to/track.flac</span></code></pre></div>
+<p>When measuring a directory, the results are written to a text table named after the DR value (for example <code>dr14-DR12.txt</code>) in that directory. Useful options:</p>
+<ul>
+<li><code>-t a</code> also writes the results as HTML, BBCode and MediaWiki tables,</li>
+<li><code>-o DIR</code> writes the result files to <code>DIR</code> instead,</li>
+<li><code>-p</code> prints the full table to the terminal, and <code>-n</code> skips writing files.</li>
+</ul>
+<p>See <a href="how_to_use.html">how_to_use.html</a> for all the other features, or run <code>dr14_tmeter --help</code> for the full list of options.</p>
+<h2 id="how-the-dr-value-is-computed">How the DR value is computed</h2>
+<blockquote>
+<p>📐 <strong>The full mathematical description of the algorithm, with every quantity defined, is in <a href="algorithm.html">algorithm.html</a>.</strong></p>
+</blockquote>
+<p>In short, each channel of the track is split into blocks of about 3 seconds, and the RMS level and the peak level of every block are measured. Then, for each channel <span class="math inline">\(c\)</span> out of the <span class="math inline">\(C\)</span> channels of the track:</p>
+<ul>
+<li><span class="math inline">\(\bar{R}_c\)</span> is the quadratic mean of the RMS levels of the loudest 20% of the blocks,</li>
+<li><span class="math inline">\(\hat{P}_c\)</span> is the second-highest block peak.</li>
+</ul>
+<p>The DR value is the ratio between the two in decibels, averaged over the channels and rounded to an integer:</p>
+<p><span class="math display">\[
+\mathrm{DR} = \mathrm{round}\left( \frac{1}{C} \sum_{c=1}^{C} 20 \log_{10} \frac{\hat{P}_c}{\bar{R}_c} \right)
+\]</span></p>
+<h2 id="more-information">More information</h2>
+<p>Visit <a href="https://github.com/simon-r/dr14_t.meter">https://github.com/simon-r/dr14_t.meter</a>.</p>
 
+</div>
+<!-- END BODY -->
+</td>
+</tr>
+</tbody>
+</table></td>
+<td width="170" id="menu_col">
+<script type="text/javascript">print_site_menu()</script>
+<script type="text/javascript">print_link_menu()</script>
+<br>
+<table>
+<tbody>
+<tr>
+<td align="char"><a href="https://github.com/simon-r/dr14_t.meter" target="_parent" title="GitHub"><img src="github-logo.png" width="30" height="30" alt="GitHub" /></a></td>
+</tr>
+</tbody>
+</table>
+<br>
+<table class="menu_table">
+<tbody>
+<tr>
+<td>
+<br>
+<div style="text-align: center;">
+<a href="https://web.archive.org/web/20130111082140/http://www.pleasurizemusic.com/"><img title="DR logo" alt="DR logo" src="dr.png"></a>
+<br>
+</div>
+<br>
+</td>
+</tr>
+</tbody>
+</table>
+</td>
+</tr>
+</tbody>
+</table>
+<br>
+<br>
+</body>
+</html>

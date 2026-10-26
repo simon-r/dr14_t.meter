@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://simon-r.github.io/dr14_t.meter/sitemap.xml

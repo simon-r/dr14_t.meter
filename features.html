@@ -1,208 +1,96 @@
 <!DOCTYPE HTML>
-
 <html>
-	<head>
-		<link rel="shortcut icon" href="favicon.ico" />
-		<meta http-equiv="content-type" content="text/html; charset=UTF-8">
-		<title>DR14 T.meter</title>
-		<meta name="keywords" content="dynamic, range, DR, dr14, meter, audio, music, loudnesswar, loudness, war, python, off-line, Pleasurize, Music, Foundation, dynamic, linux, open, source"/>
-		<meta name="description" content="DR14 T.meter is a free and opens source command line tool for computing the DR - Dynamic Range of your music according to the procedure used in the off-line meter released by the Pleasurize Music Foundation" />
-		<script type="text/javascript">
-			var _gaq = _gaq || [];
-			_gaq.push(['_setAccount', 'UA-27163012-1']);
-			_gaq.push(['_trackPageview']); (function() {
-				var ga = document.createElement('script');
-				ga.type = 'text/javascript';
-				ga.async = true;
-				ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
-				var s = document.getElementsByTagName('script')[0];
-				s.parentNode.insertBefore(ga, s);
-			})();
-
-		</script>
-		<script type="text/javascript" src="https://apis.google.com/js/plusone.js">
-			{ parsetags:'explicit'
-			}
-		</script>
-		<meta http-equiv="content-type" content="text/html; charset=UTF-8">
-		<link href="layout.css" rel="stylesheet" type="text/css">
-		<script src="js/scripts.js"></script>
-	</head>
-	<body style="background-color: rgb(255, 255, 255);" link="#1e2580" marginheight="0" marginwidth="0">
-		<br>
-		<script>
-			( function(d, s, id) {
-				var js, fjs = d.getElementsByTagName(s)[0];
-				if(d.getElementById(id)) {
-					return;
-				}
-				js = d.createElement(s);
-				js.id = id;
-				js.src = "//connect.facebook.net/en_US/all.js#xfbml=1";
-				fjs.parentNode.insertBefore(js, fjs);
-			}(document, 'script', 'facebook-jssdk'));
-
-		</script>
-		<script src="http://gitforked.com/api/1.1/button.js" type="text/javascript"></script>
-		<table class="top_table">
-			<tbody>
-				<tr>
-					<td><img src="logo-2.png" alt="" border="0"></td>
-				</tr>
-			</tbody>
-		</table>
-		<br>
-		<table border="0" cellpadding="0" cellspacing="10" width="100%">
-			<tbody>
-				<tr valign="top">
-					<td>
-					<table class="main_table">
-						<!-- BEGIN BODY -->
-						<tbody>
-							<tr>
-								<td>
-								<div class="chapter">
-									<h2 class="">Features list:</h2>
-									<ul>
-										<li>
-											Compute the DR dynamic range of the audio files
-										</li>
-										<li>
-											Multithreaded computation
-										</li>
-										<li>
-											Read mp3 files via lame
-										</li>
-										<li>
-											Read ogg files via vorbis-tools
-										</li>
-										<li>
-											Read mp4 files via ffmpeg
-										</li>
-										<li>
-											Read ape files via ffmpeg
-										</li>
-										<li>
-											Read flac files via flac tool
-										</li>
-										<li>
-											Scan a full directory
-										</li>
-										<li>
-											Scan recursively the subdirectories
-										</li>
-										<li>
-											Write the result in a tabbed text file
-										</li>
-										<li>
-											Write the result in a formatted HTML table
-										</li>
-										<li>
-											Write the result in a formatted BBCODE table
-										</li>
-										<li>
-											Write the resulting tables in the audio file's directory
-										</li>
-										<li>
-											Uses the audio metadata for generating the tables
-										</li>
-									</ul>
-								</div>
-								<div class="chapter">
-									<h2> Releases history </h2>
-									<ul>
-										<li>
-											<a href="index.html"><b> DR14 T.meter v0.8.5: </b></a> current version
-										</li>
-										<li>
-											<a href="https://github.com/simon-r/dr14_t.meter/tarball/v0.8.4">DR14 T.meter v0.8.4</a>
-										</li>
-										<li>
-											<a href="https://github.com/simon-r/dr14_t.meter/tarball/v0.8.3">DR14 T.meter v0.8.3</a>
-										</li>
-										<li>
-											<a href="https://github.com/simon-r/dr14_t.meter/tarball/v0.8.2">DR14 T.meter v0.8.2</a>
-										</li>
-										<li>
-											<a href="https://github.com/simon-r/dr14_t.meter/tarball/v0.8.1">DR14 T.meter v0.8.1</a>
-										</li>
-										<li>
-											<a href="https://github.com/simon-r/dr14_t.meter/tarball/v0.8.0">DR14 T.meter v0.8.0</a>
-										</li>
-									</ul>
-								</div><!-- END BODY --></td>
-							</tr>
-						</tbody>
-					</table></td>
-					<td width="170" id="menu_col">
-					<script type="text/javascript">print_site_menu()</script>
-					<script type="text/javascript">print_link_menu()</script>
-					<br>
-					<table>
-						<tbody>
-							<tr>
-								<td align="char"><a href="http://www.facebook.com/pages/DR14-tmeter/256205391119227" target="_parent" name="Facebook"><img src="facebook-logo.png" width="30" height="30" alt="Facebook" /></a><a href="https://twitter.com/#!/dr14tmeter" target="_parent" title="Twitter"><img src="twitter-logo.png" width="30" height="30" alt="Twitter" /></a><a href="https://github.com/simon-r/dr14_t.meter" target="_parent" title="Github"><img src="github-logo.png" width="30" height="30" alt="GitHub" /></a></td>
-							</tr>
-						</tbody>
-					</table>
-					<br>
-					<table class="menu_table">
-						<tbody>
-							<tr>
-								<td>
-								<br>
-								<div style="text-align: center;">
-									<a href="http://dynamicrange.de/"><img
-									title="DR logo" alt="DR logo" src="dr.png"></a>
-									<br>
-								</div>
-								<br>
-								</td>
-							</tr>
-							<tr>
-								<td>
-								<div style="text-align: center;">
-									<a target="_blank" href="http://www.tnt-audio.com/topics/realstereo_e.html"> <img title="Real Stero" alt="Real Stero" src="smallstereo_white.png"> </a>
-								</div></td>
-							</tr>
-						</tbody>
-					</table>
-					<br>
-					<table>
-						<tbody>
-							<tr>
-								<td><g:plusone count="false" href="http://simon-r.github.com/dr14_t.meter/"></g:plusone>
-								<script type="text/javascript">
-									gapi.plusone.go();
-
-								</script></td>
-							</tr>
-							<tr>
-								<td><div class="fb-like" data-href="http://simon-r.github.com/dr14_t.meter/"
-								data-send="true" data-layout="button_count" data-width="140"
-								data-show-faces="true"></div>
-								<br>
-								</td>
-							</tr>
-							<tr>
-								<td><a href="https://twitter.com/share" class="twitter-share-button"
-								data-count="none">Tweet</a><script type="text/javascript" src="//platform.twitter.com/widgets.js"></script></td>
-							</tr>
-							<tr>
-								<td><!-- AddThis Button BEGIN --><a class="addthis_button" href="http://www.addthis.com/bookmark.php?v=250&amp;pubid=ra-4ee71a167483df39"><img
-								src="http://s7.addthis.com/static/btn/sm-share-en.gif" alt="Bookmark and Share"
-								style="border: 0pt none;" height="16" width="83"></a><script type="text/javascript" src="http://s7.addthis.com/js/250/addthis_widget.js#pubid=ra-4ee71a167483df39"></script><!-- AddThis Button END --></td>
-							</tr>
-							<tr>
-								<td><a href="https://github.com/simon-r/dr14_t.meter"
-								class="gitforked-button gitforked-watchers">Fork</a></td>
-							</tr>
-						</tbody>
-					</table></td>
-				</tr>
-			</tbody>
-		</table>
-		<br>
-		<br>
-	</body>
+<head>
+<link rel="shortcut icon" href="favicon.ico" />
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>DR14 T.meter - Features</title>
+<meta name="keywords" content="dynamic, range, DR, dr14, meter, audio, music, loudness war, python, off-line, Pleasurize Music Foundation, linux, open source"/>
+<meta name="description" content="DR14 T.meter is a free and open source command line tool for computing the DR - Dynamic Range of your music according to the procedure used in the off-line meter released by the Pleasurize Music Foundation" />
+<link href="layout.css" rel="stylesheet" type="text/css">
+<script src="js/scripts.js"></script>
+</head>
+<body style="background-color: rgb(255, 255, 255);" link="#1e2580" marginheight="0" marginwidth="0">
+<br>
+<table class="top_table">
+<tbody>
+<tr>
+<td><img src="logo-2.png" alt="DR14 T.meter" border="0"></td>
+</tr>
+</tbody>
+</table>
+<br>
+<table border="0" cellpadding="0" cellspacing="10" width="100%">
+<tbody>
+<tr valign="top">
+<td>
+<table class="main_table">
+<tbody>
+<tr>
+<td>
+<!-- BEGIN BODY -->
+<div class="chapter">
+<h2>Features list</h2>
+<ul>
+<li>Computes the DR dynamic range of audio files, with identical results to the official offline meter</li>
+<li>Reads FLAC, MP3, Ogg Vorbis, Opus, MP4/M4A, WAV, WavPack, AC3, WMA, DSF and DFF</li>
+<li>Multi-core computation (half of the cores by default)</li>
+<li>Scans a directory, or recursively a whole music collection</li>
+<li>Measures a single file or a list of files (also from standard input)</li>
+<li>Writes the results as text, HTML, BBCode or MediaWiki tables, also compatible with the <a href="https://dr.loudness-war.info/">DR database</a></li>
+<li>Uses the audio metadata for generating the tables</li>
+<li>Optional local SQLite database of all your results, with queries: best and worst tracks, albums and artists, DR per year and per codec, collection summary, in an interactive terminal menu</li>
+<li>Writes the DR values into the tags of FLAC, Ogg, Opus, MP3 and MP4 files</li>
+<li>Plots: histograms, waveform, spectrogram and dynamic vivacity of a single track</li>
+<li>Dynamic compression of a single track (very soft to very hard)</li>
+</ul>
+<p>See <a href="how_to_use.html">How to use</a> for the details.</p>
+</div>
+<div class="chapter">
+<h2>Releases history</h2>
+<ul>
+<li><a href="https://github.com/simon-r/dr14_t.meter/releases/tag/v2.1.2"><b>DR14 T.meter v2.1.2</b></a> current version</li>
+<li><a href="https://github.com/simon-r/dr14_t.meter/releases/tag/v2.1.1">DR14 T.meter v2.1.1</a></li>
+<li><a href="https://github.com/simon-r/dr14_t.meter/releases/tag/v2.1.0">DR14 T.meter v2.1.0</a></li>
+<li><a href="https://github.com/simon-r/dr14_t.meter/tags">All the older releases</a></li>
+</ul>
+</div>
+<!-- END BODY -->
+</td>
+</tr>
+</tbody>
+</table></td>
+<td width="170" id="menu_col">
+<script type="text/javascript">print_site_menu()</script>
+<script type="text/javascript">print_link_menu()</script>
+<br>
+<table>
+<tbody>
+<tr>
+<td align="char"><a href="https://github.com/simon-r/dr14_t.meter" target="_parent" title="GitHub"><img src="github-logo.png" width="30" height="30" alt="GitHub" /></a></td>
+</tr>
+</tbody>
+</table>
+<br>
+<table class="menu_table">
+<tbody>
+<tr>
+<td>
+<br>
+<div style="text-align: center;">
+<a href="https://web.archive.org/web/20130111082140/http://www.pleasurizemusic.com/"><img title="DR logo" alt="DR logo" src="dr.png"></a>
+<br>
+</div>
+<br>
+</td>
+</tr>
+</tbody>
+</table>
+</td>
+</tr>
+</tbody>
+</table>
+<br>
+<br>
+</body>
 </html>

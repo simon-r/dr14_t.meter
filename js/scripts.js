@@ -12,7 +12,7 @@ function mail_to_me() {
 }
 
 function dr14_version() {
-	document.write("Ver.: 0.8.5");
+	document.write("Ver.: 2.1.2");
 }
 
 
@@ -62,7 +62,13 @@ function print_site_menu() {
 	row = add_menu_row( "DR Results" , "dr14.html" , "td" ) ;
 	tblBody.appendChild( row ) ;
 
-	row = add_menu_row( "nam page" , "man.html" , "td" ) ;
+	row = add_menu_row( "How to use" , "how_to_use.html" , "td" ) ;
+	tblBody.appendChild( row ) ;
+
+	row = add_menu_row( "The algorithm" , "algorithm.html" , "td" ) ;
+	tblBody.appendChild( row ) ;
+
+	row = add_menu_row( "Man page" , "man.html" , "td" ) ;
 	tblBody.appendChild( row ) ;
 
 	tbl.appendChild(tblBody);
@@ -89,16 +95,19 @@ function print_link_menu() {
 	row = add_menu_row( "Project page" , "https://github.com/simon-r/dr14_t.meter" , "td" ) ;
 	tblBody.appendChild( row ) ;
 	
-	row = add_menu_row( "DR14 T.meter on Freecode" , "http://freecode.com/projects/dr14-tmeter" , "td" ) ;
+	row = add_menu_row( "Releases" , "https://github.com/simon-r/dr14_t.meter/releases" , "td" ) ;
+	tblBody.appendChild( row ) ;
+
+	row = add_menu_row( "Report a bug" , "https://github.com/simon-r/dr14_t.meter/issues" , "td" ) ;
 	tblBody.appendChild( row ) ;
 	
-	row = add_menu_row( "Pleasurize Music Foundation" , "http://www.dynamicrange.de/" , "td" ) ;
+	row = add_menu_row( "Pleasurize Music Foundation" , "https://web.archive.org/web/20130111082140/http://www.pleasurizemusic.com/" , "td" ) ;
 	tblBody.appendChild( row ) ;
 
-	row = add_menu_row( "Loudness War" , "http://en.wikipedia.org/wiki/Loudness_war" , "td" ) ;
+	row = add_menu_row( "Loudness War" , "https://en.wikipedia.org/wiki/Loudness_war" , "td" ) ;
 	tblBody.appendChild( row ) ;
 
-	row = add_menu_row( "Article on TNT-audio" , "http://www.tnt-audio.com/edcorner/february09.html" , "td" ) ;
+	row = add_menu_row( "Article on TNT-audio" , "https://www.tnt-audio.com/edcorner/february09.html" , "td" ) ;
 	tblBody.appendChild( row ) ;
 
 	tbl.appendChild(tblBody);
