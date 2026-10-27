@@ -291,6 +291,10 @@ def query_command_line(query):
     return eq_cmd
 
 
+def is_track_table(rows):
+    return len(rows) > 0 and "id" in rows[0] and "Title" in rows[0]
+
+
 def query_helper_tui():
     # menu selectable with the arrow keys, the results are shown in a pager
     labels = ["%d. %s" % (i + 1, m[0]) for i, m in enumerate(QUERY_MENU)]
@@ -333,11 +337,24 @@ def query_helper_tui():
 
         options.query = query
 
-        res = database_exec_query(options)
+        tables = []
+        res = database_exec_query(options, tables_out=tables)
 
         header = "%s\n>    %s\n\n" % (
             ansi.style("equivalent command line:", "bold"), query_command_line(query))
-        tui.pager(header + (res or ""), QUERY_MENU[pos][0])
+
+        if not any(is_track_table(rows) for _, _, rows, _ in tables):
+            tui.pager(header + (res or ""), QUERY_MENU[pos][0])
+            continue
+
+        # the tracks can be selected and show their metadata, the other
+        # tables are shown in the pager
+        for table_title, q, rows, code in tables:
+            if is_track_table(rows):
+                tui.track_browser(table_title, q.get_col_keys(), rows,
+                                  track_details, header)
+            else:
+                tui.pager(header + code, table_title)
 
 
 def query_helper_text():
@@ -487,7 +504,9 @@ def found_names_title(names, max_names=3):
     return "%s and %d more" % (", ".join(names[:max_names]), len(names) - max_names)
 
 
-def database_exec_query(options, tm=None):
+def database_exec_query(options, tm=None, tables_out=None):
+    # tables_out, when given, receives a ( title , query , rows , text ) for
+    # every table of the result
 
     if tm is None:
         tm = ExtendedTextTable()
@@ -591,6 +610,9 @@ def database_exec_query(options, tm=None):
         plot = q.get_plot(res)
         if plot != "":
             code = plot + "\n" + code
+
+        if tables_out is not None:
+            tables_out.append((table_title, q, res, code))
 
         if code != "":
             codes.append(code)

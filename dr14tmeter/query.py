@@ -17,6 +17,7 @@
 
 import datetime
 import shutil
+import struct
 import sys
 import unicodedata
 
@@ -405,6 +406,60 @@ class query_album_tracks(query_selection):
         """ % self.get_ids_list()
 
         return q
+
+
+def track_details(track_id):
+    # the metadata of a track as a list of ( label , value ), None if missing
+    db = dr_database_singletone().get()
+    q = """
+    select Track.title as Title, Track.track_nr as Track_Nr, Track.duration as Duration,
+           Track.rms as Rms, Track.peak as Peak, Track.bit as Bit, Track.bitrate as Bitrate,
+           Track.sampling_rate as Sampling_Rate, Track.size as Size, Track.sha1 as Sha1,
+           dr.dr as DR, Codec.Name as Codec, Genre.Name as Genre, Date.Date as Date,
+           Artist.Name as Artist, Album.Title as Album
+        from Track
+            left join DR_Track on DR_Track.IdTrack = Track.Id
+            left join DR on DR.Id = DR_Track.IdDr
+            left join Codec_Track on Codec_Track.IdTrack = Track.Id
+            left join Codec on Codec.Id = Codec_Track.IdCodec
+            left join Genre_Track on Genre_Track.IdTrack = Track.Id
+            left join Genre on Genre.Id = Genre_Track.IdGenre
+            left join Date_Track on Date_Track.IdTrack = Track.Id
+            left join Date on Date.Id = Date_Track.IdDate
+            left join Artist_Track on Artist_Track.IdTrack = Track.Id
+            left join Artist on Artist.Id = Artist_Track.IdArtist
+            left join Album_Track on Album_Track.IdTrack = Track.Id
+            left join Album on Album.Id = Album_Track.IdAlbum
+        where Track.Id = ? ;
+    """
+    rows = db.query(q, (track_id,), dict_factory_arg=my_dict_factory)
+    if len(rows) == 0:
+        return []
+    r = rows[0]
+
+    def fmt(key, f=str):
+        v = r[key]
+        # rms is stored as the raw bytes of a float32
+        if isinstance(v, (bytes, bytearray)):
+            v = struct.unpack("<f", v)[0] if len(v) == 4 else struct.unpack("<d", v)[0]
+        return "" if v is None else f(v)
+
+    return [("Title", fmt("Title")),
+            ("Artist", fmt("Artist")),
+            ("Album", fmt("Album")),
+            ("Track nr", fmt("Track_Nr")),
+            ("Genre", fmt("Genre")),
+            ("Date", fmt("Date")),
+            ("DR", fmt("DR")),
+            ("RMS", fmt("Rms", lambda v: "%.2f dB" % v)),
+            ("Peak", fmt("Peak", lambda v: "%.2f dB" % v)),
+            ("Length", fmt("Duration", seconds_to_str)),
+            ("Codec", fmt("Codec")),
+            ("Bit", fmt("Bit")),
+            ("Bitrate", fmt("Bitrate", lambda v: "%d kbps" % (v // 1000 if v > 10000 else v))),
+            ("Sampling", fmt("Sampling_Rate", lambda v: "%d Hz" % v)),
+            ("Size", fmt("Size", lambda v: "%.2f MB" % (v / 1048576.0))),
+            ("SHA1", fmt("Sha1"))]
 
 
 class query_dr_histogram(query):

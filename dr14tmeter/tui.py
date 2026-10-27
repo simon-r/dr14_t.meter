@@ -323,3 +323,84 @@ def pager(text, title=""):
 
     r = _run(fun)
     return r is True
+
+
+def track_browser(title, keys, rows, details_fn, header=""):
+    # the rows of a query on tracks, selectable with the cursor. The metadata
+    # of the highlighted track are shown in a box beside the list, or below
+    # it on a narrow terminal. details_fn( id ) is a list of ( label , value ).
+    # Returns False when curses can not be used
+    keys = list(keys)
+    def cols(txt):
+        return sum(char_width(c) for c in str(txt))
+
+    widths = [max([cols(k)] + [cols(r[k]) for r in rows]) for k in keys]
+
+    def line(r):
+        out = ""
+        for k, wd in zip(keys, widths):
+            v = str(r[k])
+            out += v + " " * (wd - cols(v)) + "  "
+        return out
+
+    lines = [line(r) for r in rows]
+    head = "".join(k + " " * (wd - cols(k)) + "  " for k, wd in zip(keys, widths))
+    cache = {}
+
+    def fun(stdscr):
+        _init(stdscr)
+        cur = 0
+        top = 0
+
+        while True:
+            h, w = stdscr.getmaxyx()
+            side = w >= 100
+            list_w = min(sum(widths) + 2 * len(widths) + 2, w - 44) if side else w
+            list_h = h - 4 if side else max((h - 4) // 2, 3)
+            page = max(list_h - 1, 1)
+
+            if cur < top:
+                top = cur
+            if cur >= top + page:
+                top = cur - page + 1
+
+            stdscr.erase()
+            _put(stdscr, 0, 1, title, curses.A_BOLD)
+            _put(stdscr, 2, 1, _clip(head, 0, list_w - 2), curses.A_UNDERLINE)
+            for i in range(top, min(top + page, len(rows))):
+                attr = curses.A_REVERSE if i == cur else 0
+                _put(stdscr, 3 + i - top, 1,
+                     _clip(lines[i], 0, list_w - 2).ljust(list_w - 2), attr)
+
+            tid = rows[cur]["id"]
+            if tid not in cache:
+                cache[tid] = details_fn(tid)
+            if side:
+                y0, x0, bh, bw = 2, list_w + 1, h - 4, w - list_w - 2
+            else:
+                y0, x0, bh, bw = 3 + page + 1, 1, h - 5 - page, w - 2
+            if bh >= 3 and bw >= 10:
+                _put(stdscr, y0, x0, "+" + "-" * (bw - 2) + "+")
+                _put(stdscr, y0 + bh - 1, x0, "+" + "-" * (bw - 2) + "+")
+                for y in range(y0 + 1, y0 + bh - 1):
+                    _put(stdscr, y, x0, "|")
+                    _put(stdscr, y, x0 + bw - 1, "|")
+                for n, (lab, val) in enumerate(cache[tid]):
+                    if n >= bh - 2:
+                        break
+                    _put(stdscr, y0 + 1 + n, x0 + 2, lab + ":", curses.A_BOLD)
+                    _put(stdscr, y0 + 1 + n, x0 + 12,
+                         _clip(val, 0, bw - 14))
+
+            _put(stdscr, h - 1, 1, "%d/%d   Up/Down PgUp/PgDn Home/End: select   q/Esc: back" % (
+                cur + 1, len(rows)), curses.A_REVERSE)
+            stdscr.refresh()
+
+            key = stdscr.getch()
+            if key in (KEY_ESC, ord('q'), curses.KEY_ENTER, 10, 13):
+                return True
+            if key == curses.KEY_RESIZE:
+                continue
+            cur = _move(key, cur, len(rows), page)
+
+    return _run(fun) is True
