@@ -295,6 +295,10 @@ def is_track_table(rows):
     return len(rows) > 0 and "id" in rows[0] and "Title" in rows[0]
 
 
+def is_album_table(rows):
+    return len(rows) > 0 and "id" in rows[0] and "Album_Title" in rows[0]
+
+
 def query_helper_tui():
     # menu selectable with the arrow keys, the results are shown in a pager
     labels = ["%d. %s" % (i + 1, m[0]) for i, m in enumerate(QUERY_MENU)]
@@ -343,7 +347,7 @@ def query_helper_tui():
         header = "%s\n>    %s\n\n" % (
             ansi.style("equivalent command line:", "bold"), query_command_line(query))
 
-        if not any(is_track_table(rows) for _, _, rows, _ in tables):
+        if not any(is_track_table(rows) or is_album_table(rows) for _, _, rows, _ in tables):
             tui.pager(header + (res or ""), QUERY_MENU[pos][0])
             continue
 
@@ -353,6 +357,9 @@ def query_helper_tui():
             if is_track_table(rows):
                 tui.track_browser(table_title, q.get_col_keys(), rows,
                                   track_details, header)
+            elif is_album_table(rows):
+                tui.track_browser(table_title, q.get_col_keys(), rows,
+                                  album_details, header)
             else:
                 tui.pager(header + code, table_title)
 

@@ -34,7 +34,7 @@ lock_db = threading.Lock()
 
 # Schema version produced by the latest migration. Bump it together with a
 # new entry in dr_database._migrations.
-DB_SCHEMA_VERSION = 1
+DB_SCHEMA_VERSION = 2
 
 
 def my_dict_factory(cursor, row):
@@ -81,7 +81,7 @@ class dr_database:
         # {from_version: method}: each method returns the SQL script that
         # migrates the db from from_version to from_version + 1 and ends
         # with the matching insert into Db_Version.
-        self._migrations = {}
+        self._migrations = {1: self.dr14_db_migrate_v1_to_v2}
 
     def build_database(self):
         global lock_db
@@ -472,8 +472,8 @@ class dr_database:
                 disk_nr integer
             ) ;
             create index Album_indx on Album ( sha1 ) ;
-            create index Album_title_indx on Track ( Title ) ;
-            
+            create index Album_title_indx on Album ( Title ) ;
+
             insert into Album ( Id , Title , sha1 ) values ( 0 , "None" , "0000000000000000000000000000000000000000" ) ; 
             
             
@@ -570,6 +570,16 @@ class dr_database:
                 foreign key ( IdTrack ) references Track ( Id )
             ) ;
             
+        """
+
+        return db
+
+    def dr14_db_migrate_v1_to_v2(self):
+        # Album_title_indx was created on Track instead of Album in v1.
+        db = """
+            drop index Album_title_indx ;
+            create index Album_title_indx on Album ( Title ) ;
+            insert into Db_Version ( Version ) values ( 2 ) ;
         """
 
         return db

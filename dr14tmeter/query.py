@@ -462,6 +462,60 @@ def track_details(track_id):
             ("SHA1", fmt("Sha1"))]
 
 
+def album_details(album_id):
+    # the metadata of an album, with the numbered list of all its tracks
+    db = dr_database_singletone().get()
+    head = db.query("""
+    select Album.Title as Title, dr.dr as DR, Date.Date as Date, Genre.Name as Genre,
+           group_concat( distinct Artist.Name ) as Artist
+        from Album
+            left join DR_Album on DR_Album.IdAlbum = Album.Id
+            left join DR on DR.Id = DR_Album.IdDr
+            left join Artist_Album on Artist_Album.IdAlbum = Album.Id
+            left join Artist on Artist.Id = Artist_Album.IdArtist
+            left join Album_Track on Album_Track.IdAlbum = Album.Id
+            left join Date_Track on Date_Track.IdTrack = Album_Track.IdTrack
+            left join Date on Date.Id = Date_Track.IdDate
+            left join Genre_Track on Genre_Track.IdTrack = Album_Track.IdTrack
+            left join Genre on Genre.Id = Genre_Track.IdGenre
+        where Album.Id = ? ;
+    """, (album_id,), dict_factory_arg=my_dict_factory)
+    tracks = db.query("""
+    select Track.title as Title, Track.track_nr as Track_Nr, Track.duration as Duration,
+           dr.dr as DR
+        from Album_Track inner join Track on Track.Id = Album_Track.IdTrack
+            left join DR_Track on DR_Track.IdTrack = Track.Id
+            left join DR on DR.Id = DR_Track.IdDr
+        where Album_Track.IdAlbum = ?
+        order by Track.track_nr , Track.title ;
+    """, (album_id,), dict_factory_arg=my_dict_factory)
+    if len(head) == 0:
+        return []
+    r = head[0]
+
+    def txt(v):
+        return "" if v is None else str(v)
+
+    total = sum(t["Duration"] or 0 for t in tracks)
+    items = []
+    for t in tracks:
+        extra = []
+        if t["DR"] is not None:
+            extra.append("DR%d" % t["DR"])
+        if t["Duration"]:
+            extra.append(seconds_to_str(t["Duration"]))
+        items.append("%s%s" % (t["Title"] or "", " (%s)" % ", ".join(extra) if extra else ""))
+
+    return [("Album", txt(r["Title"])),
+            ("Artist", txt(r["Artist"])),
+            ("Genre", txt(r["Genre"])),
+            ("Date", txt(r["Date"])),
+            ("DR", txt(r["DR"])),
+            ("Tracks", "%d" % len(tracks)),
+            ("Length", seconds_to_str(total)),
+            ("Track list", items)]
+
+
 class query_dr_histogram(query):
 
     def __init__(self):

@@ -29,7 +29,7 @@ except ImportError:
     curses = None
 
 from dr14tmeter import ansi
-from dr14tmeter.table import char_width
+from dr14tmeter.table import char_width, wrap_text
 
 KEY_ESC = 27
 
@@ -325,6 +325,25 @@ def pager(text, title=""):
     return r is True
 
 
+def _detail_lines(details, width):
+    # the ( label , text ) lines of the box. A value is a text on the line of
+    # its label, or a list of texts shown as a numbered list: the lines that
+    # follow a wrapped item are indented under its text
+    out = []
+    for lab, val in details:
+        if isinstance(val, str):
+            out.append((lab + ":", val))
+            continue
+
+        out.append((lab + ":", ""))
+        nw = len(str(len(val)))
+        for i, item in enumerate(val):
+            num = "%*d. " % (nw, i + 1)
+            for k, l in enumerate(wrap_text(item, max(width - len(num), 10)) or [""]):
+                out.append(("", (num if k == 0 else " " * len(num)) + l))
+    return out
+
+
 def track_browser(title, keys, rows, details_fn, header=""):
     # the rows of a query on tracks, selectable with the cursor. The metadata
     # of the highlighted track are shown in a box beside the list, or below
@@ -351,6 +370,8 @@ def track_browser(title, keys, rows, details_fn, header=""):
         _init(stdscr)
         cur = 0
         top = 0
+        dtop = 0
+        shown = None
 
         while True:
             h, w = stdscr.getmaxyx()
@@ -373,6 +394,9 @@ def track_browser(title, keys, rows, details_fn, header=""):
                      _clip(lines[i], 0, list_w - 2).ljust(list_w - 2), attr)
 
             tid = rows[cur]["id"]
+            if tid != shown:
+                shown = tid
+                dtop = 0
             if tid not in cache:
                 cache[tid] = details_fn(tid)
             if side:
@@ -385,12 +409,19 @@ def track_browser(title, keys, rows, details_fn, header=""):
                 for y in range(y0 + 1, y0 + bh - 1):
                     _put(stdscr, y, x0, "|")
                     _put(stdscr, y, x0 + bw - 1, "|")
-                for n, (lab, val) in enumerate(cache[tid]):
-                    if n >= bh - 2:
-                        break
-                    _put(stdscr, y0 + 1 + n, x0 + 2, lab + ":", curses.A_BOLD)
-                    _put(stdscr, y0 + 1 + n, x0 + 12,
-                         _clip(val, 0, bw - 14))
+                box = _detail_lines(cache[tid], bw - 4)
+                dtop = max(min(dtop, len(box) - (bh - 2)), 0)
+                for n in range(bh - 2):
+                    if dtop + n < len(box):
+                        lab, txt = box[dtop + n]
+                        if lab:
+                            _put(stdscr, y0 + 1 + n, x0 + 2, lab, curses.A_BOLD)
+                        off = 12 if lab else 0
+                        _put(stdscr, y0 + 1 + n, x0 + 2 + off,
+                             _clip(txt, 0, bw - 4 - off))
+                if len(box) > bh - 2:
+                    _put(stdscr, y0 + bh - 1, x0 + 2,
+                         " Left/Right: scroll %d/%d " % (dtop + 1, len(box)))
 
             _put(stdscr, h - 1, 1, "%d/%d   Up/Down PgUp/PgDn Home/End: select   q/Esc: back" % (
                 cur + 1, len(rows)), curses.A_REVERSE)
@@ -401,6 +432,11 @@ def track_browser(title, keys, rows, details_fn, header=""):
                 return True
             if key == curses.KEY_RESIZE:
                 continue
-            cur = _move(key, cur, len(rows), page)
+            if key == curses.KEY_RIGHT:
+                dtop += 3
+            elif key == curses.KEY_LEFT:
+                dtop = max(dtop - 3, 0)
+            else:
+                cur = _move(key, cur, len(rows), page)
 
     return _run(fun) is True
