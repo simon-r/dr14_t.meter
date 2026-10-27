@@ -27,4 +27,5 @@ package() {
   cd "$_name-$pkgver"
   python -m installer --destdir="$pkgdir" dist/*.whl
   install -Dm644 -t "$pkgdir/usr/share/doc/$pkgname" README.md dr14_algorithm.md
+  install -Dm644 man/dr14_tmeter.1 "$pkgdir/usr/share/man/man1/dr14_tmeter.1"
 }
