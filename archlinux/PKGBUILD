@@ -16,7 +16,7 @@ optdepends=('python-matplotlib: plotting options'
             'python-mutagen: --tag option')
 conflicts=(python-dr14_tmeter)
 source=("$pkgname-$pkgver.tar.gz::$url/archive/refs/tags/v$pkgver.tar.gz")
-sha256sums=('695f50aeb408ebc7af1a8ee4e40cc37648f09037304d489629b2b4d5e29e45c8')
+sha256sums=('125733b8dc99ec48beaa57293efb23dd937a7bf8342be7cccbd61ca6f33ff56b')
 
 build() {
   cd "$_name-$pkgver"
