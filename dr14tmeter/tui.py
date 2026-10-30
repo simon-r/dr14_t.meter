@@ -440,3 +440,189 @@ def track_browser(title, keys, rows, details_fn, header=""):
                 cur = _move(key, cur, len(rows), page)
 
     return _run(fun) is True
+
+
+def artist_browser(title, keys, rows, albums_fn, details_fn, tracks_fn=None, header=""):
+    # the rows of a query on artists. The albums of the highlighted artist are
+    # listed in the box beside the list (below it on a narrow terminal). With
+    # the Right key an album can be selected and its metadata are shown in the
+    # box; Left goes back to the artists. albums_fn( id ) is a list of rows
+    # with id, Album_Title and DR (tracks if no albums, with kind = "track"), details_fn( row ) a list of ( label , value ).
+    # Returns False when curses can not be used
+    keys = list(keys)
+    def cols(txt):
+        return sum(char_width(c) for c in str(txt))
+
+    widths = [max([cols(k)] + [cols(r[k]) for r in rows]) for k in keys]
+
+    def line(r):
+        out = ""
+        for k, wd in zip(keys, widths):
+            v = str(r[k])
+            out += v + " " * (wd - cols(v)) + "  "
+        return out
+
+    lines = [line(r) for r in rows]
+    head = "".join(k + " " * (wd - cols(k)) + "  " for k, wd in zip(keys, widths))
+    albums = {}
+    tracks = {}
+    cache = {}
+
+    def fun(stdscr):
+        _init(stdscr)
+        cur = 0
+        top = 0
+        acur = 0
+        atop = 0
+        dtop = 0
+        in_albums = False
+        in_tracks = False
+        tcur = 0
+
+        while True:
+            h, w = stdscr.getmaxyx()
+            side = w >= 100
+            list_w = min(sum(widths) + 2 * len(widths) + 2, w - 44) if side else w
+            list_h = h - 4 if side else max((h - 4) // 2, 3)
+            page = max(list_h - 1, 1)
+
+            if cur < top:
+                top = cur
+            if cur >= top + page:
+                top = cur - page + 1
+
+            stdscr.erase()
+            _put(stdscr, 0, 1, title, curses.A_BOLD)
+            _put(stdscr, 2, 1, _clip(head, 0, list_w - 2), curses.A_UNDERLINE)
+            for i in range(top, min(top + page, len(rows))):
+                attr = curses.A_REVERSE if i == cur and not in_albums else (
+                    curses.A_BOLD if i == cur else 0)
+                _put(stdscr, 3 + i - top, 1,
+                     _clip(lines[i], 0, list_w - 2).ljust(list_w - 2), attr)
+
+            aid = rows[cur]["id"]
+            if aid not in albums:
+                albums[aid] = albums_fn(aid)
+            alb = albums[aid]
+            if acur >= len(alb):
+                acur = max(len(alb) - 1, 0)
+
+            # the list of the box: the albums, or the tracks of the selected album
+            lst, lcur = alb, acur
+            if in_tracks:
+                bkey = alb[acur]["id"]
+                if bkey not in tracks:
+                    tracks[bkey] = tracks_fn(bkey)
+                lst, lcur = tracks[bkey], tcur
+                if lcur >= len(lst):
+                    lcur = tcur = max(len(lst) - 1, 0)
+
+            if side:
+                y0, x0, bh, bw = 2, list_w + 1, h - 4, w - list_w - 2
+            else:
+                y0, x0, bh, bw = 3 + page + 1, 1, h - 5 - page, w - 2
+            if bh >= 3 and bw >= 10:
+                _put(stdscr, y0, x0, "+" + "-" * (bw - 2) + "+")
+                _put(stdscr, y0 + bh - 1, x0, "+" + "-" * (bw - 2) + "+")
+                for y in range(y0 + 1, y0 + bh - 1):
+                    _put(stdscr, y, x0, "|")
+                    _put(stdscr, y, x0 + bw - 1, "|")
+                inner = bh - 2
+                what = "Tracks" if lst and lst[0].get("kind") == "track" else "Albums"
+                _put(stdscr, y0, x0 + 2, " %s (%d) " % (what, len(lst)))
+
+                # the albums take the whole box, or its upper part when the
+                # details of the selected one are shown below
+                ah = max(inner // 3, 3) if in_albums else inner
+                ah = min(ah, max(len(lst), 1)) if in_albums else ah
+                if lcur < atop:
+                    atop = lcur
+                if lcur >= atop + ah:
+                    atop = lcur - ah + 1
+                if not in_albums:
+                    atop = 0
+                for n in range(ah):
+                    i = atop + n
+                    if i >= len(lst):
+                        break
+                    txt = "%-5s %s" % (lst[i]["DR"], lst[i]["Album_Title"])
+                    attr = curses.A_REVERSE if in_albums and i == lcur else 0
+                    _put(stdscr, y0 + 1 + n, x0 + 2,
+                         _clip(txt, 0, bw - 4).ljust(bw - 4), attr)
+
+                if in_albums and lst:
+                    dy = y0 + 1 + ah
+                    _put(stdscr, dy, x0, "+" + "-" * (bw - 2) + "+")
+                    bid = (lst[lcur].get("kind"), lst[lcur]["id"])
+                    if bid not in cache:
+                        cache[bid] = details_fn(lst[lcur])
+                    box = _detail_lines(cache[bid], bw - 4)
+                    dh = inner - ah - 1
+                    dtop = max(min(dtop, len(box) - dh), 0)
+                    for n in range(dh):
+                        if dtop + n < len(box):
+                            lab, txt = box[dtop + n]
+                            if lab:
+                                _put(stdscr, dy + 1 + n, x0 + 2, lab, curses.A_BOLD)
+                            off = 12 if lab else 0
+                            _put(stdscr, dy + 1 + n, x0 + 2 + off,
+                                 _clip(txt, 0, bw - 4 - off))
+                    if len(box) > dh:
+                        _put(stdscr, y0 + bh - 1, x0 + 2,
+                             " PgUp/PgDn: scroll %d/%d " % (dtop + 1, len(box)))
+
+            if in_albums:
+                can = tracks_fn and not in_tracks and lst and lst[0].get("kind") != "track"
+                msg = "%d/%d   Up/Down: select   PgUp/PgDn: scroll details   %sLeft/Esc: back   q: quit" % (
+                    lcur + 1, len(lst), "Right: tracks   " if can else "")
+            else:
+                msg = "%d/%d   Up/Down PgUp/PgDn Home/End: select   Right: albums/tracks   q/Esc: back" % (
+                    cur + 1, len(rows))
+            _put(stdscr, h - 1, 1, msg, curses.A_REVERSE)
+            stdscr.refresh()
+
+            key = stdscr.getch()
+            if key == curses.KEY_RESIZE:
+                continue
+            if key == ord('q'):
+                return True
+            if in_albums:
+                if key in (KEY_ESC, curses.KEY_LEFT):
+                    if in_tracks:
+                        in_tracks = False
+                    else:
+                        in_albums = False
+                    dtop = 0
+                elif key in (curses.KEY_RIGHT, ord('l')):
+                    if tracks_fn and not in_tracks and lst and lst[0].get("kind") != "track":
+                        in_tracks = True
+                        tcur = 0
+                        atop = 0
+                        dtop = 0
+                elif key == curses.KEY_PPAGE:
+                    dtop = max(dtop - 5, 0)
+                elif key == curses.KEY_NPAGE:
+                    dtop += 5
+                else:
+                    new = _move(key, lcur, len(lst), 1)
+                    if new != lcur:
+                        if in_tracks:
+                            tcur = new
+                        else:
+                            acur = new
+                        dtop = 0
+            else:
+                if key in (KEY_ESC, curses.KEY_ENTER, 10, 13):
+                    return True
+                if key in (curses.KEY_RIGHT, ord('l')):
+                    if alb:
+                        in_albums = True
+                        acur = 0
+                        dtop = 0
+                else:
+                    new = _move(key, cur, len(rows), page)
+                    if new != cur:
+                        cur = new
+                        acur = 0
+
+    return _run(fun) is True

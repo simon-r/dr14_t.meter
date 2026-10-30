@@ -182,14 +182,14 @@ class query_top_artists(query):
 
     def get_query(self):
         q = """
-        select Artist, Mean_DR , Track_Count from 
+        select id, Artist, Mean_DR , Track_Count from 
         ( 
-            select artist.name as Artist , avg( dr.dr ) as Mean_DR , count( track.id ) as Track_Count
+            select artist.id as id , artist.name as Artist , round( avg( dr.dr ) , 1 ) as Mean_DR , count( track.id ) as Track_Count
                from track inner join DR_Track on DR_Track.idtrack = track.id 
                       inner join dr on dr.id = DR_Track.iddr 
                       inner join Artist_Track on Artist_Track.idtrack = track.id
                       inner join Artist on Artist.id = Artist_Track.IdArtist
-                      group by artist                  
+                      group by artist.id
         )
         where Track_Count >= ? 
         order by mean_dr desc  
@@ -335,6 +335,43 @@ class query_artist_albums(query_selection):
         """ % self.get_ids_list()
 
         return q
+
+
+def artist_albums(artist_id):
+    # the albums of an artist: rows with id, Album_Title and DR
+    # an artist without albums gets the list of his tracks, with Album_Title
+    # set to the track title and kind set to "track"
+    q = query_artist_albums([artist_id])
+    q.limit = 1000
+    rows = q.exec_query()
+    if rows:
+        return rows
+
+    q = query_artist_tracks([artist_id])
+    q.limit = 1000
+    rows = q.exec_query()
+    for r in rows:
+        r["Album_Title"] = r["Title"]
+        r["kind"] = "track"
+    return rows
+
+
+def album_tracks(album_id):
+    # the tracks of an album: rows with id, Album_Title (the title) and DR
+    q = query_album_tracks([album_id])
+    q.limit = 1000
+    rows = q.exec_query()
+    for r in rows:
+        r["Album_Title"] = r["Title"]
+        r["kind"] = "track"
+    return rows
+
+
+def artist_item_details(item):
+    # the details of an item of artist_albums
+    if item.get("kind") == "track":
+        return track_details(item["id"])
+    return album_details(item["id"])
 
 
 class query_artist_tracks(query_selection):
@@ -627,7 +664,7 @@ class query_dr_codec(query):
 
     def get_query(self):
         q = """
-        select codec.name as Codec , avg( dr.dr ) as Mean_DR , count( Codec_Track.IdCodec ) as Codec_Freq 
+        select codec.name as Codec , round( avg( dr.dr ) , 1 ) as Mean_DR , count( Codec_Track.IdCodec ) as Codec_Freq 
            from track inner join DR_Track on DR_Track.idtrack = track.id 
                   inner join dr on dr.id = DR_Track.iddr 
                   inner join Codec_Track on Codec_Track.idtrack = track.id

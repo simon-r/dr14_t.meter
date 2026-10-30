@@ -7,86 +7,107 @@ Visit: http://www.dynamicrange.de/
 
 .SH "HOMEPAGE"
 https://github.com/simon-r/dr14_t.meter
+.SH "SYNOPSIS"
+\fBdr14_tmeter\fR [\fIOPTIONS\fR] [\fIPATH\fR]
 .SH "DESCRIPTION"
 \fBDR14 T.meter\fR is a free and opens source command line tool for computing the Dynamic Range of your music according to the procedure used in the off\-line meter released by the Pleasurize Music Foundation.
 
 This tool is very useful to measure how is loud your music and for understanding that a good quality album always has also a good dynamic, and it's also useful for understanding the effects of the so called loudness war.
 
-\fBusage\fR: dr14_tmeter [\-h] [\-v] [\-1] [\-r] [\-a] [\-b] [\-n] [\-p] [\-o OUT_DIR]
-                   [\-t {h,t,b,w,a}] [\-f] [\-d] [\-\-hist] [\-\-lev_hist]
-                   [\-\-spectrogram] [\-\-plot_track] [\-\-plot_track_dst]
-                   [\-\-compress {very_soft,v,soft,s,medium,m,hard,h,very_hard,vh}]
-                   [\-\-dyn_vivacity] [\-\-files_list] [\-\-quiet]
-                   [path_name]
-
-
-
-\fBpositional arguments:\fR
-  path_name
-
-\fBoptional arguments:\fR
-\fB  \-h, \-\-help\fR            show this help message and exit
-
-\fB  \-v, \-\-version\fR         show program's version number and exit
-
-\fB  \-1, \-\-disable_multithread\fR
-                        Disable the multi\-Core mode
-
-\fB  \-r, \-\-recursive\fR       Scan recursively the subdirectories
-
-\fB  \-a, \-\-append \fR         Append all results in a single file; it should be used
-                        in couple with \-r
-
-\fB  \-b, \-\-basic_table\fR     Write the resulting tables in the basic format
-
-\fB  \-n, \-\-turn_off_out\fR    do not writes the output files
-
-\fB  \-\-no_overwrite\fR        Skip the directories that already contain the selected
-                        output files (e.g. dr14.txt); useful with \-r for
-                        analyzing only the new albums
-
-\fB  \-p, \-\-print_std_out\fR   writes the full result on the std_out
-
-\fB  \-o OUT_DIR, \-\-outdir OUT_DIR\fR
-                        Write the resultings files into the given directory
-
-\fB  \-t {h,t,b,w,a}, \-\-tables {h,t,b,w,a}\fR
-                        Select the output files to be written. h=html t=text
-                        b=bbcode w=mediawiki a=all_formats
-
-\fB  \-f, \-\-file\fR            Compute the DR14 of a single file and exit
-
-\fB  \-d, \-\-dr_database\fR     Output file compatible with the DR database at
-                        https://dr.loudness\-war.info/
-
-\fB  \-\-hist\fR                Plot the histogram of dynamic of a single file and
-                        exit
-
-\fB  \-\-lev_hist\fR            Plot the histogram of the saples levels of a single
-                        file and exit
-
-\fB  \-\-spectrogram\fR         Plot the spectrogram of a single file and exit (beta)
-
-\fB  \-\-plot_track\fR          Plot the track of the given file and exit                                                                                                                                                              
-\fB  \-\-plot_track_dst\fR      Plot the track in a cool manner of the given file and exit 
-
-\fB  \-\-compress {very_soft,v,soft,s,medium,m,hard,h,very_hard,vh}\fR
-                        Perform the dynamic compression on a single file and
-                        exit, the resulting track will be written in a temp
-                        directory
-
-\fB  \-\-dyn_vivacity\fR        Plot the graph of the dynamic vivacity of a single
-                        audio file and exit
-
-\fB  \-\-files_list\fR          takes a files list and compute the DR of each file, if
-                        no files are specified, it reads from STDIN
-
-\fB  \-\-quiet\fR               Quite mode
-
-
-
-
-
+.SH "OPTIONS"
+.TP
+\fB\-h\fR, \fB\-\-help\fR
+Show the help message and exit.
+.SS "Input and scanning"
+.TP
+\fIPATH\fR
+File or directory to analyze.
+.TP
+\fB\-r, \-\-recursive\fR
+Scan recursively the subdirectories.
+.TP
+\fB\-f, \-\-file\fR
+Compute the DR14 of a single file and exit.
+.TP
+\fB\-\-files_list\fR
+Take a files list and compute the DR of each file; if no files are specified, it reads from STDIN.
+.SS "Output files"
+.TP
+\fB\-o, \-\-outdir \fIOUT_DIR\fR\fR
+Write the resulting files into the given directory.
+.TP
+\fB\-t, \-\-tables \fR{h,t,b,w,a}\fB\fR
+Select the output files to be written. h=html t=text b=bbcode w=mediawiki a=all_formats.
+.TP
+\fB\-b, \-\-basic_table\fR
+Write the resulting tables in the basic format.
+.TP
+\fB\-a, \-\-append\fR
+Append all results in a single file; it should be used in couple with \-r.
+.TP
+\fB\-n, \-\-turn_off_out\fR
+Do not write the output files.
+.TP
+\fB\-\-no_overwrite\fR
+Skip the directories that already contain the selected output files (e.g. dr14.txt); useful with \-r for analyzing only the new albums.
+.TP
+\fB\-p, \-\-print_std_out\fR
+Write the full result on the std_out.
+.TP
+\fB\-d, \-\-dr_database\fR
+Output file compatible with the DR database at https://dr.loudness\-war.info/
+.TP
+\fB\-\-tag\fR
+Write the DR to the tag of the input files.
+.SS "Performance and verbosity"
+.TP
+\fB\-1, \-\-disable_multithread\fR
+Disable the multi\-Core mode.
+.TP
+\fB\-\-quiet\fR
+Quiet mode.
+.SS "Local database"
+.TP
+\fB\-\-enable_database\fR
+Enable and create, if necessary, the local DR database.
+.TP
+\fB\-\-disable_database\fR
+Disable the local DR database.
+.TP
+\fB\-\-dump_database\fR
+Dump the local DR database.
+.TP
+\fB\-q, \-\-query [\fIQUERY\fR ...]\fR
+Query the database. Options: [\-q] [\-q top #nr] [\-q worst #nr] [\-q top_alb #nr] [\-q worst_alb #nr] [\-q top_art #nr #mt] [\-q artist "name" #nr] [\-q album "name" #nr] [\-q hist] [\-q evol] [\-q codec] [\-q info #nr] [\-q help]
+.SS "Single-file analysis and plots"
+.TP
+\fB\-\-hist\fR
+Plot the histogram of dynamic of a single file and exit.
+.TP
+\fB\-\-lev_hist\fR
+Plot the histogram of the samples levels of a single file and exit.
+.TP
+\fB\-\-spectrogram\fR
+Plot the spectrogram of a single file and exit (beta).
+.TP
+\fB\-\-plot_track\fR
+Plot the track of the given file and exit.
+.TP
+\fB\-\-plot_track_dst\fR
+Plot the track in a cool manner of the given file and exit.
+.TP
+\fB\-\-dyn_vivacity\fR
+Plot the graph of the dynamic vivacity of a single audio file and exit.
+.TP
+\fB\-\-compress \fR{very_soft,v,soft,s,medium,m,hard,h,very_hard,vh}\fB\fR
+Perform the dynamic compression on a single file and exit; the resulting track will be written in a temp directory.
+.SS "Miscellaneous"
+.TP
+\fB\-\-skip_version_check\fR
+Do not check for new versions.
+.TP
+\fB\-v, \-\-version\fR
+Print the current version and exit.
 .SH "AUTHOR"
 Written by Simone Riva.
 .SH "REPORTING BUGS"
