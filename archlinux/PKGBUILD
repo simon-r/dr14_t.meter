@@ -3,7 +3,7 @@
 
 _name=dr14_t.meter
 pkgname=dr14_tmeter
-pkgver=2.1.2
+pkgver=2.2.0
 pkgrel=1
 pkgdesc="Compute the DR14 dynamic range value of audio files"
 arch=(any)

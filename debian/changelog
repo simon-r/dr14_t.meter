@@ -1,3 +1,16 @@
+dr14tmeter (2.2.0) stable; urgency=medium
+
+  * New release 2.2.0.
+  * Add the interactive terminal browser (TUI) for database queries and
+    ANSI colour support.
+  * Add the album, artist, genre and collection info queries
+    (-q artist, -q album, -q genres, -q info).
+  * Update the database schema to version 2.
+  * Add the dr14_tmeter man page.
+  * Update the project URLs.
+
+ -- Simone Riva <simone.rva@gmail.com>  Fri, 30 Oct 2026 22:36:49 +0100
+
 dr14tmeter (2.1.2) stable; urgency=medium
 
   * New release 2.1.2.
