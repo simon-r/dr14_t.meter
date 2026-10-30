@@ -91,7 +91,7 @@
 </thead>
 <tbody>
 <tr>
-<td><code>-t t|h|b|w|a</code></td>
+<td><code>-t t\|h\|b\|w\|a</code></td>
 <td>Chooses the format: <code>t</code> text, <code>h</code> HTML, <code>b</code> BBCode, <code>w</code> MediaWiki, <code>a</code> all of them.</td>
 </tr>
 <tr>
@@ -191,8 +191,12 @@
 <td>The number of tracks and the mean DR for each codec.</td>
 </tr>
 <tr>
-<td><code>dr14_tmeter -q info [N]</code></td>
-<td>A summary of the collection: number of tracks, albums, artists and genres, total and mean track length, and the mean, median, minimum and maximum DR. Followed by the <code>N</code> most common genres (default 30) with their mean length and DR.</td>
+<td><code>dr14_tmeter -q info</code></td>
+<td>A summary of the collection: number of tracks, albums, artists and genres, total and mean track length, and the mean, median, minimum and maximum DR.</td>
+</tr>
+<tr>
+<td><code>dr14_tmeter -q genres [N]</code></td>
+<td>The <code>N</code> most common genres (default 30) with the number of tracks, their mean length and DR.</td>
 </tr>
 </tbody>
 </table>
@@ -202,7 +206,7 @@
 <li>Every name that contains <code>NAME</code> is found: <code>-q artist pink</code> finds both Pink and Pink Floyd.</li>
 <li>Names a few typos away from <code>NAME</code> are found too, so <code>-q artist metalica</code> finds Metallica and <code>-q album "dark side of the mon"</code> finds The Dark Side of the Moon. A typo is a missing, extra, wrong, or swapped character. One typo is allowed for every 5 characters of <code>NAME</code>, so names shorter than 5 characters have to match exactly.</li>
 <li>When more than one name is found, a menu lists them with the closest first. All the names that contain <code>NAME</code> are listed, followed by the names with typos until the list holds 10 names. Move with the arrow keys, check the names with Space (<code>a</code> checks all) and confirm with Enter; the closest ones are already checked.</li>
-<li>When the output is not a terminal, for example in a script or when piped, there is no menu and the closest names are used. The menus need Python's <code>curses</code> module (on Windows, <code>pip install windows-curses</code>); without it a numbered text menu is used.</li>
+<li>When the output is not a terminal, for example in a script or when piped, there is no menu and the closest names are used. The menus need Python’s <code>curses</code> module (on Windows, <code>pip install windows-curses</code>); without it a numbered text menu is used.</li>
 </ul>
 <h3 id="maintenance">Maintenance</h3>
 <table>
@@ -272,7 +276,6 @@
 </tr>
 </tbody>
 </table>
-
 </div>
 <!-- END BODY -->
 </td>

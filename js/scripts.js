@@ -12,7 +12,7 @@ function mail_to_me() {
 }
 
 function dr14_version() {
-	document.write("Ver.: 2.1.2");
+	document.write("Ver.: 2.2.0");
 }
 
 
