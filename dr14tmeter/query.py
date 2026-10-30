@@ -356,6 +356,48 @@ def artist_albums(artist_id):
     return rows
 
 
+def genre_albums(genre):
+    # the albums with tracks of a genre (the name, "(none)" for the tracks
+    # without a genre): rows with id, Album_Title, DR and Artist. A genre
+    # without albums gets its tracks, with kind set to "track"
+    db = dr_database_singletone().get()
+    none = genre == "(none)"
+    cond = "Genre.Id is null" if none else "Genre.Name = ?"
+    par = () if none else (genre,)
+
+    rows = db.query("""
+    select Album.Id as id , Album.Title as Album_Title , dr.dr as DR ,
+           group_concat( distinct Artist.Name ) as Artist
+        from Album
+            inner join DR_Album on DR_Album.IdAlbum = Album.Id
+            inner join dr on dr.id = DR_Album.IdDr
+            inner join Album_Track on Album_Track.IdAlbum = Album.Id
+            left join Artist_Album on Artist_Album.IdAlbum = Album.Id
+            left join Artist on Artist.Id = Artist_Album.IdArtist
+            left join Genre_Track on Genre_Track.IdTrack = Album_Track.IdTrack
+            left join Genre on Genre.Id = Genre_Track.IdGenre
+        where %s
+        group by Album.Id
+        order by dr.dr desc , Album_Title ;
+    """ % cond, par, dict_factory_arg=my_dict_factory)
+    if rows:
+        return rows
+
+    rows = db.query("""
+    select track.id as id , track.title as Album_Title , dr.dr as DR
+        from track
+            inner join DR_Track on DR_Track.IdTrack = track.id
+            inner join dr on dr.id = DR_Track.IdDr
+            left join Genre_Track on Genre_Track.IdTrack = track.id
+            left join Genre on Genre.Id = Genre_Track.IdGenre
+        where %s
+        order by dr.dr desc , track.title ;
+    """ % cond, par, dict_factory_arg=my_dict_factory)
+    for r in rows:
+        r["kind"] = "track"
+    return rows
+
+
 def album_tracks(album_id):
     # the tracks of an album: rows with id, Album_Title (the title) and DR
     q = query_album_tracks([album_id])
@@ -609,7 +651,7 @@ class query_date_dr_evolution(query):
 
     def get_query(self):
         q = """
-        select date.date as Date , avg( dr.dr ) as Mean
+        select date.date as Date , round( avg( dr.dr ) , 1 ) as Mean
            from track inner join DR_Track on DR_Track.idtrack = track.id 
                   inner join dr on dr.id = DR_Track.iddr
                   inner join Date_Track on Date_Track.idtrack = track.id
@@ -738,7 +780,7 @@ class query_collection_info(query):
         if len(dr) > 0:
             mid = len(dr) // 2
             median = dr[mid] if len(dr) % 2 else (dr[mid - 1] + dr[mid]) / 2.0
-            info += [("Mean DR", "%.2f" % (sum(dr) / float(len(dr)))),
+            info += [("Mean DR", "%.1f" % (sum(dr) / float(len(dr)))),
                      ("Median DR", "%.1f" % median),
                      ("Min DR", dr[0]),
                      ("Max DR", dr[-1]),
@@ -769,11 +811,11 @@ class query_genres(query):
         res = []
         for genre, rows in per_genre.items():
             dr = [r["DR"] for r in rows if r["DR"] is not None]
-            res.append({"Genre": genre,
+            res.append({"id": genre, "Genre": genre,
                         "Tracks": len(rows),
                         "Mean_Length": seconds_to_str(
                             sum(r["Seconds"] for r in rows) / len(rows)),
-                        "Mean_DR": sum(dr) / float(len(dr)) if dr else ""})
+                        "Mean_DR": "%.1f" % (sum(dr) / float(len(dr))) if dr else ""})
 
         res.sort(key=lambda r: (-r["Tracks"], r["Genre"]))
         return res[:self.limit]
@@ -783,7 +825,7 @@ class query_genres(query):
         # ignoring the ones with few tracks
         ranked = [r for r in res
                   if r["Mean_DR"] != "" and r["Tracks"] >= self.min_track]
-        ranked.sort(key=lambda r: -r["Mean_DR"])
+        ranked.sort(key=lambda r: -float(r["Mean_DR"]))
 
         rows = dict((r["Genre"], "red") for r in ranked[-self.n_best:])
         rows.update((r["Genre"], "green") for r in ranked[:self.n_best])

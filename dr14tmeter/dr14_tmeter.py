@@ -115,7 +115,7 @@ def main():
 
         if options.query[0] not in ["help", "top", "top_alb",
                                     "worst", "worst_alb", "top_art",
-                                    "artist", "album", "hist", "evol", "codec", "info"]:
+                                    "artist", "album", "hist", "evol", "codec", "info", "genres"]:
 
             print_err("Error: -q invalid parameter .")
             print_err("Error: type dr14_tmeter -q for more info.")

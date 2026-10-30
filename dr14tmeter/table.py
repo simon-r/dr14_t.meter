@@ -96,6 +96,15 @@ def histogram_bar(value, max_value, width):
     return "█" * full + ("", "▏", "▎", "▍", "▌", "▋", "▊", "▉")[part]
 
 
+class one_decimal(float):
+    # a float shown with one decimal digit, like the mean DR
+    pass
+
+
+def one_decimal_formatter(el):
+    return "%.1f" % el
+
+
 def float_formatter(el):
     if abs(el) >= 1.0:
         return "%.2f" % el
@@ -127,6 +136,7 @@ class Table:
         self.__formatter = {}
 
         self.add_formatter(float, float_formatter)
+        self.add_formatter(one_decimal, one_decimal_formatter)
         self.add_formatter(str, string_formatter)
         if sys.version_info[0] == 2:
             self.add_formatter(unicode, string_formatter)

@@ -273,6 +273,7 @@ QUERY_MENU = [
     ("Used audio CODEC and mean DR", "codec"),
     ("The best DR albums and tracks of an artist", "artist"),
     ("The DR of an album and of its tracks", "album"),
+    ("The list of the genres: tracks, mean length and DR", "genres"),
     ("The collection summary: tracks, albums, genres, length and DR", "info"),
 ]
 
@@ -303,6 +304,10 @@ def is_artist_table(rows):
     return len(rows) > 0 and "id" in rows[0] and "Artist" in rows[0] and "Mean_DR" in rows[0]
 
 
+def is_genre_table(rows):
+    return len(rows) > 0 and "id" in rows[0] and "Genre" in rows[0] and "Mean_Length" in rows[0]
+
+
 def query_helper_tui():
     # menu selectable with the arrow keys, the results are shown in a pager
     labels = ["%d. %s" % (i + 1, m[0]) for i, m in enumerate(QUERY_MENU)]
@@ -325,7 +330,7 @@ def query_helper_tui():
                 continue
             query.append(name)
 
-        if kind in ["top", "top_alb", "top_art", "worst", "worst_alb", "artist", "album", "info"]:
+        if kind in ["top", "top_alb", "top_art", "worst", "worst_alb", "artist", "album", "genres"]:
             nr = tui.prompt("Number of desired results", 30)
             if nr is None:
                 continue
@@ -351,7 +356,7 @@ def query_helper_tui():
         header = "%s\n>    %s\n\n" % (
             ansi.style("equivalent command line:", "bold"), query_command_line(query))
 
-        if not any(is_track_table(rows) or is_album_table(rows) or is_artist_table(rows) for _, _, rows, _ in tables):
+        if not any(is_track_table(rows) or is_album_table(rows) or is_artist_table(rows) or is_genre_table(rows) for _, _, rows, _ in tables):
             tui.pager(header + (res or ""), QUERY_MENU[pos][0])
             continue
 
@@ -364,6 +369,9 @@ def query_helper_tui():
             elif is_artist_table(rows):
                 tui.artist_browser(table_title, q.get_col_keys(), rows,
                                    artist_albums, artist_item_details, album_tracks, header)
+            elif is_genre_table(rows):
+                tui.artist_browser(table_title, q.get_col_keys(), rows,
+                                   genre_albums, artist_item_details, album_tracks, header)
             elif is_album_table(rows):
                 # the tracks of the highlighted album are listed beside it
                 tui.artist_browser(table_title, q.get_col_keys(), rows,
@@ -603,8 +611,10 @@ def database_exec_query(options, tm=None, tables_out=None):
         tables = [("Codec Info", query_dr_codec())]
 
     elif options.query[0] == "info":
-        tables = [("Collection", query_collection_info()),
-                  ("Genres", query_genres())]
+        tables = [("Collection", query_collection_info())]
+
+    elif options.query[0] == "genres":
+        tables = [("Genres", query_genres())]
 
     else:
         raise Exception("Option not allowed")
@@ -616,6 +626,10 @@ def database_exec_query(options, tm=None, tables_out=None):
         q.limit = limit
 
         res = q.exec_query()
+        for r in res:
+            for k in ("Mean_DR", "Mean"):
+                if isinstance(r.get(k), float):
+                    r[k] = one_decimal(r[k])
         tm.highlight = q.get_highlight(res)
 
         code = wr.write_query_result(
