@@ -34,8 +34,7 @@ lock_db = threading.Lock()
 
 # Schema version produced by the latest migration. Bump it together with a
 # new entry in dr_database._migrations.
-DB_SCHEMA_VERSION = 3
-
+DB_SCHEMA_VERSION = 2
 
 def my_dict_factory(cursor, row):
     d = {}
