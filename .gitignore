@@ -14,3 +14,4 @@ dist/*
 archlinux/src/
 archlinux/pkg/
 archlinux/*.tar.*
+archlinux/aur_publish.sh
