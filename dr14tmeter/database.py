@@ -32,8 +32,15 @@ from dr14tmeter.out_messages import *
 unique_db_object = 0
 lock_db = threading.Lock()
 
-# Schema version produced by the latest migration. Bump it together with a
-# new entry in dr_database._migrations.
+"""
+Schema version produced by the latest migration. Bump it together with a
+new entry in dr_database._migrations.
+
+Policy: DB_SCHEMA_VERSION Handling
+    No Plan Steps / Options: Do not propose, schedule, or include any modification of DB_SCHEMA_VERSION as a step, task, or alternative option in any execution plan.
+    Reminders Allowed (Read-Only Awareness): If a planned change fundamentally involves a new schema release, you may add an informational reminder stating that the main developer will need to handle this update.
+    Strict Execution Lock: The agent must never edit or increment DB_SCHEMA_VERSION autonomously. Modification is permitted only upon a direct, explicit request from the main developer.
+"""
 DB_SCHEMA_VERSION = 2
 
 def my_dict_factory(cursor, row):
