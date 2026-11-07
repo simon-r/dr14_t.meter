@@ -30,6 +30,7 @@ from dr14tmeter.dr14_config import *
 from dr14tmeter.database_utils import *
 
 import os
+import sqlite3
 import subprocess
 import sys
 import logging
@@ -82,12 +83,21 @@ def main():
         print_msg("The local DR database is disabled! ")
         return
 
+    if developer_db_enabled() and (db_is_enabled() or
+                                   options.dump_database or
+                                   options.query is not None):
+        try:
+            ensure_developer_database()
+        except (OSError, sqlite3.Error, ValueError, RuntimeError) as e:
+            print_err(str(e))
+            return
+
     if options.dump_database:
         db = dr_database_singletone().get()
         db.dump()
         return
 
-    if db_is_enabled():
+    if db_is_enabled() and not developer_db_enabled():
         db = dr_database_singletone().get()
         f = db.is_db_valid()
 

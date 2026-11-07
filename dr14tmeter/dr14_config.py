@@ -95,8 +95,24 @@ def set_config_field(section, field, value):
         config.write(configfile)
 
 
-def get_db_path():
+def developer_db_enabled():
+    return os.environ.get('DR14_DEVELOPER_DB') == '1'
+
+
+def get_normal_db_path():
     return get_config_filed('database', 'path')
+
+
+def get_db_path():
+    path = get_normal_db_path()
+    if not developer_db_enabled():
+        return path
+
+    developer_path = path + '.developer'
+    if (os.path.exists(path) and os.path.exists(developer_path) and
+            os.path.samefile(path, developer_path)):
+        raise ValueError("The developer database must not be the normal database")
+    return developer_path
 
 
 def db_is_enabled():

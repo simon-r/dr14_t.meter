@@ -23,9 +23,12 @@
 # dr.id = DR_Track.iddr group by (dr.dr) ;
 
 import sqlite3
+import tempfile
 import threading
+from urllib.parse import quote
 
-from dr14tmeter.dr14_config import get_db_path
+from dr14tmeter.dr14_config import (
+    developer_db_enabled, get_db_path, get_normal_db_path)
 from dr14tmeter.out_messages import *
 
 
@@ -42,6 +45,77 @@ Policy: DB_SCHEMA_VERSION Handling
     Strict Execution Lock: The agent must never edit or increment DB_SCHEMA_VERSION autonomously. Modification is permitted only upon a direct, explicit request from the main developer.
 """
 DB_SCHEMA_VERSION = 2
+
+
+def _is_developer_database_valid(conn):
+    required_tables = {
+        "Db_Version", "Artist", "Track", "Album", "DR", "Date",
+        "Codec", "Genre", "DR_Track", "Codec_Track", "DR_Album",
+        "Genre_Track", "Date_Track", "Artist_Track", "Artist_Album",
+        "Album_Track",
+    }
+    tables = {row[0] for row in conn.execute(
+        "select name from sqlite_master where type = 'table'")}
+    return (required_tables.issubset(tables) and
+            conn.execute("select max(Version) from Db_Version").fetchone()[0] is not None and
+            conn.execute("pragma quick_check").fetchone()[0] == "ok")
+
+
+def prepare_developer_database():
+    """Create the developer database from a consistent normal-db snapshot."""
+    if not developer_db_enabled():
+        return
+
+    destination = get_db_path()
+    if os.path.lexists(destination):
+        if not os.path.isfile(destination):
+            raise ValueError("The developer database is not a regular file: %s" %
+                             destination)
+        return
+
+    source = get_normal_db_path()
+    if not os.path.isfile(source):
+        raise ValueError("The normal database does not exist: %s" % source)
+
+    temporary_path = None
+    try:
+        fd, temporary_path = tempfile.mkstemp(
+            prefix=".dr14-developer-", dir=os.path.dirname(os.path.abspath(destination)))
+        os.close(fd)
+        source_uri = "file:%s?mode=ro" % quote(os.path.abspath(source))
+        source_conn = sqlite3.connect(source_uri, uri=True)
+        try:
+            if source_conn.execute("pragma schema_version").fetchone()[0] < 21:
+                raise ValueError("The normal database is invalid: %s" % source)
+            dest_conn = sqlite3.connect(temporary_path)
+            try:
+                if hasattr(source_conn, "backup"):
+                    source_conn.backup(dest_conn)
+                else:
+                    source_conn.execute("begin")
+                    for statement in source_conn.iterdump():
+                        dest_conn.execute(statement)
+
+                if not _is_developer_database_valid(dest_conn):
+                    raise ValueError("The normal database is invalid: %s" % source)
+            finally:
+                dest_conn.close()
+        finally:
+            source_conn.close()
+
+        try:
+            os.link(temporary_path, destination)
+        except FileExistsError:
+            # Another process published its complete copy first.
+            if not os.path.isfile(get_db_path()):
+                raise ValueError("The developer database is not a regular file: %s" %
+                                 destination)
+    except (OSError, sqlite3.Error) as e:
+        raise RuntimeError("Unable to create the developer database: %s" % e)
+    finally:
+        if temporary_path is not None:
+            os.unlink(temporary_path)
+
 
 def my_dict_factory(cursor, row):
     d = {}
@@ -389,17 +463,17 @@ class dr_database:
     def query(self, query, t=(), dict_factory_arg=None):
 
         conn = sqlite3.connect(get_db_path())
-
-        if dict_factory_arg != None:
-            conn.row_factory = dict_factory_arg
-
-        c = conn.cursor()
-
-        c.execute(query, t)
-        res_l = c.fetchall()
-        c.close()
-
-        return res_l
+        try:
+            if dict_factory_arg != None:
+                conn.row_factory = dict_factory_arg
+            c = conn.cursor()
+            try:
+                c.execute(query, t)
+                return c.fetchall()
+            finally:
+                c.close()
+        finally:
+            conn.close()
 
     @property
     def db_version(self):
@@ -414,6 +488,16 @@ class dr_database:
 
         if not os.path.exists(get_db_path()):
             return False
+
+        if developer_db_enabled():
+            # SQLite's backup API resets schema_version on the destination.
+            conn = sqlite3.connect(get_db_path())
+            try:
+                return _is_developer_database_valid(conn)
+            except sqlite3.DatabaseError:
+                return False
+            finally:
+                conn.close()
 
         if self._pragma_schema_version() < 21:
             return False
@@ -606,16 +690,19 @@ class dr_database:
 
     def upgrade_db(self):
         cur = self.db_version
+        target = DB_SCHEMA_VERSION
+        if developer_db_enabled():
+            target = max([target] + [version + 1 for version in self._migrations])
 
-        if cur > DB_SCHEMA_VERSION:
-            raise Exception("Error: database.upgrade_db the database version "
-                            "(%d) is newer than the supported one (%d)" %
-                            (cur, DB_SCHEMA_VERSION))
+        if cur > target:
+            raise RuntimeError("Error: database.upgrade_db the database version "
+                               "(%d) is newer than the supported one (%d)" %
+                               (cur, target))
 
-        while cur < DB_SCHEMA_VERSION:
+        while cur < target:
             if cur not in self._migrations:
-                raise Exception("Error: database.upgrade_db no migration "
-                                "from version %d to %d" % (cur, cur + 1))
+                raise RuntimeError("Error: database.upgrade_db no migration "
+                                   "from version %d to %d" % (cur, cur + 1))
 
             script = self._migrations[cur]()
 
@@ -624,16 +711,16 @@ class dr_database:
                 conn.executescript("begin; " + script + " commit;")
             except Exception as e:
                 conn.rollback()
-                raise Exception("Error: database.upgrade_db migration "
-                                "%d -> %d failed: %s" % (cur, cur + 1, e))
+                raise RuntimeError("Error: database.upgrade_db migration "
+                                   "%d -> %d failed: %s" % (cur, cur + 1, e))
             finally:
                 conn.close()
 
             new = self.db_version
             if new != cur + 1:
-                raise Exception("Error: database.upgrade_db migration "
-                                "%d -> %d left the database at version %d" %
-                                (cur, cur + 1, new))
+                raise RuntimeError("Error: database.upgrade_db migration "
+                                   "%d -> %d left the database at version %d" %
+                                   (cur, cur + 1, new))
             cur = new
 
     def dump(self):

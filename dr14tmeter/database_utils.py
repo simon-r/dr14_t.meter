@@ -17,8 +17,9 @@
 
 
 import os
+import sqlite3
 
-from dr14tmeter.database import dr_database_singletone
+from dr14tmeter.database import dr_database_singletone, prepare_developer_database
 from dr14tmeter.table import *
 from dr14tmeter.audio_analysis import *
 from dr14tmeter.dr14_global import *
@@ -155,7 +156,27 @@ def fix_problematic_database():
         print_out("  ")
 
 
+def ensure_developer_database():
+    prepare_developer_database()
+    db = dr_database_singletone().get()
+    if not db.is_db_valid():
+        raise ValueError("The developer database is invalid: %s" % get_db_path())
+    db.upgrade_db()
+    return db
+
+
 def enable_database(prompt=True):
+
+    if developer_db_enabled():
+        try:
+            ensure_developer_database()
+        except (OSError, sqlite3.Error, ValueError, RuntimeError) as e:
+            print_err(str(e))
+            return
+        enable_db(True)
+        print_msg("The local DR database is ready and enabled! It is located in the file: %s  " %
+                  get_db_path())
+        return
 
     f = False
 

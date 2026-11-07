@@ -95,6 +95,30 @@ If the database file is damaged, `dr14_tmeter` offers to rebuild it, keeping a b
 
 The database is a plain SQLite file, so you can also open it with `sqlite3` or any SQLite browser to run your own queries.
 
+### Developer database
+
+Developers can opt in to the latest available database migrations without
+upgrading the normal database:
+
+```sh
+DR14_DEVELOPER_DB=1 dr14_tmeter -q info
+```
+
+The developer database is stored alongside the configured normal database,
+with `.developer` appended to its filename. On first use, it is created as a
+consistent copy of the normal SQLite database, then migrated to the latest
+registered schema (currently version 3). The normal database must already
+exist; if it is missing or invalid, an error is reported instead.
+
+The copy is reused on later runs and changes to either database are not
+synchronized. Unset the variable to use the normal database again; values
+other than `1` also select the normal database. The database enabled/disabled
+setting and collection directory are shared. The variable does not enable the
+database by itself; `DR14_DEVELOPER_DB=1 dr14_tmeter --enable_database`
+enables it using the existing normal database. Explicit queries and dumps also
+prepare the developer copy when needed. If the developer copy is damaged,
+the program reports an error; back it up or remove it to create a fresh copy.
+
 ## Writing DR tags
 
 `--tag` writes the measured values into the tags of the audio files, during a directory scan or a `--files_list` scan. It requires [Mutagen](https://mutagen.readthedocs.io).
