@@ -682,7 +682,14 @@ class dr_database:
                 sha1 varchar(40) not null ,
                 path text not null
             ) ;
+            
+            create table Collections (
+                Id integer primary key autoincrement ,
+                path text not null
+            ) ;
+            
             create index TrackPath_sha1_indx on TrackPath ( sha1 ) ;
+            
             insert into Db_Version ( Version ) values ( 3 ) ;
         """
 
