@@ -494,16 +494,21 @@ def artist_browser(title, keys, rows, albums_fn, details_fn, tracks_fn=None, hea
             stdscr.erase()
             _put(stdscr, 0, 1, title, curses.A_BOLD)
             _put(stdscr, 2, 1, _clip(head, 0, list_w - 2), curses.A_UNDERLINE)
-            for i in range(top, min(top + page, len(rows))):
-                attr = curses.A_REVERSE if i == cur and not in_albums else (
-                    curses.A_BOLD if i == cur else 0)
-                _put(stdscr, 3 + i - top, 1,
-                     _clip(lines[i], 0, list_w - 2).ljust(list_w - 2), attr)
-
             aid = rows[cur]["id"]
             if aid not in albums:
                 albums[aid] = albums_fn(aid)
             alb = albums[aid]
+
+            for i in range(top, min(top + page, len(rows))):
+                attr = curses.A_REVERSE if i == cur and not in_albums else (
+                    curses.A_BOLD if i == cur else 0)
+                if i == cur and alb:
+                    # the highlighted entry has a sub-level: show a right arrow
+                    txt = _clip(lines[i], 0, list_w - 4).ljust(list_w - 4) + " >"
+                else:
+                    txt = _clip(lines[i], 0, list_w - 2).ljust(list_w - 2)
+                _put(stdscr, 3 + i - top, 1, txt, attr)
+
             if acur >= len(alb):
                 acur = max(len(alb) - 1, 0)
 
@@ -516,6 +521,7 @@ def artist_browser(title, keys, rows, albums_fn, details_fn, tracks_fn=None, hea
                 lst, lcur = tracks[bkey], tcur
                 if lcur >= len(lst):
                     lcur = tcur = max(len(lst) - 1, 0)
+            can = tracks_fn and not in_tracks and lst and lst[0].get("kind") != "track"
 
             if side:
                 y0, x0, bh, bw = 2, list_w + 1, h - 4, w - list_w - 2
@@ -547,8 +553,11 @@ def artist_browser(title, keys, rows, albums_fn, details_fn, tracks_fn=None, hea
                         break
                     txt = "%-5s %s" % (lst[i]["DR"], lst[i]["Album_Title"])
                     attr = curses.A_REVERSE if in_albums and i == lcur else 0
-                    _put(stdscr, y0 + 1 + n, x0 + 2,
-                         _clip(txt, 0, bw - 4).ljust(bw - 4), attr)
+                    if in_albums and i == lcur and can:
+                        txt = _clip(txt, 0, bw - 6).ljust(bw - 6) + " >"
+                    else:
+                        txt = _clip(txt, 0, bw - 4).ljust(bw - 4)
+                    _put(stdscr, y0 + 1 + n, x0 + 2, txt, attr)
 
                 if in_albums and lst:
                     dy = y0 + 1 + ah
@@ -572,7 +581,6 @@ def artist_browser(title, keys, rows, albums_fn, details_fn, tracks_fn=None, hea
                              " PgUp/PgDn: scroll %d/%d " % (dtop + 1, len(box)))
 
             if in_albums:
-                can = tracks_fn and not in_tracks and lst and lst[0].get("kind") != "track"
                 msg = "%d/%d   Up/Down: select   PgUp/PgDn: scroll details   %sLeft/Esc: back   q: quit" % (
                     lcur + 1, len(lst), "Right: tracks   " if can else "")
             else:

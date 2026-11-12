@@ -484,6 +484,21 @@ class dr_database:
 
         return int(r[0][0])
 
+    def get_collections(self):
+        """Collection paths stored in the database (empty before schema v3)."""
+        if self.db_version < 3:
+            return []
+        return [row[0] for row in self.query("select path from Collections ;")]
+
+    def find_collection(self, dir_path):
+        """Return the stored collection path containing dir_path, or None."""
+        real = os.path.realpath(dir_path)
+        for c in self.get_collections():
+            c = os.path.realpath(c)
+            if real == c or real.startswith(c.rstrip(os.sep) + os.sep):
+                return c
+        return None
+
     def is_db_valid(self):
 
         if not os.path.exists(get_db_path()):
@@ -686,6 +701,19 @@ class dr_database:
             create table Collections (
                 Id integer primary key autoincrement ,
                 path text not null
+            ) ;
+            
+            create table TrackLists (
+                Id integer primary key autoincrement ,
+                name text not null
+            ) ;
+
+            create table Track_List (
+                IdTrack integer not null ,
+                IdList integer not null ,
+                primary key ( IdTrack , IdList ) ,
+                foreign key ( IdTrack ) references Track ( Id ) ,
+                foreign key ( IdList ) references TrackLists ( Id )
             ) ;
             
             create index TrackPath_sha1_indx on TrackPath ( sha1 ) ;

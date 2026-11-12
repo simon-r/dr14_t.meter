@@ -32,6 +32,7 @@ from dr14tmeter.duration import StructDuration
 from dr14tmeter.write_dr import WriteDr, WriteDrExtended
 from dr14tmeter.audio_math import sha1_track_v1
 from dr14tmeter.dr14_config import get_collection_dir
+from dr14tmeter.database import dr_database_singletone
 from dr14tmeter.out_messages import print_msg, flush_msg
 
 import dr14tmeter.dr14_global as dr14
@@ -145,8 +146,16 @@ class DynamicRangeMeter:
 
         wr = WriteDr()
 
-        if self.__write_to_local_db and os.path.realpath(self.dir_name).startswith(self.coll_dir):
+        if self.__write_to_local_db and self.__in_collection():
             wr.write_to_local_dr_database(self)
+
+    def __in_collection(self):
+        # From DB schema v3 the collection paths come from the database;
+        # older databases fall back to collection_dir of the config file.
+        db = dr_database_singletone().get()
+        if db.db_version >= 3:
+            return db.find_collection(self.dir_name) is not None
+        return os.path.realpath(self.dir_name).startswith(self.coll_dir)
 
     def fwrite_dr(self, file_name, tm, ext_table=False, std_out=False, append=False, dr_database=True):
 
