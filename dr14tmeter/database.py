@@ -711,13 +711,25 @@ class dr_database:
             create table Track_List (
                 IdTrack integer not null ,
                 IdList integer not null ,
+                AddedAt datetime not null default current_timestamp ,
                 primary key ( IdTrack , IdList ) ,
                 foreign key ( IdTrack ) references Track ( Id ) ,
                 foreign key ( IdList ) references TrackLists ( Id )
             ) ;
             
             create index TrackPath_sha1_indx on TrackPath ( sha1 ) ;
-            
+
+            -- SQLite cannot add a column with a non-constant default, so the
+            -- column is added empty, back-filled, and set on insert by a trigger.
+            alter table Track add column AddedAt datetime ;
+            update Track set AddedAt = current_timestamp ;
+
+            create trigger Track_AddedAt_trg after insert on Track
+            when new.AddedAt is null
+            begin
+                update Track set AddedAt = current_timestamp where Id = new.Id ;
+            end ;
+
             insert into Db_Version ( Version ) values ( 3 ) ;
         """
 
