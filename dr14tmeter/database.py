@@ -22,13 +22,14 @@
 # select dr.dr as dr , count(dr.dr) as dr_cnt from  DR_Track join dr on
 # dr.id = DR_Track.iddr group by (dr.dr) ;
 
+import configparser
 import sqlite3
 import tempfile
 import threading
 from urllib.parse import quote
 
 from dr14tmeter.dr14_config import (
-    developer_db_enabled, get_db_path, get_normal_db_path)
+    developer_db_enabled, get_collection_dir, get_db_path, get_normal_db_path)
 from dr14tmeter.out_messages import *
 
 
@@ -158,11 +159,17 @@ class dr_database:
         self._id_dr = 0
         self._id_date = 0
 
+        self._track_paths = []
+
         # {from_version: method}: each method returns the SQL script that
         # migrates the db from from_version to from_version + 1 and ends
         # with the matching insert into Db_Version.
         self._migrations = {1: self.dr14_db_migrate_v1_to_v2,
                             2: self.dr14_db_migrate_v2_to_v3}
+
+        # {from_version: method(conn)}: optional Python data steps that run
+        # after the SQL script of the same migration, in the same transaction.
+        self._data_migrations = {2: self._migrate_v2_to_v3_data}
 
     def build_database(self):
         global lock_db
@@ -199,6 +206,7 @@ class dr_database:
         self._codec = {}
         self._dr = {}
         self._date = {}
+        self._track_paths = []
 
         self._id_artist = self.query("select max(Id) from Artist").pop()[0]
         self._id_artist = 0 if self._id_artist == None else self._id_artist + 1
@@ -230,6 +238,8 @@ class dr_database:
             lock_db.release()
             raise Exception(
                 "Error: database.commit_insert_session the session has not been opened !")
+
+        record_paths = self.db_version >= 3
 
         conn = sqlite3.connect(get_db_path())
         c = conn.cursor()
@@ -309,6 +319,15 @@ class dr_database:
                 c.execute(
                     "insert into Album_Track ( IdAlbum , IdTrack ) values ( :album_id , :id ) ", self._tracks[k_track])
 
+        if record_paths:
+            # The id is resolved by sha1, so this works both for the tracks
+            # inserted above and for tracks that were already in the db.
+            for (track_sha1, path) in self._track_paths:
+                c.execute("insert or ignore into TrackPath ( IdTrack , path ) "
+                          "select Id , ? from Track where sha1 = ? ",
+                          (path, track_sha1))
+        self._track_paths = []
+
         conn.commit()
         conn.close()
 
@@ -319,7 +338,13 @@ class dr_database:
                      dr, rms, peak, duration,
                      codec, bit, bitrate, sampling_rate,
                      album_sha1=None, artist=None,
-                     genre=None, date=None, track_nr=None, size=None):
+                     genre=None, date=None, track_nr=None, size=None, path=None):
+        """Queue a track for the current insert session.
+
+        path, if given, is stored in TrackPath (schema v3 and later), also when
+        the track is already in the db. Tracks stored before v3 have no path:
+        it was never saved.
+        """
 
         global lock_db
         lock_db.acquire()
@@ -327,6 +352,9 @@ class dr_database:
             lock_db.release()
             raise Exception(
                 "Error: database.insert_track the insert session has not been opened !")
+
+        if path is not None:
+            self._track_paths.append((track_sha1, os.path.realpath(path)))
 
         q = "select Id from track where sha1 = ? "
         rq = self.query(q, (track_sha1,))
@@ -498,6 +526,78 @@ class dr_database:
             if real == c or real.startswith(c.rstrip(os.sep) + os.sep):
                 return c
         return None
+
+    def add_collection(self, dir_path):
+        """Add a collection directory. Return False if it was already stored."""
+        real = os.path.realpath(dir_path)
+        if not os.path.isdir(real):
+            raise ValueError("The collection is not a directory: %s" % dir_path)
+        return self._write_collection(
+            "insert or ignore into Collections ( path ) values ( ? ) ;", real)
+
+    def remove_collection(self, dir_path):
+        """Remove a collection directory. Return False if it was not stored."""
+        return self._write_collection(
+            "delete from Collections where path = ? ;", os.path.realpath(dir_path))
+
+    def _write_collection(self, sql, path):
+        return self._write_v3(sql, [(path,)]) > 0
+
+    def _require_v3(self):
+        if self.db_version < 3:
+            raise ValueError("This needs database schema v3 or later "
+                             "(the current database is v%d)" % self.db_version)
+
+    def _write_v3(self, sql, rows):
+        """Run sql once per parameter tuple in rows, in one transaction.
+        Return the number of changed rows."""
+        self._require_v3()
+        lock_db.acquire()
+        try:
+            conn = sqlite3.connect(get_db_path())
+            try:
+                changed = 0
+                for row in rows:
+                    changed += conn.execute(sql, row).rowcount
+                conn.commit()
+                return changed
+            finally:
+                conn.close()
+        finally:
+            lock_db.release()
+
+    def find_tracks_by_metadata(self, size, duration):
+        """Ids of the tracks with this file size and duration (from ffprobe)."""
+        self._require_v3()
+        return [row[0] for row in self.query(
+            "select Id from Track where size = ? and duration = ? ;",
+            (size, duration))]
+
+    def find_track_by_sha1(self, sha1):
+        self._require_v3()
+        rows = self.query("select Id from Track where sha1 = ? ;", (sha1,))
+        return rows[0][0] if rows else None
+
+    def get_track_paths(self, root):
+        """[(TrackPath.Id, path)] for the paths equal to root or below it."""
+        self._require_v3()
+        root = os.path.realpath(root)
+        prefix = root.rstrip(os.sep) + os.sep
+        return self.query(
+            "select Id , path from TrackPath "
+            "where path = ? or substr( path , 1 , ? ) = ? ;",
+            (root, len(prefix), prefix))
+
+    def add_track_paths(self, pairs):
+        """Store (IdTrack, path) pairs. Return the number of new rows."""
+        return self._write_v3(
+            "insert or ignore into TrackPath ( IdTrack , path ) values ( ? , ? ) ;",
+            [(id_track, os.path.realpath(path)) for (id_track, path) in pairs])
+
+    def delete_track_paths(self, ids):
+        """Delete TrackPath rows by Id. Return the number of deleted rows."""
+        return self._write_v3("delete from TrackPath where Id = ? ;",
+                              [(i,) for i in ids])
 
     def is_db_valid(self):
 
@@ -694,13 +794,15 @@ class dr_database:
         db = """
             create table TrackPath (
                 Id integer primary key autoincrement ,
-                sha1 varchar(40) not null ,
-                path text not null
+                IdTrack integer not null ,
+                path text not null ,
+                unique ( IdTrack , path ) ,
+                foreign key ( IdTrack ) references Track ( Id )
             ) ;
-            
+
             create table Collections (
                 Id integer primary key autoincrement ,
-                path text not null
+                path text not null unique
             ) ;
             
             create table TrackLists (
@@ -717,12 +819,12 @@ class dr_database:
                 foreign key ( IdList ) references TrackLists ( Id )
             ) ;
             
-            create index TrackPath_sha1_indx on TrackPath ( sha1 ) ;
+            -- The unique ( IdTrack , path ) index also serves lookups by IdTrack.
 
             -- SQLite cannot add a column with a non-constant default, so the
-            -- column is added empty, back-filled, and set on insert by a trigger.
+            -- column is added empty and set on insert by a trigger. Tracks that
+            -- existed before v3 keep AddedAt null: their real add time is unknown.
             alter table Track add column AddedAt datetime ;
-            update Track set AddedAt = current_timestamp ;
 
             create trigger Track_AddedAt_trg after insert on Track
             when new.AddedAt is null
@@ -734,6 +836,17 @@ class dr_database:
         """
 
         return db
+
+    def _migrate_v2_to_v3_data(self, conn):
+        # Before v3 the single collection lived in the config file; copy it
+        # so the tracks of that collection are still written to the db.
+        # '/' ("any") is copied as it is: it matches every directory.
+        try:
+            coll_dir = get_collection_dir()
+        except (configparser.Error, OSError):
+            return
+        conn.execute("insert or ignore into Collections ( path ) values ( ? ) ;",
+                     (os.path.realpath(coll_dir),))
 
     def upgrade_db(self):
         cur = self.db_version
@@ -755,7 +868,11 @@ class dr_database:
 
             conn = sqlite3.connect(get_db_path())
             try:
-                conn.executescript("begin; " + script + " commit;")
+                conn.executescript("begin; " + script)
+                data_step = self._data_migrations.get(cur)
+                if data_step is not None:
+                    data_step(conn)
+                conn.commit()
             except Exception as e:
                 conn.rollback()
                 raise RuntimeError("Error: database.upgrade_db migration "

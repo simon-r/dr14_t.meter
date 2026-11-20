@@ -83,8 +83,14 @@ def main():
         print_msg("The local DR database is disabled! ")
         return
 
+    manage_coll = (options.add_collection is not None or
+                   options.remove_collection is not None or
+                   options.list_collections or
+                   options.update_paths is not None)
+
     if developer_db_enabled() and (db_is_enabled() or
                                    options.dump_database or
+                                   manage_coll or
                                    options.query is not None):
         try:
             ensure_developer_database()
@@ -111,6 +117,17 @@ def main():
         except Exception as e:
             print_err(str(e))
             return
+
+    if manage_coll:
+        if not database_exists():
+            print_err("Error: The database does not exist")
+            print_err("Error: type %s --enable_database to create it." % get_exe_name())
+            return
+        if options.update_paths is not None:
+            update_paths(options)
+        else:
+            manage_collections(options)
+        return
 
     if options.query != None:
 

@@ -1,14 +1,18 @@
 import configparser
+import math
 from contextlib import closing
 import os
 import sqlite3
+import struct
 import subprocess
 import sys
 import tempfile
 import threading
 import unittest
+import wave
 from unittest import mock
 
+from dr14tmeter import collection_paths
 from dr14tmeter import database
 from dr14tmeter import dr14_config
 
@@ -16,7 +20,9 @@ from dr14tmeter import dr14_config
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 
-class DeveloperDatabaseTests(unittest.TestCase):
+class DatabaseTestBase(unittest.TestCase):
+    """Temporary config and databases shared by the tests below."""
+
     def setUp(self):
         self.temp = tempfile.TemporaryDirectory()
         self.addCleanup(self.temp.cleanup)
@@ -65,6 +71,13 @@ class DeveloperDatabaseTests(unittest.TestCase):
             stdout=subprocess.PIPE, stderr=subprocess.PIPE, universal_newlines=True,
             env=process_env, cwd=ROOT, timeout=30)
 
+    def make_dir(self, *parts):
+        path = os.path.join(self.temp.name, *parts)
+        os.makedirs(path, exist_ok=True)
+        return os.path.realpath(path)
+
+
+class DeveloperDatabaseTests(DatabaseTestBase):
     def test_normal_mode_keeps_version_two(self):
         self.create_normal_database(version=1)
         os.environ["DR14_DEVELOPER_DB"] = "0"
@@ -307,6 +320,211 @@ class DeveloperDatabaseTests(unittest.TestCase):
         result = self.run_cli("-q", "info")
         self.assertIn("Error:", result.stderr)
         self.assertEqual(self.query(self.normal_path, "select max(Version) from Db_Version"), [(2,)])
+
+    def test_migration_copies_config_collection(self):
+        music = self.make_dir("music")
+        dr14_config.set_collection_dir(music)
+        self.create_normal_database()
+        database.prepare_developer_database()
+        self.db.upgrade_db()
+        self.assertEqual(self.db.get_collections(), [music])
+        self.assertEqual(self.db.find_collection(self.make_dir("music", "album")), music)
+        self.assertIsNone(self.db.find_collection(self.make_dir("other")))
+
+    def test_migration_copies_any_collection(self):
+        self.create_normal_database()
+        database.prepare_developer_database()
+        self.db.upgrade_db()
+        self.assertEqual(self.db.get_collections(), ["/"])
+        self.assertEqual(self.db.find_collection(self.make_dir("anything")), "/")
+
+    def test_failed_data_migration_rolls_back(self):
+        self.create_normal_database()
+        database.prepare_developer_database()
+
+        def fail(conn):
+            raise sqlite3.OperationalError("data step failed")
+        self.db._data_migrations[2] = fail
+        with self.assertRaisesRegex(Exception, "migration 2 -> 3 failed"):
+            self.db.upgrade_db()
+        self.assertEqual(self.db.db_version, 2)
+        self.assertEqual(self.query(self.dev_path,
+                                    "select name from sqlite_master where name='TrackPath'"), [])
+
+    def test_add_and_remove_collections(self):
+        music = self.make_dir("music")
+        self.create_normal_database()
+        database.prepare_developer_database()
+        self.db.upgrade_db()
+        self.assertTrue(self.db.remove_collection("/"))
+        self.assertFalse(self.db.remove_collection("/"))
+
+        first = self.make_dir("music", "rock")
+        second = self.make_dir("music", "jazz")
+        self.assertTrue(self.db.add_collection(first))
+        self.assertTrue(self.db.add_collection(second + os.sep))
+        self.assertFalse(self.db.add_collection(first))
+        self.assertEqual(sorted(self.db.get_collections()), sorted([first, second]))
+        with self.assertRaisesRegex(ValueError, "not a directory"):
+            self.db.add_collection(os.path.join(music, "missing"))
+
+        self.assertEqual(self.db.find_collection(self.make_dir("music", "jazz", "a")), second)
+        self.assertIsNone(self.db.find_collection(music))
+        self.assertTrue(self.db.remove_collection(second))
+        self.assertIsNone(self.db.find_collection(self.make_dir("music", "jazz", "a")))
+
+    def test_collections_need_v3(self):
+        self.create_normal_database()
+        os.environ["DR14_DEVELOPER_DB"] = "0"
+        with self.assertRaisesRegex(ValueError, "schema v3"):
+            self.db.add_collection(self.make_dir("music"))
+
+    def insert_track_with_path(self, sha1, path):
+        self.db.open_insert_session()
+        self.db.insert_track(sha1, "Track", 12, 0.1, 0.5, 60, "wav", 16, 1411, 44100,
+                             path=path)
+        self.db.commit_insert_session()
+
+    def test_track_paths_are_recorded(self):
+        self.create_normal_database()
+        database.prepare_developer_database()
+        self.db.upgrade_db()
+        first = os.path.join(self.make_dir("music"), "a.flac")
+        copy = os.path.join(self.make_dir("backup"), "a.flac")
+        self.insert_track_with_path("same-track", first)
+        self.insert_track_with_path("same-track", copy)
+        self.insert_track_with_path("same-track", copy)
+
+        self.assertEqual(self.db.query("select count(*) from Track"), [(1,)])
+        self.assertEqual(self.db.query(
+            "select Track.sha1, TrackPath.path from TrackPath "
+            "join Track on Track.Id = TrackPath.IdTrack order by TrackPath.Id"),
+            [("same-track", first), ("same-track", copy)])
+
+    def test_track_paths_ignored_before_v3(self):
+        self.create_normal_database()
+        os.environ["DR14_DEVELOPER_DB"] = "0"
+        self.insert_track_with_path("v2-track", "/music/a.flac")
+        self.assertEqual(self.db.query("select Title from Track"), [("Track",)])
+
+    def test_cli_manage_collections(self):
+        self.create_normal_database()
+        music = self.make_dir("music")
+        result = self.run_cli("--add_collection", music)
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertIn("Collection added", result.stderr)
+        result = self.run_cli("--remove_collection", "/")
+        self.assertIn("Collection removed", result.stderr)
+        result = self.run_cli("--list_collections")
+        self.assertEqual(result.stdout.split(), [music])
+        result = self.run_cli("--remove_collection", "/")
+        self.assertIn("no such collection", result.stderr)
+        result = self.run_cli("--add_collection", music, DR14_DEVELOPER_DB="0")
+        self.assertIn("schema v3", result.stderr)
+        self.assertEqual(self.query(self.normal_path, "select max(Version) from Db_Version"), [(2,)])
+
+
+class UpdatePathsTests(DatabaseTestBase):
+    """--update_paths: link files to stored tracks without computing DR."""
+
+    def make_wav(self, path, seconds, period=20.0):
+        frames = 44100 * seconds
+        w = wave.open(path, "w")
+        w.setnchannels(2)
+        w.setsampwidth(2)
+        w.setframerate(44100)
+        w.writeframes(b"".join(
+            struct.pack("<hh", int(10000 * math.sin(i / period)), 0)
+            for i in range(frames)))
+        w.close()
+        return os.path.realpath(path)
+
+    def analysed_album(self, *lengths):
+        """Analyse music/album through the CLI and forget its paths."""
+        self.create_normal_database()
+        self.album = self.make_dir("music", "album")
+        self.files = [self.make_wav(os.path.join(self.album, "%02d.wav" % n), s, 10 + n)
+                      for (n, s) in enumerate(lengths)]
+        result = self.run_cli("--skip_version_check", "-o", self.make_dir("out"),
+                              self.album)
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertEqual(self.db.query("select count(*) from Track"), [(len(lengths),)])
+        self.db.delete_track_paths([i for (i, _) in self.db.get_track_paths(self.album)])
+        self.tracks_before = self.db.query(
+            "select Track.*, DR_Track.IdDr from Track join DR_Track on IdTrack = Track.Id")
+
+    def stored_paths(self):
+        return sorted(p for (_, p) in self.db.get_track_paths(self.temp.name))
+
+    def update(self, *roots):
+        def no_dr(*args, **kwargs):
+            raise AssertionError("the DR must not be computed")
+        with mock.patch("dr14tmeter.dynamic_range_meter.compute_dr14", no_dr), \
+                mock.patch("dr14tmeter.compute_dr14.compute_dr14", no_dr):
+            return collection_paths.update_collection_paths(
+                self.db, list(roots) or [self.make_dir("music")])
+
+    def test_paths_restored_by_metadata_without_dr(self):
+        self.analysed_album(1, 2)
+        report = self.update()
+        self.assertEqual(report["by_metadata"], 2)
+        self.assertEqual(report["by_sha1"], 0)
+        self.assertEqual(self.stored_paths(), self.files)
+        self.assertEqual(self.db.query(
+            "select Track.*, DR_Track.IdDr from Track join DR_Track on IdTrack = Track.Id"),
+            self.tracks_before)
+
+        again = self.update()
+        self.assertEqual((again["known"], again["by_metadata"], again["by_sha1"]), (2, 0, 0))
+
+    def test_same_size_files_matched_by_sha1(self):
+        # Two WAVs of the same length have the same size and duration.
+        self.analysed_album(1, 1)
+        report = self.update()
+        self.assertEqual((report["by_metadata"], report["by_sha1"]), (0, 2))
+        self.assertEqual(self.stored_paths(), self.files)
+
+    def test_no_metadata_match_falls_back_to_sha1(self):
+        self.analysed_album(1)
+        with mock.patch.object(self.db, "find_tracks_by_metadata", return_value=[]):
+            report = self.update()
+        self.assertEqual(report["by_sha1"], 1)
+        self.assertEqual(self.stored_paths(), self.files)
+
+    def test_moved_folder_replaces_stale_paths(self):
+        self.analysed_album(1, 2)
+        self.update()
+        moved = os.path.join(os.path.dirname(self.album), "renamed")
+        os.rename(self.album, moved)
+        report = self.update()
+        self.assertEqual(report["removed"], 2)
+        self.assertEqual(self.stored_paths(),
+                         [os.path.join(moved, os.path.basename(f)) for f in self.files])
+
+    def test_unknown_file_is_reported_not_stored(self):
+        self.analysed_album(1)
+        new = self.make_wav(os.path.join(self.make_dir("music", "new"), "x.wav"), 3, 3.0)
+        report = self.update()
+        self.assertEqual(report["unknown"], [new])
+        self.assertEqual(self.db.query("select count(*) from Track"), [(1,)])
+
+    def test_any_collection_is_skipped(self):
+        self.analysed_album(1)
+        report = self.update("/")
+        self.assertEqual(report["skipped_roots"], ["/"])
+        self.assertEqual(self.stored_paths(), [])
+
+    def test_cli_update_paths(self):
+        self.analysed_album(1)
+        result = self.run_cli("--update_paths", self.album)
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertIn("New paths (metadata):      1", result.stderr)
+        self.assertEqual(self.stored_paths(), self.files)
+
+        result = self.run_cli("--update_paths")
+        self.assertIn("Skipped the collection '/'", result.stderr)
+        result = self.run_cli("--update_paths", self.album, DR14_DEVELOPER_DB="0")
+        self.assertIn("schema v3", result.stderr)
 
 
 if __name__ == "__main__":

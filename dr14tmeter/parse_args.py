@@ -132,6 +132,28 @@ def parse_args():
                       dest="dump_database",
                       help="Dump the local DR database")
 
+    g_db.add_argument("--add_collection",
+                      metavar="DIR",
+                      dest="add_collection",
+                      help="Add DIR to the collections: only the tracks inside a collection are stored in the local DR database (database v3)")
+
+    g_db.add_argument("--remove_collection",
+                      metavar="DIR",
+                      dest="remove_collection",
+                      help="Remove DIR from the collections (database v3)")
+
+    g_db.add_argument("--list_collections",
+                      action="store_true",
+                      dest="list_collections",
+                      help="List the collections of the local DR database (database v3)")
+
+    g_db.add_argument("--update_paths",
+                      nargs="?",
+                      const="",
+                      metavar="DIR",
+                      dest="update_paths",
+                      help="Recursively store the paths of the already analysed tracks of all the collections, or only of DIR, without computing the DR again (database v3)")
+
     g_db.add_argument("-q", "--query",
                       nargs="*",
                       dest="query",

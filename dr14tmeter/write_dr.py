@@ -83,7 +83,8 @@ class WriteDr:
                             dr, rms, peak, duration,
                             codec,  bit, bitrate, sampling_rate,
                             album_sha1, artist,
-                            genre, date, track_nr, size)
+                            genre, date, track_nr, size,
+                            path=os.path.join(drm.dir_name, curr_file_name))
 
         db.commit_insert_session()
 

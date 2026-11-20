@@ -20,6 +20,7 @@ import os
 import sqlite3
 
 from dr14tmeter.database import dr_database_singletone, prepare_developer_database
+from dr14tmeter.collection_paths import update_collection_paths
 from dr14tmeter.table import *
 from dr14tmeter.audio_analysis import *
 from dr14tmeter.dr14_global import *
@@ -229,6 +230,92 @@ def enable_database(prompt=True):
     else:
         print_err("The building procedure of the database has failed ... retry ")
     return
+
+
+def manage_collections(options):
+    """Handle --add_collection, --remove_collection and --list_collections."""
+    db = dr_database_singletone().get()
+
+    if not _check_v3(db, "collections"):
+        return
+
+    try:
+        if options.add_collection is not None:
+            path = os.path.realpath(os.path.expanduser(options.add_collection))
+            if db.add_collection(path):
+                print_msg("Collection added: %s" % path)
+            else:
+                print_msg("Collection already present: %s" % path)
+
+        if options.remove_collection is not None:
+            path = os.path.realpath(os.path.expanduser(options.remove_collection))
+            if db.remove_collection(path):
+                print_msg("Collection removed: %s" % path)
+            else:
+                print_err("Error: no such collection: %s" % path)
+    except ValueError as e:
+        print_err("Error: %s" % e)
+        return
+
+    if options.list_collections:
+        collections = db.get_collections()
+        if len(collections) == 0:
+            print_msg("No collections: no track will be stored in the database.")
+        for c in collections:
+            print_out(c)
+
+
+def _check_v3(db, feature):
+    if db.db_version >= 3:
+        return True
+    print_err("Error: %s need the database schema v3 or later "
+              "(the current database is v%d)." % (feature, db.db_version))
+    print_err("Error: today v3 is available only with DR14_DEVELOPER_DB=1.")
+    return False
+
+
+def update_paths(options):
+    """Handle --update_paths [DIR]."""
+    db = dr_database_singletone().get()
+
+    if not _check_v3(db, "track paths"):
+        return
+
+    if options.update_paths == "":
+        roots = db.get_collections()
+        if len(roots) == 0:
+            print_msg("No collections: nothing to update.")
+            return
+    else:
+        root = os.path.realpath(os.path.expanduser(options.update_paths))
+        if not os.path.isdir(root):
+            print_err("Error: not a directory: %s" % root)
+            return
+        if db.find_collection(root) is None:
+            print_err("Error: %s is not inside a collection" % root)
+            print_err("Error: type %s --list_collections to see them." % get_exe_name())
+            return
+        roots = [root]
+
+    report = update_collection_paths(db, roots)
+
+    for root in report["skipped_roots"]:
+        if root == os.sep:
+            print_msg("Skipped the collection '/' (any directory): "
+                      "use --update_paths DIR for a part of it.")
+        else:
+            print_err("Skipped the collection %s: it is not a directory." % root)
+
+    print_msg("")
+    print_msg("Paths already stored:      %d" % report["known"])
+    print_msg("New paths (metadata):      %d" % report["by_metadata"])
+    print_msg("New paths (audio sha1):    %d" % report["by_sha1"])
+    print_msg("Stale paths removed:       %d" % report["removed"])
+    print_msg("Files not in the database: %d" % len(report["unknown"]))
+    for path in report["unknown"]:
+        print_out(path)
+    if report["unknown"]:
+        print_msg("Analyse them normally to add them to the database.")
 
 
 def input_number(p=" > ", rng=(0, 2**31)):
